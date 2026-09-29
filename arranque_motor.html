@@ -96,6 +96,9 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .lab{font-size:13px;fill:#555}
 .title2{font-size:17px;font-weight:700;fill:#1F4E79}
 .dot.y.on{background:#F2C200;box-shadow:0 0 14px #F2C200}
+#rstRing.on{opacity:1;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.2}}
+@media (prefers-reduced-motion: reduce){#rstRing.on{animation:none}}
 .leds{flex-wrap:wrap}
 </style>
 
@@ -103,7 +106,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 <body>
 <main>
   <h1>Arranque directo de un motor</h1>
-  <p class="sub">Fuerza y mando con contactor y relé térmico. Toca los aparatos del esquema (<b>-Q1</b>, <b>-Q2</b>, <b>-S0</b>, <b>-S1</b>, <b>-F2</b>) o usa los botones.</p>
+  <p class="sub">Fuerza y mando con contactor y relé térmico. Toca los aparatos del esquema (<b>-Q1</b>, <b>-Q2</b>, <b>-S0</b>, <b>-S1</b>, <b>-F2</b> y su botón azul <b>RESET</b>) o usa los botones.</p>
   <div class="grid">
     <div class="sheet">
       <svg viewBox="0 0 1000 680" role="img" aria-labelledby="svgt">
@@ -163,6 +166,13 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 <text class="t" x="268" y="392" text-anchor="start" >5</text><text class="t" x="268" y="454" text-anchor="start" >6</text>
 <line class="dash" x1="163" y1="416" x2="192" y2="416"/><line class="dash" x1="218" y1="416" x2="247" y2="416"/>
 <text class="t name" x="126" y="422" text-anchor="end" >-F2</text>
+</g>
+<g id="gRST" class="hit" tabindex="0" role="button" aria-label="Botón azul de rearme del relé térmico F2">
+<rect class="hitbox" x="292" y="394" width="46" height="62"/>
+<circle id="rstRing" cx="315" cy="414" r="17" fill="none" stroke="#1E5AA8" stroke-width="3" opacity="0"/>
+<circle cx="315" cy="414" r="12" fill="#1E5AA8" stroke="#0d2d57" stroke-width="2"/>
+<line class="dash" x1="287" y1="414" x2="303" y2="414"/>
+<text class="t" x="315" y="446" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#1E5AA8">RESET</text>
 </g>
 <circle cx="205" cy="580" r="45" fill="#fff" stroke="#111" stroke-width="3"/>
 <g id="rotorM" style="transform-origin:205px 580px"><line x1="205" y1="552" x2="205" y2="608" stroke="#c9ced4" stroke-width="5" stroke-linecap="round"/><line x1="177" y1="580" x2="233" y2="580" stroke="#c9ced4" stroke-width="5" stroke-linecap="round"/></g>
@@ -278,12 +288,9 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
             <button id="bS1" aria-pressed="false">Marcha -S1<span class="small">mantén pulsado · tecla M</span></button>
             <button id="bS0" aria-pressed="false">Paro -S0<span class="small">mantén pulsado · tecla P</span></button>
             <button id="bF2">Sobrecarga en el motor<span class="small">tecla T</span></button>
-            <button id="bRST">Rearmar -F2 (RESET)<span class="small">tecla R</span></button>
+            <button id="bRST">Rearmar -F2 (botón azul)<span class="small">tecla R</span></button>
             <button id="bQ1">Abrir -Q1 (fuerza)</button>
             <button id="bQ2">Abrir -Q2 (mando)</button>
-          </div>
-          <div class="row" style="margin-top:14px">
-            <label class="toggle"><input type="checkbox" id="fb" checked> Con realimentación (13-14 de -KM1)</label>
           </div>
         </div>
         <p class="foot">La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul.</p>
@@ -309,13 +316,12 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
   function running(){ return st.coil && st.q1; }
   function msg(){
     if (st.heat) return '<b>Sobrecarga:</b> el motor consume más corriente de la normal (está frenado o tiene demasiada carga). La corriente pasa por los calefactores del <b>-F2</b> y los bimetales se calientan y se curvan…';
-    if (st.f2) return '<b>Ha saltado el relé térmico -F2.</b> En el mando se abre su <span class="k">95-96</span>: la bobina de -KM1 se queda sin corriente, los contactos principales se abren y <b>el motor se para</b>. A la vez se cierra su <span class="k">97-98</span> y se enciende <b>H3</b> (fallo térmico). Fíjate: el térmico <b>no corta el motor directamente</b>, lo hace el contactor. Pulsa <b>RESET</b> para rearmarlo; el motor no arranca solo.';
+    if (st.f2) return '<b>Ha saltado el relé térmico -F2.</b> En el mando se abre su <span class="k">95-96</span>: la bobina de -KM1 se queda sin corriente, los contactos principales se abren y <b>el motor se para</b>. A la vez se cierra su <span class="k">97-98</span> y se enciende <b>H3</b> (fallo térmico). Fíjate: el térmico <b>no corta el motor directamente</b>, lo hace el contactor. Pulsa el <b>botón azul RESET</b> del térmico (en la fuerza, al lado de -F2) para rearmarlo; el motor no arranca solo.';
     if (!st.q2) return '<b>-Q2 abierto:</b> el circuito de <b>mando</b> se queda sin tensión. -KM1 se suelta, el motor se para y se apagan todos los pilotos. Al cerrarlo, el motor no arranca solo: hay que pulsar marcha.';
     if (st.coil && !st.q1) return '<b>-KM1 está activado, pero -Q1 (fuerza) está abierto.</b> Los contactos principales <span class="k">1-2, 3-4, 5-6</span> están cerrados, pero no llega corriente al motor. Fuerza y mando son <b>dos circuitos distintos</b>.';
     if (st.s0 && !st.coil) return '<b>Pulsas -S0 (paro).</b> Se abre su <span class="k">1-2</span>, la bobina se queda sin corriente y -KM1 se suelta: se abren sus contactos principales y el motor se para. También se abre el <span class="k">13-14</span>, así que al soltar -S0 el motor <b>sigue parado</b>.';
     if (st.s1 && st.coil) return '<b>Pulsas -S1 (marcha).</b> La bobina de -KM1 recibe corriente por el <span class="k">3-4</span> de -S1. -KM1 se activa: se cierran sus contactos principales <span class="k">1-2, 3-4, 5-6</span> y <b>arranca el motor</b>. Se enciende H1, se apaga H2 (su 61-62 se abre) y se cierra el <span class="k">13-14</span>. <b>Ahora suelta -S1.</b>';
     if (!st.s1 && st.coil && st.fb) return '<b>Has soltado -S1 y el motor sigue girando.</b> La bobina recibe ahora la corriente por el <span class="k">13-14</span> de -KM1: <b>realimentación</b>. Prueba el botón <b>Sobrecarga</b> para ver actuar al relé térmico.';
-    if (last === 'soltarSinFb') return '<b>Sin realimentación, al soltar -S1 el motor se para.</b> Hace falta el 13-14 de -KM1 en paralelo con -S1.';
     if (last === 'noSobrecarga') return 'Para que haya sobrecarga, <b>el motor tiene que estar en marcha</b>. Arráncalo primero con -S1.';
     return 'Motor parado. -KM1 en reposo: sus contactos principales están abiertos y el <span class="k">61-62</span> cerrado, por eso <b>H2</b> está encendido. Mantén pulsado <b>-S1</b> (marcha).';
   }
@@ -353,6 +359,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
     $('state').className = 'state ' + (run ? 'run' : 'stop');
     $('bS1').classList.toggle('on', st.s1); $('bS0').classList.toggle('on', st.s0);
     $('bF2').classList.toggle('on', st.heat || st.f2);
+    $('rstRing').classList.toggle('on', st.f2);
     $('bQ1').textContent = st.q1 ? 'Abrir -Q1 (fuerza)' : 'Cerrar -Q1 (fuerza)';
     $('bQ2').textContent = st.q2 ? 'Abrir -Q2 (mando)' : 'Cerrar -Q2 (mando)';
     $('explain').innerHTML = msg();
@@ -378,7 +385,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
     heatT = setTimeout(function(){ st.heat = false; st.f2 = true; last = 'f2'; settle(); }, 1600);
   }
   function reset(){ clearTimeout(heatT); st.heat = false; if (st.f2) { st.f2 = false; last = 'reset'; } settle(); }
-  function f2click(){ if (st.f2) reset(); else overload(); }
+  function f2click(){ overload(); }
   function tq(k){ st[k] = !st[k]; last = k; settle(); }
   function clickable(el, fn){
     el.addEventListener('click', fn);
@@ -387,8 +394,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
   $('bF2').addEventListener('click', overload); $('bRST').addEventListener('click', reset);
   $('bQ1').addEventListener('click', function(){ tq('q1'); }); $('bQ2').addEventListener('click', function(){ tq('q2'); });
   clickable($('gQ1'), function(){ tq('q1'); }); clickable($('gQ2'), function(){ tq('q2'); });
-  clickable($('gF2'), f2click); clickable($('gF2m'), f2click);
-  $('fb').addEventListener('change', function(){ st.fb = this.checked; last = 'fb'; settle(); });
+  clickable($('gF2'), f2click); clickable($('gF2m'), f2click); clickable($('gRST'), reset);
   document.addEventListener('keydown', function(e){
     if (e.repeat) return;
     var tg = e.target; if (tg.tagName === 'BUTTON' || tg.tagName === 'INPUT' || (tg.getAttribute && tg.getAttribute('role') === 'button')) return;

@@ -182,6 +182,8 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
         </g>
 
         <!-- KM1 13-14 (NA) realimentación -->
+        <g id="gFB" class="hit" tabindex="0" role="button" aria-label="Quitar o poner el contacto de realimentación 13-14 de KM1">
+        <rect class="hitbox" x="262" y="346" width="126" height="118"/>
         <g id="fbGroup" class="fb">
           <rect id="hlKM" class="hl" x="318" y="366" width="62" height="92" rx="10"/>
           <line class="sym" x1="340" y1="378" x2="340" y2="398"/>
@@ -193,6 +195,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
         <g id="cut" style="display:none">
           <line x1="328" y1="352" x2="352" y2="376" stroke="#C0392B" stroke-width="4"/>
           <line x1="352" y1="352" x2="328" y2="376" stroke="#C0392B" stroke-width="4"/>
+        </g>
         </g>
 
         <!-- KM1 61-62 (NC) para H2 -->
@@ -270,7 +273,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
           <button id="bQ1" style="padding:10px 12px">Abrir magnetotérmico -Q1</button>
         </div>
       </div>
-      <p class="foot">La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul. Puedes tocar <b>-Q1</b>, <b>-S0</b> y <b>-S1</b> en el propio esquema. Teclado: <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>Q</kbd> magnetotérmico, <kbd>R</kbd> realimentación.</p>
+      <p class="foot">La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul. Puedes tocar <b>-Q1</b>, <b>-S0</b>, <b>-S1</b> y el <b>13-14 de -KM1</b> (para quitarlo o ponerlo) en el propio esquema. Teclado: <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>Q</kbd> magnetotérmico, <kbd>R</kbd> realimentación.</p>
     </div>
   </div>
 </main>
@@ -297,7 +300,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
     if (st.s1 && !st.coil) return 'La corriente pasa por el <span class="k">3-4</span> de -S1 y llega a la bobina…';
     if (!st.s1 && st.coil && st.fb) return '<b>Has soltado -S1 y -KM1 sigue activado.</b> La corriente ya no pasa por -S1: ahora entra por el <span class="k">13-14</span> de -KM1, que sigue cerrado porque su propia bobina está activada. <b>El contactor se sujeta solo: eso es la realimentación.</b>';
     if (last === 'soltarSinFb') return '<b>Sin realimentación, al soltar -S1 el contactor se suelta.</b> La bobina solo tenía corriente mientras apretabas el pulsador. Para que -KM1 siga activado hace falta su <span class="k">13-14</span> en paralelo con -S1.';
-    if (!st.fb) return 'Has quitado el <span class="k">13-14</span> de -KM1. Mantén pulsado -S1 y suéltalo: mira qué pasa con -KM1 y con los pilotos.';
+    if (!st.fb) return 'Has quitado el <span class="k">13-14</span> de -KM1 (tócalo otra vez para volver a ponerlo). Mantén pulsado -S1 y suéltalo: mira qué pasa con -KM1 y con los pilotos.';
     return '-KM1 en reposo. Su bobina no tiene corriente: el <span class="k">13-14</span> está <b>abierto</b> y el <span class="k">61-62</span> está <b>cerrado</b>, por eso el piloto <b>H2</b> está encendido. Mantén pulsado <b>-S1</b> (marcha).';
   }
   function render(){
@@ -347,6 +350,9 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
   $('gQ1').addEventListener('click', toggleQ1);
   $('gQ1').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleQ1(); } });
   $('fb').addEventListener('change', function(){ st.fb = this.checked; last = 'fb'; settle(); });
+  function toggleFb(){ st.fb = !st.fb; $('fb').checked = st.fb; last = 'fb'; settle(); }
+  $('gFB').addEventListener('click', toggleFb);
+  $('gFB').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleFb(); } });
   document.addEventListener('keydown', function(e){
     if (e.repeat) return;
     var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
