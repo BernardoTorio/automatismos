@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arranque directo de un motor: contactor y relé térmico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1120px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 18px;max-width:70ch}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:82vh;min-width:760px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:9.5em;font-size:1.08rem}
+.explain b{color:inherit}
+.explain .k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:14px 10px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+#bS1{border-color:#2E8B3E}
+#bS1.on{background:#2E8B3E;color:#fff}
+#bS0{border-color:#C0392B}
+#bS0.on{background:#C0392B;color:#fff}
+.small{font-size:.9rem;font-weight:400;display:block;opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.toggle input{width:22px;height:22px;accent-color:#2E8B3E}
+.status{display:flex;align-items:center;gap:14px}
+.motor{width:86px;height:86px;flex:none}
+.state{font-size:1.25rem;font-weight:700}
+.state.run{color:var(--ok)} .state.stop{color:var(--muted)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+/* diagrama */
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .18s ease}
+.fb{transition:opacity .25s}
+.fb.off{opacity:.18}
+.glow{fill:#FFE066;opacity:0;transition:opacity .2s}
+.glow.on{opacity:.9}
+.coilfill{transition:fill .2s}
+.hl{fill:none;stroke:var(--flow);stroke-width:4;opacity:0;transition:opacity .25s}
+.hl.on{opacity:1}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.rotor{transform-origin:43px 43px}
+.spin{animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation:none}}
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4;rx:8}
+.leds{display:flex;gap:18px;align-items:center}
+.led{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:26px;height:26px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .2s,box-shadow .2s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
+.kmicon{width:74px;height:48px;flex:none}
+
+.bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.bottom{grid-template-columns:1fr}}
+.controls3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#bF2{border-color:#D98E04}
+#bF2.on{background:#D98E04;color:#fff}
+.hot{fill:#FFB36B !important;transition:fill 1.2s}
+.lab{font-size:13px;fill:#555}
+.title2{font-size:17px;font-weight:700;fill:#1F4E79}
+.dot.y.on{background:#F2C200;box-shadow:0 0 14px #F2C200}
+.leds{flex-wrap:wrap}
+</style>
+
+</head>
+<body>
+<main>
+  <h1>Arranque directo de un motor</h1>
+  <p class="sub">Fuerza y mando con contactor y relé térmico. Toca los aparatos del esquema (<b>-Q1</b>, <b>-Q2</b>, <b>-S0</b>, <b>-S1</b>, <b>-F2</b>) o usa los botones.</p>
+  <div class="grid">
+    <div class="sheet">
+      <svg viewBox="0 0 1000 680" role="img" aria-labelledby="svgt">
+        <title id="svgt">Esquema de fuerza con Q1, contactos principales de KM1, relé térmico F2 y motor M1; esquema de mando con Q2, 95-96 de F2, paro S0, marcha S1 con realimentación 13-14 de KM1, bobina KM1, piloto H1 en marcha, H2 parado por el 61-62 y H3 de fallo térmico por el 97-98</title>
+        <text class="t title2" x="40" y="22" text-anchor="start" >FUERZA</text>
+<line class="w wf" x1="46" y1="40" x2="330" y2="40"/>
+<text class="t name" x="40" y="45" text-anchor="end" style="fill:var(--fase)">L1</text>
+<line class="w wf" x1="46" y1="60" x2="330" y2="60"/>
+<text class="t name" x="40" y="65" text-anchor="end" style="fill:var(--fase)">L2</text>
+<line class="w wf" x1="46" y1="80" x2="330" y2="80"/>
+<text class="t name" x="40" y="85" text-anchor="end" style="fill:var(--fase)">L3</text>
+<path class="w wf" d="M150 40 V110"/>
+<path class="w wf" d="M150 252 V290"/>
+<path class="w wf" d="M150 356 V392"/>
+<path class="w wf" d="M150 440 V470"/>
+<path class="w wf" d="M205 60 V110"/>
+<path class="w wf" d="M205 252 V290"/>
+<path class="w wf" d="M205 356 V392"/>
+<path class="w wf" d="M205 440 V470"/>
+<path class="w wf" d="M260 80 V110"/>
+<path class="w wf" d="M260 252 V290"/>
+<path class="w wf" d="M260 356 V392"/>
+<path class="w wf" d="M260 440 V470"/>
+<path class="w wf" d="M150 470 V500 L181 548"/>
+<path class="w wf" d="M205 470 V536"/>
+<path class="w wf" d="M260 470 V500 L229 548"/>
+<path id="fP0" class="flow" d="M46 40 H150 V110 V252 V290 V356 V392 V440 V470 V500 L181 548"/>
+<path id="fP1" class="flow" d="M46 60 H205 V110 V252 V290 V356 V392 V440 V470 V536"/>
+<path id="fP2" class="flow" d="M46 80 H260 V110 V252 V290 V356 V392 V440 V470 V500 L229 548"/>
+<circle cx="150" cy="40" r="5" fill="var(--fase)"/>
+<circle cx="205" cy="60" r="5" fill="var(--fase)"/>
+<circle cx="260" cy="80" r="5" fill="var(--fase)"/>
+<g id="gQ1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico de fuerza Q1: abrir o cerrar">
+<rect class="hitbox" x="84" y="100" width="210" height="156"/>
+<line class="sym" x1="150" y1="110" x2="150" y2="130"/><line class="sym" x1="150" y1="160" x2="150" y2="176"/><line id="kQ10" class="sym blade" x1="150" y1="160" x2="130" y2="128" style="transform-origin:150px 160px"/><line class="sym" x1="143" y1="123" x2="157" y2="137" style="stroke-width:2.4"/><line class="sym" x1="143" y1="137" x2="157" y2="123" style="stroke-width:2.4"/><text class="t" x="158" y="123" text-anchor="start" >1</text><line class="sym" x1="150" y1="176" x2="150" y2="182"/><rect id="kQ10t" class="symf th" x="139.0" y="183.0" width="22" height="28"/><path class="sym" d="M150 183.0 V192 H157 V202 H150 V211.0" style="stroke-width:2.2"/><line class="sym" x1="150" y1="211" x2="150" y2="218"/><rect class="symf" x="139.0" y="218.0" width="22" height="22"/><text class="t" x="150" y="234" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="150" y1="240" x2="150" y2="252"/><text class="t" x="158" y="251" text-anchor="start" >2</text>
+<line class="sym" x1="205" y1="110" x2="205" y2="130"/><line class="sym" x1="205" y1="160" x2="205" y2="176"/><line id="kQ11" class="sym blade" x1="205" y1="160" x2="185" y2="128" style="transform-origin:205px 160px"/><line class="sym" x1="198" y1="123" x2="212" y2="137" style="stroke-width:2.4"/><line class="sym" x1="198" y1="137" x2="212" y2="123" style="stroke-width:2.4"/><text class="t" x="213" y="123" text-anchor="start" >3</text><line class="sym" x1="205" y1="176" x2="205" y2="182"/><rect id="kQ11t" class="symf th" x="194.0" y="183.0" width="22" height="28"/><path class="sym" d="M205 183.0 V192 H212 V202 H205 V211.0" style="stroke-width:2.2"/><line class="sym" x1="205" y1="211" x2="205" y2="218"/><rect class="symf" x="194.0" y="218.0" width="22" height="22"/><text class="t" x="205" y="234" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="205" y1="240" x2="205" y2="252"/><text class="t" x="213" y="251" text-anchor="start" >4</text>
+<line class="sym" x1="260" y1="110" x2="260" y2="130"/><line class="sym" x1="260" y1="160" x2="260" y2="176"/><line id="kQ12" class="sym blade" x1="260" y1="160" x2="240" y2="128" style="transform-origin:260px 160px"/><line class="sym" x1="253" y1="123" x2="267" y2="137" style="stroke-width:2.4"/><line class="sym" x1="253" y1="137" x2="267" y2="123" style="stroke-width:2.4"/><text class="t" x="268" y="123" text-anchor="start" >5</text><line class="sym" x1="260" y1="176" x2="260" y2="182"/><rect id="kQ12t" class="symf th" x="249.0" y="183.0" width="22" height="28"/><path class="sym" d="M260 183.0 V192 H267 V202 H260 V211.0" style="stroke-width:2.2"/><line class="sym" x1="260" y1="211" x2="260" y2="218"/><rect class="symf" x="249.0" y="218.0" width="22" height="22"/><text class="t" x="260" y="234" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="260" y1="240" x2="260" y2="252"/><text class="t" x="268" y="251" text-anchor="start" >6</text>
+<g id="aQ1" class="blade"><line class="dash" x1="112" y1="145" x2="250" y2="145"/><line class="sym" x1="112" y1="133" x2="112" y2="157"/></g>
+<line class="dash" x1="161" y1="197" x2="194" y2="197"/><line class="dash" x1="216" y1="197" x2="249" y2="197"/>
+<text class="t name" x="104" y="151" text-anchor="end" >-Q1</text>
+</g>
+<line class="sym" x1="150" y1="290" x2="150" y2="310"/><line class="sym" x1="150" y1="340" x2="150" y2="356"/><line id="kKMp0" class="sym blade" x1="150" y1="340" x2="130" y2="308" style="transform-origin:150px 340px"/><path class="sym" d="M143 304 A7 7 0 0 0 157 304" style="stroke-width:2.2"/><text class="t" x="158" y="303" text-anchor="start" >1</text><text class="t" x="158" y="354" text-anchor="start" >2</text>
+<line class="sym" x1="205" y1="290" x2="205" y2="310"/><line class="sym" x1="205" y1="340" x2="205" y2="356"/><line id="kKMp1" class="sym blade" x1="205" y1="340" x2="185" y2="308" style="transform-origin:205px 340px"/><path class="sym" d="M198 304 A7 7 0 0 0 212 304" style="stroke-width:2.2"/><text class="t" x="213" y="303" text-anchor="start" >3</text><text class="t" x="213" y="354" text-anchor="start" >4</text>
+<line class="sym" x1="260" y1="290" x2="260" y2="310"/><line class="sym" x1="260" y1="340" x2="260" y2="356"/><line id="kKMp2" class="sym blade" x1="260" y1="340" x2="240" y2="308" style="transform-origin:260px 340px"/><path class="sym" d="M253 304 A7 7 0 0 0 267 304" style="stroke-width:2.2"/><text class="t" x="268" y="303" text-anchor="start" >5</text><text class="t" x="268" y="354" text-anchor="start" >6</text>
+<line class="dash" x1="112" y1="320" x2="250" y2="320"/>
+<text class="t name" x="104" y="326" text-anchor="end" >-KM1</text>
+<g id="gF2" class="hit" tabindex="0" role="button" aria-label="Relé térmico F2: provocar sobrecarga o rearmar">
+<rect class="hitbox" x="84" y="384" width="210" height="64"/>
+<line class="sym" x1="150" y1="392" x2="150" y2="401"/><line class="sym" x1="150" y1="431" x2="150" y2="440"/>
+<rect id="thF0" class="symf th" x="137.0" y="401.0" width="26" height="30"/><path class="sym" d="M150 401.0 V411 H157 V421 H150 V431.0" style="stroke-width:2.2"/>
+<text class="t" x="158" y="392" text-anchor="start" >1</text><text class="t" x="158" y="454" text-anchor="start" >2</text>
+<line class="sym" x1="205" y1="392" x2="205" y2="401"/><line class="sym" x1="205" y1="431" x2="205" y2="440"/>
+<rect id="thF1" class="symf th" x="192.0" y="401.0" width="26" height="30"/><path class="sym" d="M205 401.0 V411 H212 V421 H205 V431.0" style="stroke-width:2.2"/>
+<text class="t" x="213" y="392" text-anchor="start" >3</text><text class="t" x="213" y="454" text-anchor="start" >4</text>
+<line class="sym" x1="260" y1="392" x2="260" y2="401"/><line class="sym" x1="260" y1="431" x2="260" y2="440"/>
+<rect id="thF2" class="symf th" x="247.0" y="401.0" width="26" height="30"/><path class="sym" d="M260 401.0 V411 H267 V421 H260 V431.0" style="stroke-width:2.2"/>
+<text class="t" x="268" y="392" text-anchor="start" >5</text><text class="t" x="268" y="454" text-anchor="start" >6</text>
+<line class="dash" x1="163" y1="416" x2="192" y2="416"/><line class="dash" x1="218" y1="416" x2="247" y2="416"/>
+<text class="t name" x="126" y="422" text-anchor="end" >-F2</text>
+</g>
+<circle cx="205" cy="580" r="45" fill="#fff" stroke="#111" stroke-width="3"/>
+<g id="rotorM" style="transform-origin:205px 580px"><line x1="205" y1="552" x2="205" y2="608" stroke="#c9ced4" stroke-width="5" stroke-linecap="round"/><line x1="177" y1="580" x2="233" y2="580" stroke="#c9ced4" stroke-width="5" stroke-linecap="round"/></g>
+<text class="t" x="205" y="584" text-anchor="middle" style="font-size:26px;font-weight:700">M</text>
+<text class="t" x="205" y="606" text-anchor="middle" style="font-size:15px">3~</text>
+<text class="t" x="158" y="490" text-anchor="start" >U</text><text class="t" x="213" y="490" text-anchor="start" >V</text><text class="t" x="268" y="490" text-anchor="start" >W</text>
+<text class="t name" x="152" y="586" text-anchor="end" >-M1</text>
+<text class="t title2" x="380" y="22" text-anchor="start" >MANDO</text>
+<line class="w wf" x1="392" y1="40" x2="980" y2="40"/><text class="t name" x="386" y="45" text-anchor="end" style="fill:var(--fase)">L</text>
+<line class="w wn" x1="392" y1="650" x2="980" y2="650"/><text class="t name" x="386" y="655" text-anchor="end" style="fill:var(--neutro)">N</text>
+<path class="w wf" d="M520 40 V60"/>
+<path class="w wf" d="M520 202 V260"/>
+<path class="w wf" d="M520 326 V346"/>
+<path class="w wf" d="M520 412 V432"/>
+<path class="w wf" d="M520 432 H640 V452"/>
+<path class="w wf" d="M520 432 V452"/>
+<path class="w wf" d="M520 518 V540"/>
+<path class="w wf" d="M640 518 V540 H520"/>
+<path class="w wf" d="M520 540 V568"/>
+<path class="w wf" d="M520 556 H740 V562"/>
+<path class="w wf" d="M520 222 H940 V260"/>
+<path class="w wf" d="M840 222 V260"/>
+<path class="w wf" d="M840 326 V562"/>
+<path class="w wf" d="M940 326 V562"/>
+<path class="w wn" d="M520 616 V650"/>
+<path class="w wn" d="M740 618 V650"/>
+<path class="w wn" d="M840 618 V650"/>
+<path class="w wn" d="M940 618 V650"/>
+<path id="fTop" class="flow" d="M392 40 H520 V60 V202 V222"/>
+<path id="fMain" class="flow" d="M520 222 V260 V326 V346 V412 V432"/>
+<path id="fS1" class="flow" d="M520 432 V452 V518 V540"/>
+<path id="fKM" class="flow" d="M520 432 H640 V452 V518 V540 H520"/>
+<path id="fCoil" class="flow" d="M520 540 V568 V616 V650 H392"/>
+<path id="fH1" class="flow" d="M520 556 H740 V562 V618 V650 H520"/>
+<path id="fH2" class="flow" d="M520 222 H840 V260 V326 V562 V618 V650 H392"/>
+<path id="fH3" class="flow" d="M520 222 H940 V260 V326 V562 V618 V650 H392"/>
+<g id="gQ2" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico de mando Q2: abrir o cerrar">
+<rect class="hitbox" x="430" y="50" width="120" height="160"/>
+<line class="sym" x1="520" y1="60" x2="520" y2="80"/><line class="sym" x1="520" y1="110" x2="520" y2="126"/><line id="kQ2" class="sym blade" x1="520" y1="110" x2="500" y2="78" style="transform-origin:520px 110px"/><line class="sym" x1="513" y1="73" x2="527" y2="87" style="stroke-width:2.4"/><line class="sym" x1="513" y1="87" x2="527" y2="73" style="stroke-width:2.4"/><text class="t" x="528" y="73" text-anchor="start" >1</text><line class="sym" x1="520" y1="126" x2="520" y2="132"/><rect id="kQ2t" class="symf th" x="509.0" y="133.0" width="22" height="28"/><path class="sym" d="M520 133.0 V142 H527 V152 H520 V161.0" style="stroke-width:2.2"/><line class="sym" x1="520" y1="161" x2="520" y2="168"/><rect class="symf" x="509.0" y="168.0" width="22" height="22"/><text class="t" x="520" y="184" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="520" y1="190" x2="520" y2="202"/><text class="t" x="528" y="201" text-anchor="start" >2</text>
+<g id="aQ2" class="blade"><line class="dash" x1="474" y1="95" x2="510" y2="95"/><line class="sym" x1="474" y1="83" x2="474" y2="107"/></g>
+<text class="t name" x="466" y="101" text-anchor="end" >-Q2</text>
+</g>
+<g id="gF2m" class="hit" tabindex="0" role="button" aria-label="Contacto 95-96 del térmico F2">
+<rect class="hitbox" x="420" y="252" width="130" height="82"/>
+<line class="sym" x1="520" y1="260" x2="520" y2="280"/><line class="sym" x1="520" y1="280" x2="538" y2="280"/><line class="sym" x1="520" y1="310" x2="520" y2="326"/><line id="k9596" class="sym blade" x1="520" y1="310" x2="542" y2="274" style="transform-origin:520px 310px"/><text class="t" x="528" y="273" text-anchor="start" >95</text><text class="t" x="528" y="324" text-anchor="start" >96</text>
+<rect id="thM" class="symf th" x="458.0" y="281.0" width="24" height="24"/><path class="sym" d="M470 281.0 V288 H477 V298 H470 V305.0" style="stroke-width:2.2"/>
+<line class="dash" x1="482" y1="293" x2="526" y2="293"/>
+<text class="t name" x="450" y="299" text-anchor="end" >-F2</text>
+</g>
+<g id="gS0" class="hit" tabindex="0" role="button" aria-label="Pulsador de paro S0">
+<rect class="hitbox" x="420" y="340" width="130" height="80"/>
+<line class="sym" x1="520" y1="346" x2="520" y2="366"/><line class="sym" x1="520" y1="366" x2="538" y2="366"/><line class="sym" x1="520" y1="396" x2="520" y2="412"/><line id="kS0" class="sym blade" x1="520" y1="396" x2="542" y2="360" style="transform-origin:520px 396px"/><text class="t" x="528" y="359" text-anchor="start" >1</text><text class="t" x="528" y="410" text-anchor="start" >2</text>
+<g id="aS0" class="blade"><line class="dash" x1="470" y1="379" x2="526" y2="379"/><path class="sym" d="M478 368 H470 V390 H478"/></g>
+<text class="t name" x="460" y="385" text-anchor="end" >-S0</text>
+</g>
+<g id="gS1" class="hit" tabindex="0" role="button" aria-label="Pulsador de marcha S1">
+<rect class="hitbox" x="420" y="446" width="130" height="80"/>
+<line class="sym" x1="520" y1="452" x2="520" y2="472"/><line class="sym" x1="520" y1="502" x2="520" y2="518"/><line id="kS1" class="sym blade" x1="520" y1="502" x2="500" y2="470" style="transform-origin:520px 502px"/><text class="t" x="528" y="465" text-anchor="start" >3</text><text class="t" x="528" y="516" text-anchor="start" >4</text>
+<g id="aS1" class="blade"><line class="dash" x1="470" y1="485" x2="510" y2="485"/><path class="sym" d="M478 474 H470 V496 H478"/></g>
+<text class="t name" x="460" y="491" text-anchor="end" >-S1</text>
+</g>
+<g id="fbGroup" class="fb">
+<rect id="hlKM" class="hl" x="616" y="444" width="62" height="84" rx="10"/>
+<line class="sym" x1="640" y1="452" x2="640" y2="472"/><line class="sym" x1="640" y1="502" x2="640" y2="518"/><line id="kKM" class="sym blade" x1="640" y1="502" x2="620" y2="470" style="transform-origin:640px 502px"/><text class="t" x="648" y="465" text-anchor="start" >13</text><text class="t" x="648" y="516" text-anchor="start" >14</text>
+<text class="t name" x="614" y="491" text-anchor="end" >-KM1</text>
+</g>
+<g id="cut" style="display:none"><line x1="628" y1="424" x2="652" y2="444" stroke="#C0392B" stroke-width="4"/><line x1="652" y1="424" x2="628" y2="444" stroke="#C0392B" stroke-width="4"/></g>
+<text class="t" x="688" y="491" text-anchor="start" id="lblFb" style="font-weight:700;fill:#9a6a00;opacity:0;transition:opacity .25s">¡se sujeta!</text>
+<line class="sym" x1="840" y1="260" x2="840" y2="280"/><line class="sym" x1="840" y1="280" x2="858" y2="280"/><line class="sym" x1="840" y1="310" x2="840" y2="326"/><line id="kKM2" class="sym blade" x1="840" y1="310" x2="862" y2="274" style="transform-origin:840px 310px"/><text class="t" x="848" y="273" text-anchor="start" >61</text><text class="t" x="848" y="324" text-anchor="start" >62</text>
+<text class="t name" x="814" y="299" text-anchor="end" >-KM1</text>
+<line class="sym" x1="940" y1="260" x2="940" y2="280"/><line class="sym" x1="940" y1="310" x2="940" y2="326"/><line id="k9798" class="sym blade" x1="940" y1="310" x2="920" y2="278" style="transform-origin:940px 310px"/><text class="t" x="948" y="273" text-anchor="start" >97</text><text class="t" x="948" y="324" text-anchor="start" >98</text>
+<text class="t name" x="914" y="299" text-anchor="end" >-F2</text>
+<line class="sym" x1="520" y1="568" x2="520" y2="580"/><line class="sym" x1="520" y1="604" x2="520" y2="616"/>
+<rect id="coil" class="symf coilfill" x="492" y="580" width="56" height="24"/>
+<text class="t" x="528" y="566" text-anchor="start" >A1</text><text class="t" x="528" y="630" text-anchor="start" >A2</text><text class="t name" x="482" y="598" text-anchor="end" >-KM1</text>
+<circle id="glow1" class="glow" cx="740" cy="590" r="28" style="fill:#8FE08F"/><line class="sym" x1="740" y1="560" x2="740" y2="572"/><line class="sym" x1="740" y1="608" x2="740" y2="620"/><circle class="symf" cx="740" cy="590" r="18" style="fill:transparent"/><line class="sym" x1="727" y1="577" x2="753" y2="603"/><line class="sym" x1="727" y1="603" x2="753" y2="577"/><text class="t" x="748" y="560" text-anchor="start" >X1</text><text class="t" x="748" y="632" text-anchor="start" >X2</text><text class="t name" x="714" y="596" text-anchor="end" >-H1</text>
+<circle id="glow2" class="glow" cx="840" cy="590" r="28" style="fill:#FF9C9C"/><line class="sym" x1="840" y1="560" x2="840" y2="572"/><line class="sym" x1="840" y1="608" x2="840" y2="620"/><circle class="symf" cx="840" cy="590" r="18" style="fill:transparent"/><line class="sym" x1="827" y1="577" x2="853" y2="603"/><line class="sym" x1="827" y1="603" x2="853" y2="577"/><text class="t" x="848" y="560" text-anchor="start" >X1</text><text class="t" x="848" y="632" text-anchor="start" >X2</text><text class="t name" x="814" y="596" text-anchor="end" >-H2</text>
+<circle id="glow3" class="glow" cx="940" cy="590" r="28" style="fill:#FFE066"/><line class="sym" x1="940" y1="560" x2="940" y2="572"/><line class="sym" x1="940" y1="608" x2="940" y2="620"/><circle class="symf" cx="940" cy="590" r="18" style="fill:transparent"/><line class="sym" x1="927" y1="577" x2="953" y2="603"/><line class="sym" x1="927" y1="603" x2="953" y2="577"/><text class="t" x="948" y="560" text-anchor="start" >X1</text><text class="t" x="948" y="632" text-anchor="start" >X2</text><text class="t name" x="914" y="596" text-anchor="end" >-H3</text>
+<circle cx="520" cy="40" r="5" fill="var(--fase)"/>
+<circle cx="520" cy="222" r="5" fill="var(--fase)"/>
+<circle cx="840" cy="222" r="5" fill="var(--fase)"/>
+<circle cx="520" cy="432" r="5" fill="var(--fase)"/>
+<circle cx="520" cy="540" r="5" fill="var(--fase)"/>
+<circle cx="520" cy="556" r="5" fill="var(--fase)"/>
+<circle cx="520" cy="650" r="5" fill="var(--neutro)"/>
+<circle cx="740" cy="650" r="5" fill="var(--neutro)"/>
+<circle cx="840" cy="650" r="5" fill="var(--neutro)"/>
+<circle cx="940" cy="650" r="5" fill="var(--neutro)"/>
+      </svg>
+    </div>
+    <div class="bottom">
+      <div class="side">
+        <div class="card status">
+          <svg class="motor" viewBox="0 0 86 86" aria-hidden="true">
+            <circle cx="43" cy="43" r="38" fill="#9AA1AA" stroke="#444" stroke-width="3"/>
+            <g id="rotor" class="rotor"><line x1="43" y1="12" x2="43" y2="74" stroke="#2b2f34" stroke-width="7" stroke-linecap="round"/><line x1="12" y1="43" x2="74" y2="43" stroke="#2b2f34" stroke-width="7" stroke-linecap="round"/></g>
+            <circle cx="43" cy="43" r="8" fill="#ddd" stroke="#444" stroke-width="2"/>
+          </svg>
+          <div>
+            <div id="state" class="state stop">Motor parado</div>
+            <div class="leds" style="margin-top:6px">
+              <span class="led"><span id="dH1" class="dot g"></span>H1 marcha</span>
+              <span class="led"><span id="dH2" class="dot r"></span>H2 parado</span>
+              <span class="led"><span id="dH3" class="dot y"></span>H3 térmico</span>
+            </div>
+          </div>
+        </div>
+        <div class="card explain" id="explain" aria-live="polite"></div>
+      </div>
+      <div class="side">
+        <div class="card">
+          <div class="controls3">
+            <button id="bS1" aria-pressed="false">Marcha -S1<span class="small">mantén pulsado · tecla M</span></button>
+            <button id="bS0" aria-pressed="false">Paro -S0<span class="small">mantén pulsado · tecla P</span></button>
+            <button id="bF2">Sobrecarga en el motor<span class="small">tecla T</span></button>
+            <button id="bRST">Rearmar -F2 (RESET)<span class="small">tecla R</span></button>
+            <button id="bQ1">Abrir -Q1 (fuerza)</button>
+            <button id="bQ2">Abrir -Q2 (mando)</button>
+          </div>
+          <div class="row" style="margin-top:14px">
+            <label class="toggle"><input type="checkbox" id="fb" checked> Con realimentación (13-14 de -KM1)</label>
+          </div>
+        </div>
+        <p class="foot">La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul.</p>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+(function(){
+  var st = { s1:false, s0:false, fb:true, q1:true, q2:true, f2:false, heat:false, coil:false };
+  var last = 'inicio';
+  var $ = function(id){ return document.getElementById(id); };
+  function pathOK(){ return st.q2 && !st.f2 && !st.s0 && (st.s1 || (st.fb && st.coil)); }
+  var timer = null;
+  function settle(){
+    var want = pathOK();
+    if (want === st.coil) { render(); return; }
+    clearTimeout(timer);
+    timer = setTimeout(function(){ st.coil = want; render(); settle(); }, want ? 260 : 160);
+    render();
+  }
+  function rot(id, deg){ $(id).style.transform = 'rotate(' + deg + 'deg)'; }
+  function running(){ return st.coil && st.q1; }
+  function msg(){
+    if (st.heat) return '<b>Sobrecarga:</b> el motor consume más corriente de la normal (está frenado o tiene demasiada carga). La corriente pasa por los calefactores del <b>-F2</b> y los bimetales se calientan y se curvan…';
+    if (st.f2) return '<b>Ha saltado el relé térmico -F2.</b> En el mando se abre su <span class="k">95-96</span>: la bobina de -KM1 se queda sin corriente, los contactos principales se abren y <b>el motor se para</b>. A la vez se cierra su <span class="k">97-98</span> y se enciende <b>H3</b> (fallo térmico). Fíjate: el térmico <b>no corta el motor directamente</b>, lo hace el contactor. Pulsa <b>RESET</b> para rearmarlo; el motor no arranca solo.';
+    if (!st.q2) return '<b>-Q2 abierto:</b> el circuito de <b>mando</b> se queda sin tensión. -KM1 se suelta, el motor se para y se apagan todos los pilotos. Al cerrarlo, el motor no arranca solo: hay que pulsar marcha.';
+    if (st.coil && !st.q1) return '<b>-KM1 está activado, pero -Q1 (fuerza) está abierto.</b> Los contactos principales <span class="k">1-2, 3-4, 5-6</span> están cerrados, pero no llega corriente al motor. Fuerza y mando son <b>dos circuitos distintos</b>.';
+    if (st.s0 && !st.coil) return '<b>Pulsas -S0 (paro).</b> Se abre su <span class="k">1-2</span>, la bobina se queda sin corriente y -KM1 se suelta: se abren sus contactos principales y el motor se para. También se abre el <span class="k">13-14</span>, así que al soltar -S0 el motor <b>sigue parado</b>.';
+    if (st.s1 && st.coil) return '<b>Pulsas -S1 (marcha).</b> La bobina de -KM1 recibe corriente por el <span class="k">3-4</span> de -S1. -KM1 se activa: se cierran sus contactos principales <span class="k">1-2, 3-4, 5-6</span> y <b>arranca el motor</b>. Se enciende H1, se apaga H2 (su 61-62 se abre) y se cierra el <span class="k">13-14</span>. <b>Ahora suelta -S1.</b>';
+    if (!st.s1 && st.coil && st.fb) return '<b>Has soltado -S1 y el motor sigue girando.</b> La bobina recibe ahora la corriente por el <span class="k">13-14</span> de -KM1: <b>realimentación</b>. Prueba el botón <b>Sobrecarga</b> para ver actuar al relé térmico.';
+    if (last === 'soltarSinFb') return '<b>Sin realimentación, al soltar -S1 el motor se para.</b> Hace falta el 13-14 de -KM1 en paralelo con -S1.';
+    if (last === 'noSobrecarga') return 'Para que haya sobrecarga, <b>el motor tiene que estar en marcha</b>. Arráncalo primero con -S1.';
+    return 'Motor parado. -KM1 en reposo: sus contactos principales están abiertos y el <span class="k">61-62</span> cerrado, por eso <b>H2</b> está encendido. Mantén pulsado <b>-S1</b> (marcha).';
+  }
+  function render(){
+    var c = st.coil, run = running();
+    var h2 = st.q2 && !c, h3 = st.q2 && st.f2;
+    rot('kS1', st.s1 ? 32 : 0); $('aS1').style.transform = st.s1 ? 'translateX(12px)' : '';
+    rot('kS0', st.s0 ? -45 : 0); $('aS0').style.transform = st.s0 ? 'translateX(12px)' : '';
+    ['kQ10','kQ11','kQ12'].forEach(function(k){ rot(k, st.q1 ? 32 : 0); });
+    $('aQ1').style.transform = st.q1 ? '' : 'translateX(-10px)';
+    rot('kQ2', st.q2 ? 32 : 0); $('aQ2').style.transform = st.q2 ? '' : 'translateX(-10px)';
+    ['kKMp0','kKMp1','kKMp2','kKM'].forEach(function(k){ rot(k, c ? 32 : 0); });
+    rot('kKM2', c ? -45 : 0);
+    rot('k9596', st.f2 ? -45 : 0);
+    rot('k9798', st.f2 ? 32 : 0);
+    ['thF0','thF1','thF2','thM'].forEach(function(k){ $(k).classList.toggle('hot', st.heat || st.f2); });
+    $('fbGroup').classList.toggle('off', !st.fb); $('cut').style.display = st.fb ? 'none' : '';
+    ['fP0','fP1','fP2'].forEach(function(k){ $(k).classList.toggle('on', run); });
+    $('fTop').classList.toggle('on', st.q2 && (c || h2 || h3));
+    $('fMain').classList.toggle('on', c);
+    $('fS1').classList.toggle('on', c && st.s1);
+    $('fKM').classList.toggle('on', c && st.fb);
+    $('fCoil').classList.toggle('on', c);
+    $('fH1').classList.toggle('on', c);
+    $('fH2').classList.toggle('on', h2);
+    $('fH3').classList.toggle('on', h3);
+    $('hlKM').classList.toggle('on', c && st.fb && !st.s1);
+    $('lblFb').style.opacity = (c && st.fb && !st.s1) ? 1 : 0;
+    $('coil').style.fill = c ? '#FFE9A8' : '#fff';
+    $('glow1').classList.toggle('on', c); $('glow2').classList.toggle('on', h2); $('glow3').classList.toggle('on', h3);
+    $('dH1').classList.toggle('on', c); $('dH2').classList.toggle('on', h2); $('dH3').classList.toggle('on', h3);
+    $('rotor').classList.toggle('spin', run);
+    $('rotorM').style.animation = run ? 'spin .6s linear infinite' : 'none';
+    $('state').textContent = run ? 'Motor en marcha' : (st.f2 ? 'Motor parado por el térmico' : 'Motor parado');
+    $('state').className = 'state ' + (run ? 'run' : 'stop');
+    $('bS1').classList.toggle('on', st.s1); $('bS0').classList.toggle('on', st.s0);
+    $('bF2').classList.toggle('on', st.heat || st.f2);
+    $('bQ1').textContent = st.q1 ? 'Abrir -Q1 (fuerza)' : 'Cerrar -Q1 (fuerza)';
+    $('bQ2').textContent = st.q2 ? 'Abrir -Q2 (mando)' : 'Cerrar -Q2 (mando)';
+    $('explain').innerHTML = msg();
+  }
+  function press(which, down){
+    if (st[which] === down) return;
+    st[which] = down;
+    last = (which === 's1' && !down && !st.fb) ? 'soltarSinFb' : which + (down ? 'On' : 'Off');
+    settle();
+  }
+  function hold(el, which){
+    el.addEventListener('pointerdown', function(e){ e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){} press(which, true); });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){ press(which, false); }); });
+    el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(which, true); } });
+    el.addEventListener('keyup', function(e){ if (e.key === ' ' || e.key === 'Enter'){ press(which, false); } });
+  }
+  hold($('bS1'), 's1'); hold($('bS0'), 's0'); hold($('gS1'), 's1'); hold($('gS0'), 's0');
+  var heatT = null;
+  function overload(){
+    if (st.f2 || st.heat) return;
+    if (!running()) { last = 'noSobrecarga'; render(); return; }
+    st.heat = true; render();
+    heatT = setTimeout(function(){ st.heat = false; st.f2 = true; last = 'f2'; settle(); }, 1600);
+  }
+  function reset(){ clearTimeout(heatT); st.heat = false; if (st.f2) { st.f2 = false; last = 'reset'; } settle(); }
+  function f2click(){ if (st.f2) reset(); else overload(); }
+  function tq(k){ st[k] = !st[k]; last = k; settle(); }
+  function clickable(el, fn){
+    el.addEventListener('click', fn);
+    el.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); fn(); } });
+  }
+  $('bF2').addEventListener('click', overload); $('bRST').addEventListener('click', reset);
+  $('bQ1').addEventListener('click', function(){ tq('q1'); }); $('bQ2').addEventListener('click', function(){ tq('q2'); });
+  clickable($('gQ1'), function(){ tq('q1'); }); clickable($('gQ2'), function(){ tq('q2'); });
+  clickable($('gF2'), f2click); clickable($('gF2m'), f2click);
+  $('fb').addEventListener('change', function(){ st.fb = this.checked; last = 'fb'; settle(); });
+  document.addEventListener('keydown', function(e){
+    if (e.repeat) return;
+    var tg = e.target; if (tg.tagName === 'BUTTON' || tg.tagName === 'INPUT' || (tg.getAttribute && tg.getAttribute('role') === 'button')) return;
+    var k = e.key.toLowerCase();
+    if (k === 'm') press('s1', true);
+    if (k === 'p') press('s0', true);
+    if (k === 't') overload();
+    if (k === 'r') reset();
+  });
+  document.addEventListener('keyup', function(e){
+    var k = e.key.toLowerCase();
+    if (k === 'm') press('s1', false);
+    if (k === 'p') press('s0', false);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
