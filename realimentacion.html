@@ -86,11 +86,14 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
 .dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
 .kmicon{width:74px;height:48px;flex:none}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn,#fff);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
 </style>
 
 </head>
 <body>
 <main>
+  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>La realimentación del contactor</h1>
   <p class="sub">Toca los aparatos del esquema o usa los botones. Mantén pulsado <b>-S1</b> (marcha), suéltalo y mira por dónde sigue pasando la corriente. Luego quita la realimentación y repite.</p>
 
@@ -370,5 +373,6 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
   render();
 })();
 </script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){if(e.target.tagName!=='INPUT'){e.preventDefault();location.href='index.html';}}});</script>
 </body>
 </html>

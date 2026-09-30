@@ -21,7 +21,8 @@ main{max-width:820px;margin:0 auto;padding:28px 16px 40px}
 h1{margin:4px 0 0;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.15}
 a.card{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;color:inherit;text-decoration:none;transition:transform .12s,border-color .12s}
 a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--acc);outline:none}
-.num{flex:none;width:52px;height:52px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.3rem}
+.num{flex:none;width:58px;height:52px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.2rem}
+.sec{font-size:1.05rem;color:var(--muted);margin:0 0 12px;font-weight:700}
 .card h2{margin:0 0 2px;font-size:1.2rem;color:var(--acc)}
 .card p{margin:0;color:var(--muted);font-size:.98rem}
 .foot{color:var(--muted);font-size:.9rem;margin-top:24px}
@@ -33,12 +34,45 @@ a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--
     <small>AUTOMATISMOS INDUSTRIALES · I.E.S. TRINIDAD ARROYO</small>
     <h1>Animaciones de los esquemas</h1>
   </div>
+  <h2 class="sec">Tema 3 · Conexionado complejo</h2>
+  <a class="card" href="pulsadores_na.html">
+    <div class="num">3.1</div>
+    <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
+  </a>
+  <a class="card" href="pulsadores_nc.html">
+    <div class="num">3.2</div>
+    <div><h2>Pulsadores NC en serie y en paralelo</h2><p>Tres paros en serie (cualquiera para) y tres en paralelo (hay que pulsar todos), con bobinas de contactor.</p></div>
+  </a>
   <a class="card" href="realimentacion.html">
-    <div class="num">1</div>
-    <div><h2>La realimentación del contactor</h2><p>Marcha y paro: por qué el contactor se "sujeta solo" con su 13-14. Pilotos H1 y H2.</p></div>
+    <div class="num">3.3</div>
+    <div><h2>La realimentación del contactor</h2><p>Marcha y paro con prioridad al paro: por qué el contactor se "sujeta solo" con su 13-14.</p></div>
+  </a>
+  <a class="card" href="realimentacion_marcha.html">
+    <div class="num">3.3</div>
+    <div><h2>Realimentación con prioridad a la marcha</h2><p>El paro solo corta la realimentación: si pulsas marcha y paro a la vez, gana la marcha.</p></div>
+  </a>
+  <a class="card" href="combinaciones.html">
+    <div class="num">3.4</div>
+    <div><h2>Una combinación de paros y marchas</h2><p>Dos paros en paralelo con otro en serie; dos marchas en serie con otra en paralelo y la realimentación.</p></div>
+  </a>
+  <a class="card" href="condicionada.html">
+    <div class="num">3.5</div>
+    <div><h2>Activación condicionada</h2><p>El 53-54 de KM1 en serie con la bobina de KM2: KM2 solo arranca si KM1 ya está en marcha.</p></div>
+  </a>
+  <a class="card" href="enclavamiento.html">
+    <div class="num">3.6</div>
+    <div><h2>Enclavamiento entre dos contactores</h2><p>Inversión de giro: el 61-62 de cada contactor bloquea al otro. Quítalo y mira qué pasa.</p></div>
+  </a>
+  <a class="card" href="rele_auxiliar.html">
+    <div class="num">3.7</div>
+    <div><h2>El relé auxiliar</h2><p>Una bobina y tres contactos conmutados: KA1 se sujeta solo y maneja KM1 y dos pilotos.</p></div>
+  </a>
+  <a class="card" href="rele_base.html">
+    <div class="num">3.8</div>
+    <div><h2>El relé y su base: leer los dibujos del fabricante</h2><p>Base, pegatina y esquema: los mismos tornillos dibujados de tres formas. Con polímetro y retos.</p></div>
   </a>
   <a class="card" href="arranque_motor.html">
-    <div class="num">2</div>
+    <div class="num">3.9</div>
     <div><h2>Arranque directo de un motor</h2><p>Fuerza y mando: contactor, relé térmico y motor. Provoca una sobrecarga y mira qué pasa.</p></div>
   </a>
   <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>

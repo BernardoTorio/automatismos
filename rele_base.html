@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El relé y su base: leer los dibujos del fabricante</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 16px;max-width:75ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:74vh;min-width:320px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.boxes{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;margin-top:16px}
+@media (max-width:820px){.boxes{grid-template-columns:1fr}}
+.boxes h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.explain{min-height:6.5em;font-size:1.08rem}
+.explain .k,.idea .k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.idea{border-left:6px solid #548235}
+.idea p{margin:0 0 6px}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.controls.two{grid-template-columns:1fr 1fr}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:11px 6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.g{border-color:#2E8B3E} button.g.on{background:#2E8B3E;color:#fff}
+button.r{border-color:#C0392B} button.r.on{background:#C0392B;color:#fff}
+.small{font-size:.8rem;font-weight:400;display:block;opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.toggle input{width:22px;height:22px;accent-color:#2E8B3E}
+.leds{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:26px;height:26px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .2s,box-shadow .2s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
+.dot.y.on{background:#FFD23F;box-shadow:0 0 14px #FFD23F}
+.dot.k.on{background:#F2B400;box-shadow:0 0 14px #F2B400}
+.state{font-size:1.1rem;font-weight:700}
+.state.run{color:var(--ok)} .state.stop{color:var(--muted)} .state.bad{color:var(--warn)}
+.alarm{display:none;background:#C0392B;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700}
+.alarm.on{display:block}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .18s ease}
+.rm{transition:opacity .25s} .rm.off{opacity:.18}
+.bridge{display:none} .bridge.on{display:inline}
+.glow{opacity:0;transition:opacity .2s} .glow.on{opacity:.9}
+.coilfill{transition:fill .2s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4;rx:8}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+.motor{width:64px;height:64px;flex:none}
+.spinR{animation:spin .8s linear infinite} .spinL{animation:spin .8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinR,.spinL{animation:none}}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{padding:8px 10px;font-size:.95rem}
+.tabs button.sel{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.lbl{font-weight:700;margin:10px 0 6px;font-size:.95rem}
+.lbl:first-child{margin-top:0}
+.pt{cursor:pointer}
+.pt:focus{outline:none}
+.pt .ring{fill:none;stroke:transparent;stroke-width:4}
+.pt:hover .ring,.pt:focus-visible .ring{stroke:#F2B400;stroke-opacity:.6}
+.pt.sel .ring{stroke:#F2B400;stroke-opacity:1}
+.pt.sel2 .ring{stroke:#1F5FBF;stroke-opacity:1}
+.pt.ok .ring{stroke:#2E8B3E;stroke-opacity:1}
+.pt.bad .ring{stroke:#C0392B;stroke-opacity:1}
+.ptitle{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:17px;fill:#1F4E79}
+.psub{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:13px;fill:#56606b}
+.panel{fill:#FAFBFC;stroke:#cfd6de;stroke-width:1.5}
+.screw{fill:#DDE1E6;stroke:#444;stroke-width:2}
+.screw.no{fill:#fff;stroke:#bbb;stroke-dasharray:4 3}
+.pin{fill:#fff;stroke:#111;stroke-width:2}
+.numb{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:16px;fill:#111}
+.numn{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:15px;fill:#111}
+.nump{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:13px;fill:#8a8f96}
+.rowl{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:12px;fill:#56606b}
+.meter{display:flex;align-items:center;gap:12px}
+.lcd{font-family:ui-monospace,Consolas,monospace;font-size:1.3rem;background:#C9D8B6;color:#1d2a12;border:3px solid #444;border-radius:6px;padding:4px 10px;min-width:9ch;text-align:center}
+.lcd.beep{background:#9FE08A}
+.score{font-weight:700}
+.pin.hl{fill:#FFF3C4}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <h1>El relé y su base: leer los dibujos del fabricante</h1>
+  <p class="sub">El mismo relé se dibuja de <b>muchas formas</b>: la <b>base</b> con sus tornillos (1 a 14), la <b>pegatina</b> del relé (cada fabricante la dibuja a su manera) y el <b>esquema</b> que usamos en clase. Toca un tornillo o un número en cualquiera de los tres dibujos y mira dónde está en los otros dos.</p>
+  <div class="grid">
+    <div class="sheet"><svg id="svg" viewBox="0 0 900 660" role="img" aria-label="Base, pegatina y esquema del relé"></svg></div>
+    <div class="side">
+      <div class="card">
+        <div class="lbl">Relé de…</div>
+        <div class="tabs" id="tType"><button data-v="2">2 contactos</button><button data-v="3">3 contactos</button><button data-v="4">4 contactos</button></div>
+        <div class="lbl">Pegatina del fabricante</div>
+        <div class="tabs" id="tPeg"><button data-v="A">Fabricante A</button><button data-v="B">Fabricante B</button></div>
+        <div class="lbl">Numeración del esquema</div>
+        <div class="tabs" id="tNum"><button data-v="a">11-12-14 (la de clase)</button><button data-v="b">15-16-18 (otros)</button></div>
+        <div class="lbl">Qué quieres hacer</div>
+        <div class="tabs" id="tMode"><button data-v="explorar">Explorar</button><button data-v="polimetro">Polímetro</button><button data-v="reto">Reto</button></div>
+        <div class="row"><button id="bCoil" class="g" style="padding:10px 12px">Dar tensión a la bobina (A1-A2)</button></div>
+      </div>
+      <div class="card" id="meterCard" style="display:none"><div class="meter">
+        <svg width="44" height="54" viewBox="0 0 44 54" aria-hidden="true"><rect x="3" y="3" width="38" height="48" rx="6" fill="#F2B400" stroke="#333" stroke-width="3"/><rect x="9" y="9" width="26" height="14" fill="#C9D8B6" stroke="#333" stroke-width="2"/><circle cx="22" cy="36" r="8" fill="#555"/></svg>
+        <div><div id="lcd" class="lcd">- - -</div><div class="small" style="margin-top:4px">Continuidad (pitido)</div></div></div></div>
+      <div class="card" id="retoCard" style="display:none"><div id="retoQ" style="font-weight:700;font-size:1.1rem"></div>
+        <div class="row" style="justify-content:space-between"><span class="score" id="score">Aciertos: 0 / 0</span><button id="bNext" style="padding:8px 12px">Otra pregunta</button></div></div>
+    </div>
+  </div>
+  <div class="boxes">
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card idea"><h2>Para qué sirve</h2>
+      <p>Los tres dibujos dicen <b>lo mismo</b> con números y formas distintas. Lo que manda es la <b>función</b> de cada tornillo: <b>común</b>, <b>NC</b>, <b>NA</b> o <b>bobina</b>.</p>
+      <p>Al cablear, escribe en tu esquema el número de la base entre paréntesis: 11 (9), 14 (5), A1 (13). Y si dudas, <b>compruébalo con el polímetro</b>.</p></div>
+  </div>
+  <p class="foot"><b>Explorar:</b> toca cualquier tornillo o número. <b>Polímetro:</b> toca dos puntos y mira si pita, con la bobina con y sin tensión. <b>Reto:</b> te pido un borne del esquema y tú tocas el tornillo de la base. La disposición de los tornillos es orientativa: mira siempre la de tu base. <kbd>Esc</kbd> vuelve al índice.</p>
+</main>
+
+<script>
+(function(){
+var NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('svg');
+var S = { type:4, num:'a', peg:'A', mode:'explorar', coil:false, sel:[], reto:null, ok:0, tot:0, fb:{} };
+var USED = {2:[1,4], 3:[1,2,3], 4:[1,2,3,4]};
+function el(tag, at, parent){ var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); (parent||svg).appendChild(e); return e; }
+function tx(x, y, s, cls, anchor, parent){ var t = el('text', {x:x, y:y, 'class':cls, 'text-anchor':anchor||'middle'}, parent); t.textContent = s; return t; }
+function ord(k){ return ['1.er','2.º','3.er','4.º'][k-1]; }
+// ------ modelo de bornes (por número de base)
+function model(){
+  var T = {}, used = USED[S.type];
+  used.forEach(function(pos, i){
+    var k = i + 1, n = S.num === 'a' ? [k*10+1, k*10+2, k*10+4] : [k*10+5, k*10+6, k*10+8];
+    T[pos+8] = {base:pos+8, role:'com', k:k, pos:pos, norm:n[0]};
+    T[pos]   = {base:pos,   role:'nc',  k:k, pos:pos, norm:n[1]};
+    T[pos+4] = {base:pos+4, role:'na',  k:k, pos:pos, norm:n[2]};
+  });
+  T[13] = {base:13, role:'a1', norm:'A1'}; T[14] = {base:14, role:'a2', norm:'A2'};
+  return T;
+}
+var M = model();
+function roleTxt(t){
+  if (t.role === 'a1') return 'bobina A1';
+  if (t.role === 'a2') return 'bobina A2';
+  return {com:'común', nc:'NC', na:'NA'}[t.role] + ' del ' + ord(t.k) + ' contacto';
+}
+function conn(a, b){
+  var A = M[a], B = M[b]; if (!A || !B || a === b) return 'no';
+  if ((A.role === 'a1' && B.role === 'a2') || (A.role === 'a2' && B.role === 'a1')) return 'coil';
+  if (A.k !== B.k) return 'no';
+  var r = [A.role, B.role].sort().join('-');
+  if (r === 'com-nc') return S.coil ? 'no' : 'yes';
+  if (r === 'com-na') return S.coil ? 'yes' : 'no';
+  return 'no';
+}
+var pts = {};  // base -> [groups]
+function point(base, x, y, parent, draw){
+  var g = el('g', {'class':'pt', tabindex:0, role:'button', 'aria-label':'Borne ' + base}, parent);
+  draw(g);
+  el('circle', {cx:x, cy:y, r:24, 'class':'ring'}, g);
+  g.addEventListener('click', function(){ pick(base); });
+  g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(base); } });
+  (pts[base] = pts[base] || []).push(g);
+  return g;
+}
+// ------ dibujo
+var blades = [];
+function draw(){
+  svg.innerHTML = ''; pts = {}; blades = [];
+  var used = USED[S.type];
+  // ===== A. BASE
+  el('rect', {x:10, y:10, width:420, height:300, rx:10, 'class':'panel'});
+  tx(24, 36, 'La base: tus tornillos', 'ptitle', 'start'); tx(24, 54, 'Numeración de la base (1 a 14)', 'psub', 'start');
+  var rows = [['COMÚN', 8, 96], ['NA', 4, 152], ['NC', 0, 208]];
+  rows.forEach(function(r){
+    tx(64, r[2] + 4, r[0], 'rowl', 'end');
+    for (var p = 1; p <= 4; p++){
+      var x = 120 + (p - 1) * 82, n = p + r[1];
+      if (used.indexOf(p) >= 0){
+        (function(n, x, y){ point(n, x, y, null, function(g){ el('circle', {cx:x, cy:y, r:18, 'class':'screw'}, g); tx(x, y + 6, n, 'numb', 'middle', g); }); })(n, x, r[2]);
+      } else { el('circle', {cx:x, cy:r[2], r:18, 'class':'screw no'}); }
+    }
+  });
+  tx(64, 272, 'BOBINA', 'rowl', 'end');
+  [[13, 161], [14, 325]].forEach(function(c){ (function(n, x){ point(n, x, 268, null, function(g){ el('circle', {cx:x, cy:268, r:18, 'class':'screw'}, g); tx(x, 274, n, 'numb', 'middle', g); }); })(c[0], c[1]); });
+  for (var p = 1; p <= 4; p++) tx(120 + (p-1)*82, 72, p + '.ª', 'nump');
+  // ===== B. PEGATINA (común abajo, números de base)
+  el('rect', {x:450, y:10, width:440, height:300, rx:10, 'class':'panel'});
+  tx(464, 36, 'La pegatina del relé', 'ptitle', 'start'); tx(464, 54, S.peg === 'A' ? 'Fabricante A: común abajo, NA a la izquierda' : 'Fabricante B: común arriba, NC a la izquierda', 'psub', 'start');
+  var n = used.length, gap = Math.min(96, 330 / n), x0 = 502;
+  used.forEach(function(pos, i){
+    var x = x0 + i * gap;
+    if (S.peg === 'A'){   // común abajo; NA izquierda, NC derecha
+      var yT = 100, yB = 262, yP = 222, yh = 150;
+      el('path', {d:'M' + (x+22) + ' ' + yT + ' V' + yh + ' H' + (x+7), 'class':'sym'});
+      el('path', {d:'M' + (x-18) + ' ' + yT + ' V' + (yh+4), 'class':'sym'});
+      el('path', {d:'M' + x + ' ' + yB + ' V' + yP, 'class':'sym'});
+      blades.push({l: el('line', {x1:x, y1:yP, x2:x, y2:yP, 'class':'sym'}), rest:[x+13, yh-4], act:[x-18, yh+4]});
+      var P = [[pos+4, x-18, yT], [pos, x+22, yT], [pos+8, x, yB]];
+    } else {              // común arriba; NC izquierda, NA derecha
+      var yT = 100, yB = 262, yP = 140, yh = 212;
+      el('path', {d:'M' + (x-18) + ' ' + yB + ' V' + yh + ' H' + (x-3), 'class':'sym'});
+      el('path', {d:'M' + (x+22) + ' ' + yB + ' V' + (yh-4), 'class':'sym'});
+      el('path', {d:'M' + x + ' ' + yT + ' V' + yP, 'class':'sym'});
+      blades.push({l: el('line', {x1:x, y1:yP, x2:x, y2:yP, 'class':'sym'}), rest:[x-12, yh+4], act:[x+22, yh-4]});
+      var P = [[pos+8, x, yT], [pos, x-18, yB], [pos+4, x+22, yB]];
+    }
+    P.forEach(function(q){ (function(b, px, py){ point(b, px, py, null, function(g){ el('circle', {cx:px, cy:py, r:13, 'class':'pin'}, g); tx(px, py + 5, b, 'numn', 'middle', g); }); })(q[0], q[1], q[2]); });
+  });
+  var xc = x0 + (n - 1) * gap + 70;
+  el('path', {d:'M' + xc + ' 100 V150 M' + xc + ' 212 V262', 'class':'sym'});
+  el('rect', {x:xc-16, y:150, width:32, height:62, 'class':'symf'});
+  [[13, 100], [14, 262]].forEach(function(q){ (function(b, py){ point(b, xc, py, null, function(g){ el('circle', {cx:xc, cy:py, r:13, 'class':'pin'}, g); tx(xc, py + 5, b, 'numn', 'middle', g); }); })(q[0], q[1]); });
+  tx(xc + 26, 186, '+', 'numn', 'start'); 
+  // ===== C. ESQUEMA NORMALIZADO
+  el('rect', {x:10, y:330, width:880, height:320, rx:10, 'class':'panel'});
+  tx(24, 356, 'El esquema de clase', 'ptitle', 'start'); tx(24, 374, 'Numeración normalizada; entre paréntesis, el tornillo de la base', 'psub', 'start');
+  var cx = 120;
+  el('path', {d:'M' + cx + ' 420 V460 M' + cx + ' 500 V560', 'class':'sym'});
+  el('rect', {x:cx-30, y:460, width:60, height:40, 'class':'symf'});
+  tx(cx - 42, 486, '-KA1', 't name', 'end');
+  [[13, 420, 'A1'], [14, 560, 'A2']].forEach(function(q){ (function(b, py, lab){ point(b, cx, py, null, function(g){ el('circle', {cx:cx, cy:py, r:6, 'class':'pin'}, g); tx(cx + 12, py + 5, lab, 'numn', 'start', g); tx(cx + 12, py + 22, '(' + b + ')', 'nump', 'start', g); }); })(q[0], q[1], q[2]); });
+  var sp = Math.min(175, 600 / n);
+  used.forEach(function(pos, i){
+    var t = M[pos + 8], x = 260 + i * sp, yT = 420, yP = 448, yh = 510, yB = 575;
+    el('path', {d:'M' + x + ' ' + yT + ' V' + yP, 'class':'sym'});
+    el('path', {d:'M' + (x+8) + ' ' + yh + ' H' + (x+30) + ' V' + yB, 'class':'sym'});
+    el('path', {d:'M' + (x-24) + ' ' + (yh-6) + ' V' + yB, 'class':'sym'});
+    blades.push({l: el('line', {x1:x, y1:yP, x2:x, y2:yP, 'class':'sym'}), rest:[x+18, yh+4], act:[x-24, yh-6]});
+    [[pos+8, x, yT, 'start', 10], [pos, x+30, yB, 'start', 10], [pos+4, x-24, yB, 'end', -10]].forEach(function(q){
+      (function(b, px, py, an, dx){ point(b, px, py, null, function(g){ el('circle', {cx:px, cy:py, r:6, 'class':'pin'}, g); tx(px + dx, py + (py === yT ? 0 : 20), M[b].norm, 'numn', an, g); tx(px + dx, py + (py === yT ? 17 : 37), '(' + b + ')', 'nump', an, g); }); })(q[0], q[1], q[2], q[3], q[4]);
+    });
+  });
+  el('path', {d:'M' + (cx+30) + ' 480 H' + (260 + (n-1)*sp + 10), 'class':'dash'});
+  tx(260 - 34, 468, '-KA1', 't name', 'end');
+  setBlades();
+}
+function setBlades(){
+  blades.forEach(function(b){ var p = S.coil ? b.act : b.rest; b.l.setAttribute('x2', p[0]); b.l.setAttribute('y2', p[1]); });
+}
+// ------ interacción
+function clearMarks(){ for (var b in pts) pts[b].forEach(function(g){ g.classList.remove('sel','sel2','ok','bad'); }); }
+function mark(b, cls){ (pts[b]||[]).forEach(function(g){ g.classList.add(cls); }); }
+function pick(b){
+  if (S.mode === 'explorar'){ S.sel = [b]; }
+  else if (S.mode === 'polimetro'){ S.sel = S.sel.length >= 2 ? [b] : S.sel.concat([b]); if (S.sel.length === 2 && S.sel[0] === S.sel[1]) S.sel = [b]; }
+  else if (S.mode === 'reto' && S.reto){ S.tot++; S.fb = {b:b, good: b === S.reto.base}; if (S.fb.good) S.ok++; }
+  update();
+}
+function newReto(){
+  var keys = Object.keys(M).map(Number); var b = keys[Math.floor(Math.random() * keys.length)];
+  S.reto = M[b]; S.fb = {}; update();
+}
+function update(){
+  clearMarks();
+  var ex = '', t;
+  document.getElementById('meterCard').style.display = S.mode === 'polimetro' ? '' : 'none';
+  document.getElementById('retoCard').style.display = S.mode === 'reto' ? '' : 'none';
+  if (S.mode === 'explorar'){
+    if (!S.sel.length) ex = 'Toca un tornillo de la <b>base</b>, un número de la <b>pegatina</b> o un borne del <b>esquema</b>. Se marcará en los tres dibujos a la vez.';
+    else {
+      t = M[S.sel[0]]; mark(t.base, 'sel');
+      ex = 'Tornillo <span class="k">' + t.base + '</span> de la base = <span class="k">' + t.base + '</span> en la pegatina = <span class="k">' + t.norm + '</span> en el esquema. Es el <b>' + roleTxt(t) + '</b>.';
+      if (t.role === 'com'){ var nc = t.pos, na = t.pos + 4;
+        ex += '<br>Con la bobina ' + (S.coil ? '<b>con tensión</b>' : '<b>sin tensión</b>') + ' está unido con el <b>' + (S.coil ? na + ' (' + M[na].norm + ', NA)' : nc + ' (' + M[nc].norm + ', NC)') + '</b>.'; }
+      else if (t.role === 'nc' || t.role === 'na') ex += '<br>Su común es el <b>' + (t.pos + 8) + '</b> (' + M[t.pos+8].norm + ').';
+      else ex += '<br>Entre 13 y 14 va la tensión de la bobina, la que pone en la pegatina del relé.';
+      if (t.role !== 'a1' && t.role !== 'a2' && t.base !== t.norm) ex += ' Fíjate: <b>el mismo tornillo tiene dos números</b>.';
+    }
+  }
+  if (S.mode === 'polimetro'){
+    var lcd = document.getElementById('lcd'); lcd.classList.remove('beep');
+    if (S.sel[0]) mark(S.sel[0], 'sel'); if (S.sel[1]) mark(S.sel[1], 'sel2');
+    if (S.sel.length < 2){ lcd.textContent = '- - -'; ex = S.sel.length ? 'Punta roja en el <b>' + S.sel[0] + '</b>. Toca otro punto para la punta negra.' : 'Pon las puntas del polímetro: toca <b>dos</b> puntos de cualquier dibujo. Prueba también a dar tensión a la bobina.'; }
+    else {
+      var a = S.sel[0], b = S.sel[1], c = conn(a, b), A = M[a], B = M[b];
+      var lab = a + ' (' + A.norm + ') y ' + b + ' (' + B.norm + ')';
+      if (c === 'yes'){ lcd.textContent = '0.0 Ω  ♪'; lcd.classList.add('beep'); ex = '<b>¡PITA!</b> Entre ' + lab + ' hay continuidad: el común está tocando ' + (S.coil ? 'el <b>NA</b> porque la bobina tiene tensión.' : 'el <b>NC</b> porque la bobina está sin tensión.'); }
+      else if (c === 'coil'){ lcd.textContent = '≈ 600 Ω'; ex = 'Entre <b>13 y 14</b> (A1-A2) está la <b>bobina</b>: el polímetro no pita, pero marca unos cientos de ohmios. Si marcara 0 o infinito, la bobina estaría mal.'; }
+      else { lcd.textContent = 'OL'; ex = '<b>No pita.</b> Entre ' + lab + ' no hay unión' + ((A.k && A.k === B.k) ? (A.role === 'com' || B.role === 'com' ? ' ahora mismo: prueba a ' + (S.coil ? 'quitar' : 'dar') + ' tensión a la bobina.' : ': el NC y el NA de un mismo contacto nunca se tocan.') : ': son de contactos distintos.'); }
+    }
+  }
+  if (S.mode === 'reto'){
+    if (!S.reto) newReto();
+    var r = S.reto;
+    document.getElementById('retoQ').innerHTML = 'En el esquema pone <span class="k">' + r.norm + '</span> (' + roleTxt(r) + '). ¿A qué <b>tornillo de la base</b> va?';
+    document.getElementById('score').textContent = 'Aciertos: ' + S.ok + ' / ' + S.tot;
+    if (S.fb.b){
+      mark(S.fb.b, S.fb.good ? 'ok' : 'bad'); if (!S.fb.good) mark(r.base, 'ok');
+      ex = S.fb.good ? '<b>¡Bien!</b> El ' + r.norm + ' va al tornillo <span class="k">' + r.base + '</span>.' : '<b>No.</b> Has tocado el ' + S.fb.b + ' (' + M[S.fb.b].norm + '). El ' + r.norm + ' es el tornillo <span class="k">' + r.base + '</span> (en verde).';
+      if (r.role === 'com' || r.role === 'nc' || r.role === 'na') ex += ' Truco: el contacto está en la posición ' + r.pos + '.ª → NC = ' + r.pos + ', NA = ' + (r.pos + 4) + ', común = ' + (r.pos + 8) + '.';
+    } else ex = 'Toca el tornillo en el dibujo de la <b>base</b> (o en cualquiera de los otros dos).';
+  }
+  if (S.pegMsg && S.mode === 'explorar' && !S.sel.length) ex = 'La pegatina del <b>fabricante ' + S.peg + '</b> ' + (S.peg === 'A' ? 'dibuja el común abajo y el NA a la izquierda.' : 'dibuja el común arriba y el NC a la izquierda.') + ' <b>Parece otro relé, pero no lo es</b>: los números de la base son los mismos. Toca un tornillo y compruébalo.';
+  S.pegMsg = false;
+  var bc = document.getElementById('bCoil'); bc.textContent = S.coil ? 'Quitar tensión a la bobina' : 'Dar tensión a la bobina (A1-A2)'; bc.classList.toggle('on', S.coil);
+  document.getElementById('explain').innerHTML = ex;
+  sel('tType', S.type); sel('tPeg', S.peg); sel('tNum', S.num); sel('tMode', S.mode);
+}
+function sel(id, v){ [].forEach.call(document.getElementById(id).children, function(b){ b.classList.toggle('sel', b.dataset.v == v); }); }
+function tabs(id, fn){ [].forEach.call(document.getElementById(id).children, function(b){ b.addEventListener('click', function(){ fn(b.dataset.v); }); }); }
+tabs('tType', function(v){ S.type = +v; M = model(); S.sel = []; S.reto = null; S.fb = {}; draw(); update(); });
+tabs('tPeg', function(v){ S.peg = v; S.pegMsg = true; draw(); update(); });
+tabs('tNum', function(v){ S.num = v; M = model(); S.reto = null; S.fb = {}; draw(); update(); });
+tabs('tMode', function(v){ S.mode = v; S.sel = []; S.fb = {}; if (v === 'reto') S.reto = null; update(); });
+document.getElementById('bCoil').addEventListener('click', function(){ S.coil = !S.coil; setBlades(); update(); });
+document.getElementById('bNext').addEventListener('click', newReto);
+document.addEventListener('keydown', function(e){ if ((e.key === 'Escape' || e.key === 'Backspace') && e.target.tagName !== 'INPUT'){ e.preventDefault(); location.href = 'index.html'; } });
+draw(); update();
+})();
+</script>
+</body>
+</html>

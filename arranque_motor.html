@@ -100,11 +100,14 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 @keyframes pulse{50%{opacity:.2}}
 @media (prefers-reduced-motion: reduce){#rstRing.on{animation:none}}
 .leds{flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn,#fff);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
 </style>
 
 </head>
 <body>
 <main>
+  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>Arranque directo de un motor</h1>
   <p class="sub">Fuerza y mando con contactor y relé térmico. Toca los aparatos del esquema (<b>-Q1</b>, <b>-Q2</b>, <b>-S0</b>, <b>-S1</b>, <b>-F2</b> y su botón azul <b>RESET</b>) o usa los botones.</p>
   <div class="grid">
@@ -412,5 +415,6 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
   render();
 })();
 </script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){if(e.target.tagName!=='INPUT'){e.preventDefault();location.href='index.html';}}});</script>
 </body>
 </html>

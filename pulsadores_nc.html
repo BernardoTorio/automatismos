@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pulsadores cerrados (NC) en serie y en paralelo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 16px;max-width:75ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:74vh;min-width:320px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.boxes{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;margin-top:16px}
+@media (max-width:820px){.boxes{grid-template-columns:1fr}}
+.boxes h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.explain{min-height:6.5em;font-size:1.08rem}
+.explain .k,.idea .k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.idea{border-left:6px solid #548235}
+.idea p{margin:0 0 6px}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.controls.two{grid-template-columns:1fr 1fr}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:11px 6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.g{border-color:#2E8B3E} button.g.on{background:#2E8B3E;color:#fff}
+button.r{border-color:#C0392B} button.r.on{background:#C0392B;color:#fff}
+.small{font-size:.8rem;font-weight:400;display:block;opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.toggle input{width:22px;height:22px;accent-color:#2E8B3E}
+.leds{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:26px;height:26px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .2s,box-shadow .2s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
+.dot.y.on{background:#FFD23F;box-shadow:0 0 14px #FFD23F}
+.dot.k.on{background:#F2B400;box-shadow:0 0 14px #F2B400}
+.state{font-size:1.1rem;font-weight:700}
+.state.run{color:var(--ok)} .state.stop{color:var(--muted)} .state.bad{color:var(--warn)}
+.alarm{display:none;background:#C0392B;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700}
+.alarm.on{display:block}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .18s ease}
+.rm{transition:opacity .25s} .rm.off{opacity:.18}
+.bridge{display:none} .bridge.on{display:inline}
+.glow{opacity:0;transition:opacity .2s} .glow.on{opacity:.9}
+.coilfill{transition:fill .2s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4;rx:8}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+.motor{width:64px;height:64px;flex:none}
+.spinR{animation:spin .8s linear infinite} .spinL{animation:spin .8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinR,.spinL{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <h1>Pulsadores cerrados (NC) en serie y en paralelo</h1>
+  <p class="sub">Los pulsadores NC dejan pasar la corriente en reposo: las dos bobinas están activadas sin tocar nada. Mantén pulsados uno o varios (con <b>doble clic</b> se quedan fijados) y compara: a la izquierda tres NC en <b>serie</b> con -KM1; a la derecha tres NC en <b>paralelo</b> con -KM2.</p>
+  <div class="grid">
+    <div class="sheet"><svg viewBox="0 0 760 730" role="img" aria-labelledby="svgt"><title id="svgt">Tres pulsadores NC en serie con la bobina de KM1; tres pulsadores NC en paralelo con la bobina de KM2</title><line class="w wf" x1="40" y1="40" x2="730" y2="40"/><text class="t name" x="30" y="46" text-anchor="end" style="fill:var(--fase)">L</text><line class="w wn" x1="40" y1="690" x2="730" y2="690"/><text class="t name" x="30" y="696" text-anchor="end" style="fill:var(--neutro)">N</text><path class="w wf" d="M40 40 L150 40"/><path class="w wf" d="M150 40 L150 58"/><path class="w wf" d="M150 200 L150 222"/><path class="w wf" d="M150 222 L150 256"/><path class="w wf" d="M150 322 L150 366"/><path class="w wf" d="M150 432 L150 476"/><path class="w wf" d="M150 542 L150 596"/><path class="w wn" d="M150 636 L150 690"/><path class="w wn" d="M150 690 L40 690"/><path class="w wf" d="M150 222 L420 222"/><path class="w wf" d="M420 222 L420 256"/><path class="w wf" d="M420 222 L550 222"/><path class="w wf" d="M550 222 L550 256"/><path class="w wf" d="M550 222 L680 222"/><path class="w wf" d="M680 222 L680 256"/><path class="w wf" d="M420 322 L420 356"/><path class="w wf" d="M550 322 L550 356"/><path class="w wf" d="M680 322 L680 356"/><path class="w wf" d="M680 356 L550 356"/><path class="w wf" d="M550 356 L420 356"/><path class="w wf" d="M420 356 L420 596"/><path class="w wn" d="M420 636 L420 690"/><path class="w wn" d="M420 690 L40 690"/><path id="fl0" class="flow" d="M150 58 L150 200"/><path id="fl1" class="flow" d="M40 40 L150 40"/><path id="fl2" class="flow" d="M150 40 L150 58"/><path id="fl3" class="flow" d="M150 200 L150 222"/><path id="fl4" class="flow" d="M150 256 L150 322"/><path id="fl5" class="flow" d="M150 222 L150 256"/><path id="fl6" class="flow" d="M150 366 L150 432"/><path id="fl7" class="flow" d="M150 322 L150 366"/><path id="fl8" class="flow" d="M150 476 L150 542"/><path id="fl9" class="flow" d="M150 432 L150 476"/><path id="fl10" class="flow" d="M150 596 L150 636"/><path id="fl11" class="flow" d="M150 542 L150 596"/><path id="fl12" class="flow" d="M150 636 L150 690"/><path id="fl13" class="flow" d="M150 690 L40 690"/><path id="fl14" class="flow" d="M150 222 L420 222"/><path id="fl15" class="flow" d="M420 256 L420 322"/><path id="fl16" class="flow" d="M420 222 L420 256"/><path id="fl17" class="flow" d="M420 222 L550 222"/><path id="fl18" class="flow" d="M550 256 L550 322"/><path id="fl19" class="flow" d="M550 222 L550 256"/><path id="fl20" class="flow" d="M550 222 L680 222"/><path id="fl21" class="flow" d="M680 256 L680 322"/><path id="fl22" class="flow" d="M680 222 L680 256"/><path id="fl23" class="flow" d="M420 322 L420 356"/><path id="fl24" class="flow" d="M550 322 L550 356"/><path id="fl25" class="flow" d="M680 322 L680 356"/><path id="fl26" class="flow" d="M680 356 L550 356"/><path id="fl27" class="flow" d="M550 356 L420 356"/><path id="fl28" class="flow" d="M420 596 L420 636"/><path id="fl29" class="flow" d="M420 356 L420 596"/><path id="fl30" class="flow" d="M420 636 L420 690"/><path id="fl31" class="flow" d="M420 690 L40 690"/><g id="g_Q1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q1: abrir o cerrar">
+<rect class="hitbox" x="68" y="50" width="120" height="156"/>
+<line class="sym" x1="150" y1="58" x2="150" y2="76"/>
+<line class="sym" x1="142" y1="68" x2="158" y2="84" style="stroke-width:2.4"/>
+<line class="sym" x1="142" y1="84" x2="158" y2="68" style="stroke-width:2.4"/>
+<line id="bl_d1" class="sym blade" x1="150" y1="110" x2="150" y2="78" style="transform-origin:150px 110px"/>
+<line class="sym" x1="150" y1="110" x2="150" y2="124"/>
+<rect class="symf" x="136" y="124" width="28" height="30"/>
+<path class="sym" d="M150 124 V135 H158 V143 H150 V154" style="stroke-width:2.4"/>
+<line class="sym" x1="150" y1="154" x2="150" y2="162"/>
+<rect class="symf" x="136" y="162" width="28" height="26"/>
+<text class="t" x="150" y="180" text-anchor="middle" style="font-size:13px;font-weight:700">I&gt;</text>
+<line class="sym" x1="150" y1="188" x2="150" y2="200"/>
+<g id="ac_d1" class="blade"><line class="dash" x1="100" y1="94" x2="142" y2="94"/><line class="sym" x1="100" y1="82" x2="100" y2="106"/></g>
+<text class="t" x="158" y="58">1</text><text class="t" x="158" y="214">2</text>
+<text class="t name" x="90" y="100" text-anchor="end">-Q1</text></g><g id="g_S1" class="hit" tabindex="0" role="button" aria-label="Pulsador S1"><rect class="hitbox" x="46" y="248" width="134" height="82"/><line class="sym" x1="150" y1="256" x2="150" y2="276"/><line class="sym" x1="150" y1="306" x2="150" y2="322"/><line class="sym" x1="150" y1="276" x2="168" y2="276"/><line id="bl_d2" class="sym blade" x1="150" y1="306" x2="172" y2="270" style="transform-origin:150px 306px"/><g id="ac_d2" class="blade"><line class="dash" x1="100" y1="289" x2="158" y2="289"/><path class="sym" d="M108 278 H100 V300 H108"/></g><text class="t" x="158" y="254">1</text><text class="t" x="158" y="336">2</text><text class="t name" x="90" y="296" text-anchor="end">-S1</text></g><g id="g_S2" class="hit" tabindex="0" role="button" aria-label="Pulsador S2"><rect class="hitbox" x="46" y="358" width="134" height="82"/><line class="sym" x1="150" y1="366" x2="150" y2="386"/><line class="sym" x1="150" y1="416" x2="150" y2="432"/><line class="sym" x1="150" y1="386" x2="168" y2="386"/><line id="bl_d3" class="sym blade" x1="150" y1="416" x2="172" y2="380" style="transform-origin:150px 416px"/><g id="ac_d3" class="blade"><line class="dash" x1="100" y1="399" x2="158" y2="399"/><path class="sym" d="M108 388 H100 V410 H108"/></g><text class="t" x="158" y="364">1</text><text class="t" x="158" y="446">2</text><text class="t name" x="90" y="406" text-anchor="end">-S2</text></g><g id="g_S3" class="hit" tabindex="0" role="button" aria-label="Pulsador S3"><rect class="hitbox" x="46" y="468" width="134" height="82"/><line class="sym" x1="150" y1="476" x2="150" y2="496"/><line class="sym" x1="150" y1="526" x2="150" y2="542"/><line class="sym" x1="150" y1="496" x2="168" y2="496"/><line id="bl_d4" class="sym blade" x1="150" y1="526" x2="172" y2="490" style="transform-origin:150px 526px"/><g id="ac_d4" class="blade"><line class="dash" x1="100" y1="509" x2="158" y2="509"/><path class="sym" d="M108 498 H100 V520 H108"/></g><text class="t" x="158" y="474">1</text><text class="t" x="158" y="556">2</text><text class="t name" x="90" y="516" text-anchor="end">-S3</text></g><line class="sym" x1="150" y1="596" x2="150" y2="604"/><line class="sym" x1="150" y1="628" x2="150" y2="636"/><rect id="cf_d5" class="symf coilfill" x="122" y="604" width="56" height="24"/><text class="t" x="158" y="592">A1</text><text class="t" x="158" y="652">A2</text><text class="t name" x="110" y="622" text-anchor="end">-KM1</text><g id="g_S4" class="hit" tabindex="0" role="button" aria-label="Pulsador S4"><rect class="hitbox" x="316" y="248" width="134" height="82"/><line class="sym" x1="420" y1="256" x2="420" y2="276"/><line class="sym" x1="420" y1="306" x2="420" y2="322"/><line class="sym" x1="420" y1="276" x2="438" y2="276"/><line id="bl_d6" class="sym blade" x1="420" y1="306" x2="442" y2="270" style="transform-origin:420px 306px"/><g id="ac_d6" class="blade"><line class="dash" x1="370" y1="289" x2="428" y2="289"/><path class="sym" d="M378 278 H370 V300 H378"/></g><text class="t" x="428" y="254">1</text><text class="t" x="428" y="336">2</text><text class="t name" x="360" y="296" text-anchor="end">-S4</text></g><g id="g_S5" class="hit" tabindex="0" role="button" aria-label="Pulsador S5"><rect class="hitbox" x="446" y="248" width="134" height="82"/><line class="sym" x1="550" y1="256" x2="550" y2="276"/><line class="sym" x1="550" y1="306" x2="550" y2="322"/><line class="sym" x1="550" y1="276" x2="568" y2="276"/><line id="bl_d7" class="sym blade" x1="550" y1="306" x2="572" y2="270" style="transform-origin:550px 306px"/><g id="ac_d7" class="blade"><line class="dash" x1="500" y1="289" x2="558" y2="289"/><path class="sym" d="M508 278 H500 V300 H508"/></g><text class="t" x="558" y="254">1</text><text class="t" x="558" y="336">2</text><text class="t name" x="490" y="296" text-anchor="end">-S5</text></g><g id="g_S6" class="hit" tabindex="0" role="button" aria-label="Pulsador S6"><rect class="hitbox" x="576" y="248" width="134" height="82"/><line class="sym" x1="680" y1="256" x2="680" y2="276"/><line class="sym" x1="680" y1="306" x2="680" y2="322"/><line class="sym" x1="680" y1="276" x2="698" y2="276"/><line id="bl_d8" class="sym blade" x1="680" y1="306" x2="702" y2="270" style="transform-origin:680px 306px"/><g id="ac_d8" class="blade"><line class="dash" x1="630" y1="289" x2="688" y2="289"/><path class="sym" d="M638 278 H630 V300 H638"/></g><text class="t" x="688" y="254">1</text><text class="t" x="688" y="336">2</text><text class="t name" x="620" y="296" text-anchor="end">-S6</text></g><line class="sym" x1="420" y1="596" x2="420" y2="604"/><line class="sym" x1="420" y1="628" x2="420" y2="636"/><rect id="cf_d9" class="symf coilfill" x="392" y="604" width="56" height="24"/><text class="t" x="428" y="592">A1</text><text class="t" x="428" y="652">A2</text><text class="t name" x="380" y="622" text-anchor="end">-KM2</text><circle cx="150" cy="40" r="5" fill="var(--fase)"/><circle cx="150" cy="690" r="5" fill="var(--neutro)"/><circle cx="420" cy="690" r="5" fill="var(--neutro)"/><circle cx="420" cy="222" r="5" fill="var(--fase)"/><circle cx="150" cy="222" r="5" fill="var(--fase)"/><circle cx="420" cy="356" r="5" fill="var(--fase)"/><circle cx="550" cy="356" r="5" fill="var(--fase)"/><circle cx="550" cy="222" r="5" fill="var(--fase)"/></svg></div>
+    <div class="side"><div class="card"><div class="leds">
+<span class="led"><span id="dH1" class="dot k"></span>KM1</span><span class="led"><span id="dH2" class="dot k"></span>KM2</span></div>
+<div id="stxt" class="state stop" style="margin-top:8px"></div></div>
+<div class="card"><div style="font-weight:700;margin-bottom:6px">Serie → KM1</div><div class="controls"><button id="b_S1" class="r" aria-pressed="false">-S1<span class="small">tecla 1</span></button><button id="b_S2" class="r" aria-pressed="false">-S2<span class="small">tecla 2</span></button><button id="b_S3" class="r" aria-pressed="false">-S3<span class="small">tecla 3</span></button></div>
+<div style="font-weight:700;margin:12px 0 6px">Paralelo → KM2</div><div class="controls"><button id="b_S4" class="r" aria-pressed="false">-S4<span class="small">tecla 4</span></button><button id="b_S5" class="r" aria-pressed="false">-S5<span class="small">tecla 5</span></button><button id="b_S6" class="r" aria-pressed="false">-S6<span class="small">tecla 6</span></button></div>
+<div class="row"><button id="bq_Q1" style="padding:9px 12px">Abrir -Q1</button></div></div></div>
+  </div>
+  <div class="boxes">
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card idea"><h2>Para qué sirve</h2><p><b>NC en serie:</b> con pulsar <b>uno cualquiera</b> se corta. Es como se conectan los <b>paros</b> cuando hay varios.</p>
+<p><b>NC en paralelo:</b> solo se corta si se pulsan <b>todos a la vez</b>. Casi no se usa: un paro que no para al pulsarlo es peligroso.</p></div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>, como si lo mantuvieras pulsado: así puedes pulsar varios a la vez con el ratón. Un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul. Toca los pulsadores en el propio esquema (mantén pulsado) o usa los botones. Puedes pulsar varios a la vez con varios dedos. Teclado: <kbd>1</kbd> a <kbd>6</kbd> para los pulsadores, <kbd>Q</kbd> magnetotérmico.</p>
+</main>
+<script>
+window.PAGE = {"edges": [{"t": "q", "a": "d1t", "b": "d1b", "d": "M150 58 L150 200", "dr": "M150 200 L150 58", "id": "Q1"}, {"t": "w", "a": "L", "b": "L1", "d": "M40 40 L150 40", "dr": "M150 40 L40 40"}, {"t": "w", "a": "L1", "b": "d1t", "d": "M150 40 L150 58", "dr": "M150 58 L150 40"}, {"t": "w", "a": "d1b", "b": "jq", "d": "M150 200 L150 222", "dr": "M150 222 L150 200"}, {"t": "nc", "a": "d2t", "b": "d2b", "d": "M150 256 L150 322", "dr": "M150 322 L150 256", "ctl": "S1", "rmode": "open"}, {"t": "w", "a": "jq", "b": "d2t", "d": "M150 222 L150 256", "dr": "M150 256 L150 222"}, {"t": "nc", "a": "d3t", "b": "d3b", "d": "M150 366 L150 432", "dr": "M150 432 L150 366", "ctl": "S2", "rmode": "open"}, {"t": "w", "a": "d2b", "b": "d3t", "d": "M150 322 L150 366", "dr": "M150 366 L150 322"}, {"t": "nc", "a": "d4t", "b": "d4b", "d": "M150 476 L150 542", "dr": "M150 542 L150 476", "ctl": "S3", "rmode": "open"}, {"t": "w", "a": "d3b", "b": "d4t", "d": "M150 432 L150 476", "dr": "M150 476 L150 432"}, {"t": "load", "a": "d5t", "b": "d5b", "d": "M150 596 L150 636", "dr": "M150 636 L150 596", "load": true, "id": "KM1"}, {"t": "w", "a": "d4b", "b": "d5t", "d": "M150 542 L150 596", "dr": "M150 596 L150 542"}, {"t": "w", "a": "d5b", "b": "N2", "d": "M150 636 L150 690", "dr": "M150 690 L150 636"}, {"t": "w", "a": "N2", "b": "N", "d": "M150 690 L40 690", "dr": "M40 690 L150 690"}, {"t": "w", "a": "jq", "b": "j1", "d": "M150 222 L420 222", "dr": "M420 222 L150 222"}, {"t": "nc", "a": "d6t", "b": "d6b", "d": "M420 256 L420 322", "dr": "M420 322 L420 256", "ctl": "S4", "rmode": "open"}, {"t": "w", "a": "j1", "b": "d6t", "d": "M420 222 L420 256", "dr": "M420 256 L420 222"}, {"t": "w", "a": "j1", "b": "ptnc1550", "d": "M420 222 L550 222", "dr": "M550 222 L420 222"}, {"t": "nc", "a": "d7t", "b": "d7b", "d": "M550 256 L550 322", "dr": "M550 322 L550 256", "ctl": "S5", "rmode": "open"}, {"t": "w", "a": "ptnc1550", "b": "d7t", "d": "M550 222 L550 256", "dr": "M550 256 L550 222"}, {"t": "w", "a": "ptnc1550", "b": "ptnc2680", "d": "M550 222 L680 222", "dr": "M680 222 L550 222"}, {"t": "nc", "a": "d8t", "b": "d8b", "d": "M680 256 L680 322", "dr": "M680 322 L680 256", "ctl": "S6", "rmode": "open"}, {"t": "w", "a": "ptnc2680", "b": "d8t", "d": "M680 222 L680 256", "dr": "M680 256 L680 222"}, {"t": "w", "a": "d6b", "b": "pbnc0420", "d": "M420 322 L420 356", "dr": "M420 356 L420 322"}, {"t": "w", "a": "d7b", "b": "pbnc1550", "d": "M550 322 L550 356", "dr": "M550 356 L550 322"}, {"t": "w", "a": "d8b", "b": "pbnc2680", "d": "M680 322 L680 356", "dr": "M680 356 L680 322"}, {"t": "w", "a": "pbnc2680", "b": "pbnc1550", "d": "M680 356 L550 356", "dr": "M550 356 L680 356"}, {"t": "w", "a": "pbnc1550", "b": "pbnc0420", "d": "M550 356 L420 356", "dr": "M420 356 L550 356"}, {"t": "load", "a": "d9t", "b": "d9b", "d": "M420 596 L420 636", "dr": "M420 636 L420 596", "load": true, "id": "KM2"}, {"t": "w", "a": "pbnc0420", "b": "d9t", "d": "M420 356 L420 596", "dr": "M420 596 L420 356"}, {"t": "w", "a": "d9b", "b": "N3", "d": "M420 636 L420 690", "dr": "M420 690 L420 636"}, {"t": "w", "a": "N3", "b": "N", "d": "M420 690 L40 690", "dr": "M40 690 L420 690"}], "devs": [{"t": "q", "key": "d1", "id": "Q1"}, {"t": "nc", "key": "d2", "ctl": "S1", "btn": true, "rm": null}, {"t": "nc", "key": "d3", "ctl": "S2", "btn": true, "rm": null}, {"t": "nc", "key": "d4", "ctl": "S3", "btn": true, "rm": null}, {"t": "coil", "key": "d5", "id": "KM1"}, {"t": "nc", "key": "d6", "ctl": "S4", "btn": true, "rm": null}, {"t": "nc", "key": "d7", "ctl": "S5", "btn": true, "rm": null}, {"t": "nc", "key": "d8", "ctl": "S6", "btn": true, "rm": null}, {"t": "coil", "key": "d9", "id": "KM2"}], "buttons": ["S1", "S2", "S3", "S4", "S5", "S6"], "coils": ["KM1", "KM2"], "qs": ["Q1"], "removables": [], "keys": {"1": "S1", "2": "S2", "3": "S3", "4": "S4", "5": "S5", "6": "S6", "q": "Q1"}};
+
+PAGE.status = function(st, R, $){
+  var a = st.coil.KM1, b = st.coil.KM2;
+  $('dH1').classList.toggle('on', a); $('dH2').classList.toggle('on', b);
+  var s = $('stxt'); s.textContent = 'KM1 ' + (a ? 'activado' : 'en reposo') + ' · KM2 ' + (b ? 'activado' : 'en reposo');
+  s.className = 'state ' + ((a || b) ? 'run' : 'stop');
+};
+PAGE.msg = function(st, R){
+  var b = st.btn, ns = [b.S1, b.S2, b.S3].filter(Boolean).length, np = [b.S4, b.S5, b.S6].filter(Boolean).length;
+  if (!st.q.Q1) return '<b>-Q1 está abierto.</b> No llega corriente a ninguna rama. Ciérralo tocándolo.';
+  var t = '';
+  if (ns === 0) t += '<b>Serie (KM1):</b> sin pulsar nada, los tres <span class="k">1-2</span> están <b>cerrados</b> y KM1 está activado. Pulsa <b>uno cualquiera</b>. ';
+  else t += '<b>Serie (KM1):</b> ' + (ns === 1 ? 'con pulsar <b>uno solo</b>' : 'con ' + ns + ' pulsados') + ' se abre el camino y <b>KM1 se suelta</b>. ';
+  if (np === 0) t += '<br><b>Paralelo (KM2):</b> los tres NC cerrados: KM2 activado. ';
+  else if (np < 3) t += '<br><b>Paralelo (KM2):</b> has abierto ' + np + ' de 3, pero la corriente sigue por ' + (np === 2 ? 'el que queda' : 'los que quedan') + ' cerrado' + (np === 2 ? '' : 's') + ': <b>KM2 sigue activado</b>. ';
+  else t += '<br><b>Paralelo (KM2):</b> solo con <b>los tres pulsados a la vez</b> se cortan todos los caminos y <b>KM2 se suelta</b>.';
+  return t;
+};
+</script>
+<script>
+(function(){
+var P = window.PAGE, $ = function(id){ return document.getElementById(id); };
+var st = { btn:{}, coil:{}, q:{}, rm:{}, last:'inicio', on:{} , trip:false};
+var latched = {}, lastDown = {}, skipUp = {};
+P.buttons.forEach(function(b){ st.btn[b] = false; });
+P.coils.forEach(function(c){ st.coil[c] = false; });
+P.qs.forEach(function(q){ st.q[q] = true; });
+(P.removables||[]).forEach(function(r){ st.rm[r.id] = false; });
+function ctlOn(c){ return st.btn.hasOwnProperty(c) ? st.btn[c] : !!st.coil[c]; }
+function closed(e){
+  if (e.t === 'w') return true;
+  if (e.t === 'q') return st.q[e.id];
+  if (e.rm && st.rm[e.rm]) return e.rmode === 'bridge';
+  var a = ctlOn(e.ctl);
+  if (e.t === 'no') return a;
+  if (e.t === 'nc') return !a;
+  if (e.t === 'cona') return a;
+  if (e.t === 'conc') return !a;
+  return false;
+}
+var E = P.edges;
+function adj(filter){ var m = {}; E.forEach(function(e, i){ if (e.load || !filter(e)) return; (m[e.a]=m[e.a]||[]).push([e.b,i]); (m[e.b]=m[e.b]||[]).push([e.a,i]); }); return m; }
+function bfs(m, s, avoid){ var seen = {}; seen[s] = 0; var q = [s]; if (avoid) seen[avoid] = -1;
+  while (q.length){ var u = q.shift(); (m[u]||[]).forEach(function(p){ if (!(p[0] in seen)){ seen[p[0]] = seen[u] + 1; q.push(p[0]); } }); }
+  if (avoid) delete seen[avoid]; return seen; }
+function compute(){
+  var m = adj(closed), fromL = bfs(m, 'L'), toN = bfs(m, 'N');
+  var loads = {}, flows = {};
+  E.forEach(function(e, i){ if (e.load){ var on = (e.a in fromL) && (e.b in toN); loads[e.id] = on; if (on) flows[i] = 1; } });
+  var tops = [], bots = [];
+  E.forEach(function(e){ if (e.load && loads[e.id]){ tops.push(e.a); bots.push(e.b); } });
+  E.forEach(function(e, i){
+    if (e.load || !closed(e)) return;
+    function side(src, targets){
+      for (var k = 0; k < targets.length; k++){
+        var t = targets[k];
+        var a1 = bfs(m, src, e.b), b1 = bfs(m, e.b, e.a);
+        if ((e.a in a1 || e.a === src) && (t in b1 || t === e.b)) return 1;
+        var a2 = bfs(m, src, e.a), b2 = bfs(m, e.a, e.b);
+        if ((e.b in a2 || e.b === src) && (t in b2 || t === e.a)) return -1;
+      }
+      return 0;
+    }
+    var d = side('L', tops); if (!d){ d = -side('N', bots); }
+    if (d) flows[i] = d;
+  });
+  return { loads: loads, flows: flows };
+}
+var timer = null, R = null;
+function settle(){
+  R = compute();
+  var ch = null;
+  for (var k = 0; k < P.coils.length; k++){ var c = P.coils[k]; if (!!R.loads[c] !== !!st.coil[c]){ ch = c; break; } }
+  render();
+  if (ch === null) return;
+  clearTimeout(timer);
+  var want = !!R.loads[ch];
+  timer = setTimeout(function(){ st.coil[ch] = want; if (P.after) P.after(st); settle(); }, want ? 260 : 160);
+}
+function rot(el, deg){ if (el) el.style.transform = 'rotate(' + deg + 'deg)'; }
+function render(){
+  R = R || compute();
+  E.forEach(function(e, i){
+    var f = $('fl' + i); if (!f) return;
+    var d = R.flows[i];
+    f.classList.toggle('on', !!d);
+    if (d) f.setAttribute('d', d === -1 ? e.dr : e.d);
+  });
+  P.devs.forEach(function(v){
+    var a = v.ctl ? ctlOn(v.ctl) : false;
+    if (v.t === 'no') rot($('bl_' + v.key), a ? 32 : 0);
+    if (v.t === 'nc') rot($('bl_' + v.key), a ? -45 : 0);
+    if (v.t === 'co') rot($('bl_' + v.key), a ? 64 : 0);
+    if (v.btn){ var ac = $('ac_' + v.key); if (ac) ac.style.transform = a ? 'translateX(12px)' : ''; }
+    if (v.t === 'q'){ rot($('bl_' + v.key), st.q[v.id] ? 0 : -32); $('ac_' + v.key).style.transform = st.q[v.id] ? '' : 'translateX(-10px)'; }
+    if (v.t === 'coil'){ $('cf_' + v.key).style.fill = st.coil[v.id] ? '#FFE9A8' : '#fff'; }
+    if (v.t === 'lamp'){ $('gl_' + v.key).classList.toggle('on', !!R.loads[v.id]); }
+    if (v.rm){ var g = $('rm_' + v.key); g.classList.toggle('off', !!st.rm[v.rm]); $('cut_' + v.key).style.display = st.rm[v.rm] ? '' : 'none';
+      var br = $('br_' + v.key); if (br) br.classList.toggle('on', !!st.rm[v.rm]); }
+  });
+  P.buttons.forEach(function(b){ var el = $('b_' + b); if (el){ el.classList.toggle('on', st.btn[b]); el.classList.toggle('latched', !!latched[b]); el.setAttribute('aria-pressed', st.btn[b]); }
+    var g = $('g_' + b); if (g) g.classList.toggle('latched', !!latched[b]); });
+  (P.removables||[]).forEach(function(r){ var c = $('t_' + r.id); if (c) c.checked = !st.rm[r.id]; });
+  P.qs.forEach(function(q){ var b = $('bq_' + q); if (b) b.textContent = (st.q[q] ? 'Abrir ' : 'Cerrar ') + '-' + q; });
+  if (P.status) P.status(st, R, $);
+  $('explain').innerHTML = P.msg(st, R);
+}
+function press(b, down){ if (st.btn[b] === down) return; st.btn[b] = down; st.last = b + (down ? 'On' : 'Off'); if (P.onpress) P.onpress(st, b, down); settle(); }
+function hold(el, b){
+  if (!el) return;
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    var now = Date.now();
+    if (latched[b]){ latched[b] = false; skipUp[b] = true; press(b, false); render(); return; }
+    if (now - (lastDown[b] || 0) < 380){ latched[b] = true; skipUp[b] = true; lastDown[b] = 0; press(b, true); render(); return; }
+    lastDown[b] = now; press(b, true);
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){
+    if (skipUp[b]){ if (ev !== 'lostpointercapture') skipUp[b] = false; return; }
+    if (latched[b]) return;
+    press(b, false);
+  }); });
+  el.addEventListener('dblclick', function(e){ e.preventDefault(); });
+  el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(b, true); } });
+  el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched[b]) press(b, false); });
+}
+function click(el, fn){ if (!el) return; el.addEventListener('click', fn); el.addEventListener('keydown', function(e){ if (el.tagName !== 'BUTTON' && (e.key === ' ' || e.key === 'Enter')){ e.preventDefault(); fn(); } }); }
+P.buttons.forEach(function(b){ hold($('b_' + b), b); hold($('g_' + b), b); });
+P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q'; settle(); }; click($('bq_' + q), f); click($('g_' + q), f); });
+(P.removables||[]).forEach(function(r){
+  var f = function(){ st.rm[r.id] = !st.rm[r.id]; st.last = 'rm_' + r.id; settle(); };
+  (r.keys||[]).forEach(function(k){ click($('g_' + k), f); });
+  var c = $('t_' + r.id); if (c) c.addEventListener('change', function(){ st.rm[r.id] = !this.checked; st.last = 'rm_' + r.id; settle(); });
+});
+(P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
+var keymap = P.keys || {};
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html'; } } });
+document.addEventListener('keydown', function(e){
+  if (e.repeat) return;
+  var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
+  var k = keymap[e.key.toLowerCase()]; if (!k) return;
+  if (st.btn.hasOwnProperty(k)) press(k, true);
+  else if (st.q.hasOwnProperty(k)){ st.q[k] = !st.q[k]; settle(); }
+  else if (st.rm.hasOwnProperty(k)){ st.rm[k] = !st.rm[k]; st.last = 'rm_' + k; settle(); }
+});
+document.addEventListener('keyup', function(e){ var k = keymap[e.key.toLowerCase()]; if (k && st.btn.hasOwnProperty(k)) press(k, false); });
+settle();
+})();
+</script>
+</body>
+</html>
