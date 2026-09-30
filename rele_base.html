@@ -124,7 +124,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 </head>
 <body>
 <main>
-  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <a class="back" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>El relé y su base: leer los dibujos del fabricante</h1>
   <p class="sub">El mismo relé se dibuja de <b>muchas formas</b>: la <b>base</b> con sus tornillos (1 a 14), la <b>pegatina</b> del relé (cada fabricante la dibuja a su manera) y el <b>esquema</b> que usamos en clase. Toca un tornillo o un número en cualquiera de los tres dibujos y mira dónde está en los otros dos.</p>
   <div class="grid">
@@ -344,7 +344,7 @@ tabs('tNum', function(v){ S.num = v; M = model(); S.reto = null; S.fb = {}; draw
 tabs('tMode', function(v){ S.mode = v; S.sel = []; S.fb = {}; if (v === 'reto') S.reto = null; update(); });
 document.getElementById('bCoil').addEventListener('click', function(){ S.coil = !S.coil; setBlades(); update(); });
 document.getElementById('bNext').addEventListener('click', newReto);
-document.addEventListener('keydown', function(e){ if ((e.key === 'Escape' || e.key === 'Backspace') && e.target.tagName !== 'INPUT'){ e.preventDefault(); location.href = 'index.html'; } });
+document.addEventListener('keydown', function(e){ if ((e.key === 'Escape' || e.key === 'Backspace') && e.target.tagName !== 'INPUT'){ e.preventDefault(); location.href = 'index.html#animaciones'; } });
 draw(); update();
 })();
 </script>

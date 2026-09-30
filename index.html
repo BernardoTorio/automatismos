@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Automatismos Industriales · Animaciones</title>
+<title>Automatismos Industriales · I.E.S. Trinidad Arroyo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -30,19 +30,60 @@ a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--
 .pdf:hover,.pdf:focus-visible{border-color:var(--acc);outline:none}
 .pdf .ico{flex:none;width:44px;height:52px;border-radius:6px;background:#C0392B;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700}
 .pdf small{display:block;font-weight:400;color:var(--muted)}
+
+.folders{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:560px){.folders{grid-template-columns:1fr}}
+.folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 16px;color:inherit;text-decoration:none;font-weight:700;font-size:1.1rem;cursor:pointer}
+.folder:hover,.folder:focus-visible{border-color:var(--acc);outline:none}
+.folder.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc) inset}
+.folder small{font-weight:400;color:var(--muted);font-size:.9rem}
+.fico{width:46px;height:36px;position:relative}
+.fico:before{content:"";position:absolute;left:0;top:0;width:20px;height:8px;border-radius:4px 4px 0 0;background:#E0A800}
+.fico:after{content:"";position:absolute;left:0;top:5px;width:46px;height:31px;border-radius:0 5px 5px 5px;background:#F2B400}
+section{display:none} section.on{display:block}
+.pdf.missing{opacity:.45;border-style:dashed;pointer-events:none}
+.pdf.missing small:after{content:" · próximamente"}
 </style>
 </head>
 <body>
 <main>
   <div class="top">
     <small>AUTOMATISMOS INDUSTRIALES · I.E.S. TRINIDAD ARROYO</small>
-    <h1>Animaciones de los esquemas</h1>
+    <h1>Automatismos Industriales</h1>
   </div>
-  <h2 class="sec">Tema 3 · Conexionado básico II</h2>
-  <a class="pdf" href="T3_Conexionado_basico_II_Automatismos.pdf" download>
+  <nav class="folders" aria-label="Carpetas">
+    <a class="folder" href="#temas" data-f="temas"><span class="fico"></span>Temas<small>Apuntes en PDF</small></a>
+    <a class="folder" href="#practicas" data-f="practicas"><span class="fico"></span>Prácticas<small>Fichas en PDF</small></a>
+    <a class="folder" href="#animaciones" data-f="animaciones"><span class="fico"></span>Animaciones<small>Esquemas que se mueven</small></a>
+  </nav>
+  <section id="sec-temas">
+    <h2 class="sec">Temas · apuntes para descargar</h2>
+  <a class="pdf" href="temas/T1_Esquemas_basicos_Automatismos.pdf" download>
     <div class="ico">PDF</div>
-    <div>Descargar los apuntes del Tema 3<small>Conexionado básico II · 15 páginas · con los códigos QR de todas las animaciones</small></div>
+    <div>Tema 1 · Esquemas básicos<small>Símbolos de los aparatos del aula y criterios para dibujar esquemas</small></div>
   </a>
+  <a class="pdf" href="temas/T2_Dispositivos_basicos_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 2 · Dispositivos básicos<small>Fusible, pulsador, final de carrera, detector, piloto, contactor, relé y térmico</small></div>
+  </a>
+  <a class="pdf" href="temas/T3_Conexionado_basico_II_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 3 · Conexionado básico II<small>Serie y paralelo, realimentación, combinaciones, enclavamiento, relé auxiliar y potencia · con los QR de las animaciones</small></div>
+  </a>
+  </section>
+  <section id="sec-practicas">
+    <h2 class="sec">Prácticas · fichas para descargar</h2>
+  <a class="pdf" href="practicas/P1_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Práctica 1 · Cableados iniciales<small>Pulsadores en serie y en paralelo mandando un contactor, con señalización</small></div>
+  </a>
+  <a class="pdf" href="practicas/P2_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Práctica 2 · Cableados iniciales II<small>Realimentación, prioridad al paro y a la marcha, marchas y paros totales con relé auxiliar y activación condicionada</small></div>
+  </a>
+  </section>
+  <section id="sec-animaciones">
+    <h2 class="sec">Tema 3 · Conexionado básico II</h2>
   <a class="card" href="pulsadores_na.html">
     <div class="num">3.1</div>
     <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
@@ -87,7 +128,25 @@ a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--
     <div class="num">3.10</div>
     <div><h2>Inversión de giro de un motor</h2><p>Fuerza y mando: KM2 cruza L1 y L3. Con enclavamiento, sobrecarga y cortocircuito si lo quitas.</p></div>
   </a>
-  <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
+    <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
+  </section>
 </main>
+<script>
+(function(){
+  function show(){
+    var f = (location.hash || '#temas').slice(1);
+    if (!document.getElementById('sec-' + f)) f = 'temas';
+    document.querySelectorAll('section').forEach(function(s){ s.classList.toggle('on', s.id === 'sec-' + f); });
+    document.querySelectorAll('.folder').forEach(function(a){ a.classList.toggle('sel', a.dataset.f === f); });
+  }
+  window.addEventListener('hashchange', function(){ show(); window.scrollTo(0, 0); });
+  document.querySelectorAll('.folder').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); history.replaceState(null, '', '#' + a.dataset.f); show(); }); });
+  show(); setTimeout(function(){ window.scrollTo(0, 0); }, 0);
+  // los PDF que aún no están subidos se marcan como "próximamente"
+  document.querySelectorAll('a.pdf').forEach(function(a){
+    fetch(a.getAttribute('href'), { method:'HEAD' }).then(function(r){ if (!r.ok) a.classList.add('missing'); }).catch(function(){});
+  });
+})();
+</script>
 </body>
 </html>

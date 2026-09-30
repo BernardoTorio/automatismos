@@ -95,7 +95,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 </head>
 <body>
 <main>
-  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <a class="back" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>Una combinación de paros y marchas</h1>
   <p class="sub">Paros: -S1 y -S2 en paralelo, y -S3 en serie con ellos. Marchas: -S4 y -S5 en serie, en paralelo con -S6 y con la realimentación. Prueba a arrancar y a parar de todas las formas posibles: con <b>doble clic</b> un pulsador se queda fijado.</p>
   <div class="grid">
@@ -158,6 +158,7 @@ P.buttons.forEach(function(b){ st.btn[b] = false; });
 P.coils.forEach(function(c){ st.coil[c] = false; });
 P.qs.forEach(function(q){ st.q[q] = true; });
 (P.removables||[]).forEach(function(r){ st.rm[r.id] = false; });
+if (P.init) P.init(st);
 function ctlOn(c){ return st.btn.hasOwnProperty(c) ? st.btn[c] : !!st.coil[c]; }
 function closed(e){
   if (e.t === 'w') return true;
@@ -266,7 +267,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html#animaciones'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;

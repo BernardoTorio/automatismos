@@ -95,7 +95,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 </head>
 <body>
 <main>
-  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <a class="back" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>Inversión de giro de un motor</h1>
   <p class="sub">Fuerza y mando juntos. Arranca a derechas (-S1) o a izquierdas (-S2) y sigue en la fuerza el camino de cada fase hasta el motor. Luego quita el enclavamiento y prueba a meter los dos.</p>
   <div class="grid">
@@ -294,7 +294,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html#animaciones'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;

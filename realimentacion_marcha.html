@@ -95,7 +95,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 </head>
 <body>
 <main>
-  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <a class="back" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a>
   <h1>Realimentación con prioridad a la marcha</h1>
   <p class="sub">Un montaje poco usado: el paro solo corta la realimentación. Arranca con -S1 y luego pulsa marcha y paro a la vez (fija uno con <b>doble clic</b>).</p>
   <div class="grid">
@@ -154,6 +154,7 @@ P.buttons.forEach(function(b){ st.btn[b] = false; });
 P.coils.forEach(function(c){ st.coil[c] = false; });
 P.qs.forEach(function(q){ st.q[q] = true; });
 (P.removables||[]).forEach(function(r){ st.rm[r.id] = false; });
+if (P.init) P.init(st);
 function ctlOn(c){ return st.btn.hasOwnProperty(c) ? st.btn[c] : !!st.coil[c]; }
 function closed(e){
   if (e.t === 'w') return true;
@@ -262,7 +263,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html#animaciones'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
