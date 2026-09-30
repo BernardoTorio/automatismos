@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inversión de giro de un motor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 16px;max-width:75ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:74vh;min-width:320px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.boxes{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;margin-top:16px}
+@media (max-width:820px){.boxes{grid-template-columns:1fr}}
+.boxes h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.explain{min-height:6.5em;font-size:1.08rem}
+.explain .k,.idea .k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.idea{border-left:6px solid #548235}
+.idea p{margin:0 0 6px}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.controls.two{grid-template-columns:1fr 1fr}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:11px 6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.g{border-color:#2E8B3E} button.g.on{background:#2E8B3E;color:#fff}
+button.r{border-color:#C0392B} button.r.on{background:#C0392B;color:#fff}
+.small{font-size:.8rem;font-weight:400;display:block;opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.toggle input{width:22px;height:22px;accent-color:#2E8B3E}
+.leds{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:26px;height:26px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .2s,box-shadow .2s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
+.dot.y.on{background:#FFD23F;box-shadow:0 0 14px #FFD23F}
+.dot.k.on{background:#F2B400;box-shadow:0 0 14px #F2B400}
+.state{font-size:1.1rem;font-weight:700}
+.state.run{color:var(--ok)} .state.stop{color:var(--muted)} .state.bad{color:var(--warn)}
+.alarm{display:none;background:#C0392B;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700}
+.alarm.on{display:block}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .18s ease}
+.rm{transition:opacity .25s} .rm.off{opacity:.18}
+.bridge{display:none} .bridge.on{display:inline}
+.glow{opacity:0;transition:opacity .2s} .glow.on{opacity:.9}
+.coilfill{transition:fill .2s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4;rx:8}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+.motor{width:64px;height:64px;flex:none}
+.spinR{animation:spin .8s linear infinite} .spinL{animation:spin .8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinR,.spinL{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <h1>Inversión de giro de un motor</h1>
+  <p class="sub">Fuerza y mando juntos. Arranca a derechas (-S1) o a izquierdas (-S2) y sigue en la fuerza el camino de cada fase hasta el motor. Luego quita el enclavamiento y prueba a meter los dos.</p>
+  <div class="grid">
+    <div class="sheet"><svg viewBox="0 0 1140 800" role="img" aria-labelledby="svgt"><title id="svgt">Inversión de giro: fuerza con Q1, KM1, KM2 cruzando L1 y L3, F2 y motor; mando con enclavamiento</title><text class="t name" x="40" y="22" style="fill:#1F4E79">FUERZA</text><text class="t name" x="580" y="22" style="fill:#1F4E79">MANDO</text><line class="w wf" x1="40" y1="40" x2="490" y2="40"/><text class="t name" x="32" y="46" text-anchor="end" style="fill:var(--fase);font-size:14px">L1</text><circle cx="100" cy="40" r="5" fill="var(--fase)"/><path class="w wf" d="M100 40 V110"/><line class="w wf" x1="40" y1="58" x2="490" y2="58"/><text class="t name" x="32" y="64" text-anchor="end" style="fill:var(--fase);font-size:14px">L2</text><circle cx="160" cy="58" r="5" fill="var(--fase)"/><path class="w wf" d="M160 58 V110"/><line class="w wf" x1="40" y1="76" x2="490" y2="76"/><text class="t name" x="32" y="82" text-anchor="end" style="fill:var(--fase);font-size:14px">L3</text><circle cx="220" cy="76" r="5" fill="var(--fase)"/><path class="w wf" d="M220 76 V110"/><line class="sym" x1="93" y1="123" x2="107" y2="137" style="stroke-width:2.4"/><line class="sym" x1="93" y1="137" x2="107" y2="123" style="stroke-width:2.4"/><line class="sym" x1="153" y1="123" x2="167" y2="137" style="stroke-width:2.4"/><line class="sym" x1="153" y1="137" x2="167" y2="123" style="stroke-width:2.4"/><line class="sym" x1="213" y1="123" x2="227" y2="137" style="stroke-width:2.4"/><line class="sym" x1="213" y1="137" x2="227" y2="123" style="stroke-width:2.4"/><line class="dash" x1="82" y1="144" x2="208" y2="144"/><path class="w wf" d="M100 176 V200 H320 V260"/><path class="w wf" d="M100 200 V260"/><circle cx="100" cy="200" r="5" fill="var(--fase)"/><path class="w wf" d="M160 176 V214 H380 V260"/><path class="w wf" d="M160 214 V260"/><circle cx="160" cy="214" r="5" fill="var(--fase)"/><path class="w wf" d="M220 176 V228 H440 V260"/><path class="w wf" d="M220 228 V260"/><circle cx="220" cy="228" r="5" fill="var(--fase)"/><path class="sym" d="M93 278 A7 7 0 0 0 107 278" style="stroke-width:2.2"/><path class="sym" d="M313 278 A7 7 0 0 0 327 278" style="stroke-width:2.2"/><path class="sym" d="M153 278 A7 7 0 0 0 167 278" style="stroke-width:2.2"/><path class="sym" d="M373 278 A7 7 0 0 0 387 278" style="stroke-width:2.2"/><path class="sym" d="M213 278 A7 7 0 0 0 227 278" style="stroke-width:2.2"/><path class="sym" d="M433 278 A7 7 0 0 0 447 278" style="stroke-width:2.2"/><line class="dash" x1="82" y1="294" x2="208" y2="294"/><line class="dash" x1="302" y1="294" x2="428" y2="294"/><path class="w wf" d="M100 326 V440"/><path class="w wf" d="M320 326 V372 H220"/><circle cx="220" cy="372" r="5" fill="var(--fase)"/><path class="w wf" d="M160 326 V440"/><path class="w wf" d="M380 326 V390 H160"/><circle cx="160" cy="390" r="5" fill="var(--fase)"/><path class="w wf" d="M220 326 V440"/><path class="w wf" d="M440 326 V408 H100"/><circle cx="100" cy="408" r="5" fill="var(--fase)"/><text class="t" x="330" y="432" style="font-size:13px;fill:#56606b">KM2 cruza L1 y L3</text><line class="sym" x1="100" y1="440" x2="100" y2="452"/><rect class="symf" x="86" y="452" width="28" height="36"/><path class="sym" d="M100 452 V466 H108 V474 H100 V488" style="stroke-width:2.4"/><line class="sym" x1="100" y1="488" x2="100" y2="500"/><text class="t" x="108" y="446">1</text><text class="t" x="108" y="512">2</text><line class="sym" x1="160" y1="440" x2="160" y2="452"/><rect class="symf" x="146" y="452" width="28" height="36"/><path class="sym" d="M160 452 V466 H168 V474 H160 V488" style="stroke-width:2.4"/><line class="sym" x1="160" y1="488" x2="160" y2="500"/><text class="t" x="168" y="446">3</text><text class="t" x="168" y="512">4</text><line class="sym" x1="220" y1="440" x2="220" y2="452"/><rect class="symf" x="206" y="452" width="28" height="36"/><path class="sym" d="M220 452 V466 H228 V474 H220 V488" style="stroke-width:2.4"/><line class="sym" x1="220" y1="488" x2="220" y2="500"/><text class="t" x="228" y="446">5</text><text class="t" x="228" y="512">6</text><line class="dash" x1="114" y1="470" x2="146" y2="470"/><line class="dash" x1="174" y1="470" x2="206" y2="470"/><text class="t name" x="72" y="476" text-anchor="end">-F2</text><path class="w wf" d="M100 500 V560 L132 598"/><path class="w wf" d="M160 500 V590"/><path class="w wf" d="M220 500 V560 L188 598"/><text class="t" x="108" y="540">U</text><text class="t" x="168" y="540">V</text><text class="t" x="228" y="540">W</text><circle cx="160" cy="640" r="50" class="symf" id="motC"/><text class="t" x="160" y="640" text-anchor="middle" style="font-size:28px;font-weight:700">M</text><text class="t" x="160" y="664" text-anchor="middle" style="font-size:16px">3~</text><text class="t name" x="80" y="646" text-anchor="end">-M1</text><g id="rotFR" style="transform-origin:160px 640px;display:none"><path d="M160 574 A66 66 0 0 1 226 640" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M218 626 L226 644 L236 628 Z" fill="#1F4E79"/></g><g id="rotFL" style="transform-origin:160px 640px;display:none"><path d="M160 574 A66 66 0 0 0 94 640" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M102 626 L94 644 L84 628 Z" fill="#1F4E79"/></g><text id="shortTxt" class="t name" x="250" y="560" style="fill:#C0392B;display:none">¡CORTOCIRCUITO L1-L3!</text><path id="fk1_0" class="flow" d="M40 40 H100 V110 V176 V200 V260 V326 V440 V500 V560 L132 598"/><path id="fk2_0" class="flow" d="M40 40 H100 V110 V176 V200 H320 V260 V326 V372 H220 V440 V500 V560 L188 598"/><path id="fk1_1" class="flow" d="M40 58 H160 V110 V176 V214 V260 V326 V440 V500 V590"/><path id="fk2_1" class="flow" d="M40 58 H160 V110 V176 V214 H380 V260 V326 V390 H160 V440 V500 V590"/><path id="fk1_2" class="flow" d="M40 76 H220 V110 V176 V228 V260 V326 V440 V500 V560 L188 598"/><path id="fk2_2" class="flow" d="M40 76 H220 V110 V176 V228 H440 V260 V326 V408 H100 V440 V500 V560 L132 598"/><line class="w wf" x1="580" y1="40" x2="1120" y2="40"/><text class="t name" x="570" y="46" text-anchor="end" style="fill:var(--fase)">L</text><line class="w wn" x1="580" y1="770" x2="1120" y2="770"/><text class="t name" x="570" y="776" text-anchor="end" style="fill:var(--neutro)">N</text><path class="w wf" d="M580 40 L680 40"/><path class="w wf" d="M680 40 L680 58"/><path class="w wf" d="M680 200 L680 236"/><path class="w wf" d="M680 302 L680 330"/><path class="w wf" d="M680 396 L680 420"/><path class="w wf" d="M680 420 L810 420"/><path class="w wf" d="M810 420 L950 420"/><path class="w wf" d="M950 420 L1080 420"/><path class="w wf" d="M680 420 L680 450"/><path class="w wf" d="M810 420 L810 450"/><path class="w wf" d="M680 516 L680 542"/><path class="w wf" d="M810 516 L810 542 L680 542"/><path class="w wf" d="M680 542 L680 568"/><path class="w wf" d="M680 634 L680 680"/><path class="w wn" d="M680 720 L680 770"/><path class="w wn" d="M680 770 L580 770"/><path class="w wf" d="M950 420 L950 450"/><path class="w wf" d="M1080 420 L1080 450"/><path class="w wf" d="M950 516 L950 542"/><path class="w wf" d="M1080 516 L1080 542 L950 542"/><path class="w wf" d="M950 542 L950 568"/><path class="w wf" d="M950 634 L950 680"/><path class="w wn" d="M950 720 L950 770"/><path class="w wn" d="M950 770 L580 770"/><path id="fl0" class="flow" d="M100 110 L100 176"/><path id="fl1" class="flow" d="M160 110 L160 176"/><path id="fl2" class="flow" d="M220 110 L220 176"/><path id="fl3" class="flow" d="M100 260 L100 326"/><path id="fl4" class="flow" d="M320 260 L320 326"/><path id="fl5" class="flow" d="M160 260 L160 326"/><path id="fl6" class="flow" d="M380 260 L380 326"/><path id="fl7" class="flow" d="M220 260 L220 326"/><path id="fl8" class="flow" d="M440 260 L440 326"/><path id="fl9" class="flow" d="M680 58 L680 200"/><path id="fl10" class="flow" d="M580 40 L680 40"/><path id="fl11" class="flow" d="M680 40 L680 58"/><path id="fl12" class="flow" d="M680 236 L680 302"/><path id="fl13" class="flow" d="M680 200 L680 236"/><path id="fl14" class="flow" d="M680 330 L680 396"/><path id="fl15" class="flow" d="M680 302 L680 330"/><path id="fl16" class="flow" d="M680 396 L680 420"/><path id="fl17" class="flow" d="M680 420 L810 420"/><path id="fl18" class="flow" d="M810 420 L950 420"/><path id="fl19" class="flow" d="M950 420 L1080 420"/><path id="fl20" class="flow" d="M680 450 L680 516"/><path id="fl21" class="flow" d="M680 420 L680 450"/><path id="fl22" class="flow" d="M810 450 L810 516"/><path id="fl23" class="flow" d="M810 420 L810 450"/><path id="fl24" class="flow" d="M680 516 L680 542"/><path id="fl25" class="flow" d="M810 516 L810 542 L680 542"/><path id="fl26" class="flow" d="M680 568 L680 634"/><path id="fl27" class="flow" d="M680 542 L680 568"/><path id="fl28" class="flow" d="M680 680 L680 720"/><path id="fl29" class="flow" d="M680 634 L680 680"/><path id="fl30" class="flow" d="M680 720 L680 770"/><path id="fl31" class="flow" d="M680 770 L580 770"/><path id="fl32" class="flow" d="M950 450 L950 516"/><path id="fl33" class="flow" d="M950 420 L950 450"/><path id="fl34" class="flow" d="M1080 450 L1080 516"/><path id="fl35" class="flow" d="M1080 420 L1080 450"/><path id="fl36" class="flow" d="M950 516 L950 542"/><path id="fl37" class="flow" d="M1080 516 L1080 542 L950 542"/><path id="fl38" class="flow" d="M950 568 L950 634"/><path id="fl39" class="flow" d="M950 542 L950 568"/><path id="fl40" class="flow" d="M950 680 L950 720"/><path id="fl41" class="flow" d="M950 634 L950 680"/><path id="fl42" class="flow" d="M950 720 L950 770"/><path id="fl43" class="flow" d="M950 770 L580 770"/><line class="sym" x1="100" y1="110" x2="100" y2="130"/><line class="sym" x1="100" y1="160" x2="100" y2="176"/><line id="bl_d1" class="sym blade" x1="100" y1="160" x2="80" y2="128" style="transform-origin:100px 160px"/><text class="t" x="108" y="108">1</text><text class="t" x="108" y="190">2</text><text class="t name" x="72" y="150" text-anchor="end">-Q1</text><line class="sym" x1="160" y1="110" x2="160" y2="130"/><line class="sym" x1="160" y1="160" x2="160" y2="176"/><line id="bl_d2" class="sym blade" x1="160" y1="160" x2="140" y2="128" style="transform-origin:160px 160px"/><text class="t" x="168" y="108">3</text><text class="t" x="168" y="190">4</text><text class="t name" x="132" y="150" text-anchor="end"></text><line class="sym" x1="220" y1="110" x2="220" y2="130"/><line class="sym" x1="220" y1="160" x2="220" y2="176"/><line id="bl_d3" class="sym blade" x1="220" y1="160" x2="200" y2="128" style="transform-origin:220px 160px"/><text class="t" x="228" y="108">5</text><text class="t" x="228" y="190">6</text><text class="t name" x="192" y="150" text-anchor="end"></text><line class="sym" x1="100" y1="260" x2="100" y2="280"/><line class="sym" x1="100" y1="310" x2="100" y2="326"/><line id="bl_d4" class="sym blade" x1="100" y1="310" x2="80" y2="278" style="transform-origin:100px 310px"/><text class="t" x="108" y="258">1</text><text class="t" x="108" y="340">2</text><text class="t name" x="72" y="300" text-anchor="end">-KM1</text><line class="sym" x1="320" y1="260" x2="320" y2="280"/><line class="sym" x1="320" y1="310" x2="320" y2="326"/><line id="bl_d5" class="sym blade" x1="320" y1="310" x2="300" y2="278" style="transform-origin:320px 310px"/><text class="t" x="328" y="258">1</text><text class="t" x="328" y="340">2</text><text class="t name" x="292" y="300" text-anchor="end">-KM2</text><line class="sym" x1="160" y1="260" x2="160" y2="280"/><line class="sym" x1="160" y1="310" x2="160" y2="326"/><line id="bl_d6" class="sym blade" x1="160" y1="310" x2="140" y2="278" style="transform-origin:160px 310px"/><text class="t" x="168" y="258">3</text><text class="t" x="168" y="340">4</text><text class="t name" x="132" y="300" text-anchor="end"></text><line class="sym" x1="380" y1="260" x2="380" y2="280"/><line class="sym" x1="380" y1="310" x2="380" y2="326"/><line id="bl_d7" class="sym blade" x1="380" y1="310" x2="360" y2="278" style="transform-origin:380px 310px"/><text class="t" x="388" y="258">3</text><text class="t" x="388" y="340">4</text><text class="t name" x="352" y="300" text-anchor="end"></text><line class="sym" x1="220" y1="260" x2="220" y2="280"/><line class="sym" x1="220" y1="310" x2="220" y2="326"/><line id="bl_d8" class="sym blade" x1="220" y1="310" x2="200" y2="278" style="transform-origin:220px 310px"/><text class="t" x="228" y="258">5</text><text class="t" x="228" y="340">6</text><text class="t name" x="192" y="300" text-anchor="end"></text><line class="sym" x1="440" y1="260" x2="440" y2="280"/><line class="sym" x1="440" y1="310" x2="440" y2="326"/><line id="bl_d9" class="sym blade" x1="440" y1="310" x2="420" y2="278" style="transform-origin:440px 310px"/><text class="t" x="448" y="258">5</text><text class="t" x="448" y="340">6</text><text class="t name" x="412" y="300" text-anchor="end"></text><g id="g_Q2" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q2: abrir o cerrar">
+<rect class="hitbox" x="598" y="50" width="120" height="156"/>
+<line class="sym" x1="680" y1="58" x2="680" y2="76"/>
+<line class="sym" x1="672" y1="68" x2="688" y2="84" style="stroke-width:2.4"/>
+<line class="sym" x1="672" y1="84" x2="688" y2="68" style="stroke-width:2.4"/>
+<line id="bl_d10" class="sym blade" x1="680" y1="110" x2="680" y2="78" style="transform-origin:680px 110px"/>
+<line class="sym" x1="680" y1="110" x2="680" y2="124"/>
+<rect class="symf" x="666" y="124" width="28" height="30"/>
+<path class="sym" d="M680 124 V135 H688 V143 H680 V154" style="stroke-width:2.4"/>
+<line class="sym" x1="680" y1="154" x2="680" y2="162"/>
+<rect class="symf" x="666" y="162" width="28" height="26"/>
+<text class="t" x="680" y="180" text-anchor="middle" style="font-size:13px;font-weight:700">I&gt;</text>
+<line class="sym" x1="680" y1="188" x2="680" y2="200"/>
+<g id="ac_d10" class="blade"><line class="dash" x1="630" y1="94" x2="672" y2="94"/><line class="sym" x1="630" y1="82" x2="630" y2="106"/></g>
+<text class="t" x="688" y="58">1</text><text class="t" x="688" y="214">2</text>
+<text class="t name" x="620" y="100" text-anchor="end">-Q2</text></g><line class="sym" x1="680" y1="236" x2="680" y2="256"/><line class="sym" x1="680" y1="286" x2="680" y2="302"/><line class="sym" x1="680" y1="256" x2="698" y2="256"/><line id="bl_d11" class="sym blade" x1="680" y1="286" x2="702" y2="250" style="transform-origin:680px 286px"/><text class="t" x="688" y="234">95</text><text class="t" x="688" y="316">96</text><text class="t name" x="652" y="276" text-anchor="end"></text><g id="gF2" class="hit" tabindex="0" role="button" aria-label="Relé térmico F2: provocar o quitar la sobrecarga"><rect class="hitbox" x="560" y="230" width="112" height="80"/><rect class="symf" x="606" y="257" width="24" height="24"/><path class="sym" d="M618 257 V264 H625 V274 H618 V281" style="stroke-width:2.2"/><line class="dash" x1="630" y1="269" x2="690" y2="269"/><text class="t name" x="598" y="275" text-anchor="end">-F2</text></g><g id="g_S0" class="hit" tabindex="0" role="button" aria-label="Pulsador S0"><rect class="hitbox" x="576" y="322" width="134" height="82"/><line class="sym" x1="680" y1="330" x2="680" y2="350"/><line class="sym" x1="680" y1="380" x2="680" y2="396"/><line class="sym" x1="680" y1="350" x2="698" y2="350"/><line id="bl_d12" class="sym blade" x1="680" y1="380" x2="702" y2="344" style="transform-origin:680px 380px"/><g id="ac_d12" class="blade"><line class="dash" x1="630" y1="363" x2="688" y2="363"/><path class="sym" d="M638 352 H630 V374 H638"/></g><text class="t" x="688" y="328">1</text><text class="t" x="688" y="410">2</text><text class="t name" x="620" y="370" text-anchor="end">-S0</text></g><g id="g_S1" class="hit" tabindex="0" role="button" aria-label="Pulsador S1"><rect class="hitbox" x="576" y="442" width="134" height="82"/><line class="sym" x1="680" y1="450" x2="680" y2="470"/><line class="sym" x1="680" y1="500" x2="680" y2="516"/><line id="bl_d13" class="sym blade" x1="680" y1="500" x2="660" y2="468" style="transform-origin:680px 500px"/><g id="ac_d13" class="blade"><line class="dash" x1="630" y1="484" x2="670" y2="484"/><path class="sym" d="M638 473 H630 V495 H638"/></g><text class="t" x="688" y="448">3</text><text class="t" x="688" y="530">4</text><text class="t name" x="620" y="490" text-anchor="end">-S1</text></g><line class="sym" x1="810" y1="450" x2="810" y2="470"/><line class="sym" x1="810" y1="500" x2="810" y2="516"/><line id="bl_d14" class="sym blade" x1="810" y1="500" x2="790" y2="468" style="transform-origin:810px 500px"/><text class="t" x="818" y="448">13</text><text class="t" x="818" y="530">14</text><text class="t name" x="782" y="490" text-anchor="end">-KM1</text><g id="g_e1" class="hit" tabindex="0" role="button" aria-label="Quitar o poner el contacto 61-62 de KM2"><rect class="hitbox" x="602" y="558" width="128" height="92"/><g id="rm_d15" class="rm"><line class="sym" x1="680" y1="568" x2="680" y2="588"/><line class="sym" x1="680" y1="618" x2="680" y2="634"/><line class="sym" x1="680" y1="588" x2="698" y2="588"/><line id="bl_d15" class="sym blade" x1="680" y1="618" x2="702" y2="582" style="transform-origin:680px 618px"/><text class="t" x="688" y="566">61</text><text class="t" x="688" y="648">62</text><text class="t name" x="652" y="608" text-anchor="end">-KM2</text></g><g id="cut_d15" style="display:none"><line x1="694" y1="590" x2="720" y2="616" stroke="#C0392B" stroke-width="4"/><line x1="720" y1="590" x2="694" y2="616" stroke="#C0392B" stroke-width="4"/></g><path id="br_d15" class="w wf bridge" d="M680 568 V634"/></g><line class="sym" x1="680" y1="680" x2="680" y2="688"/><line class="sym" x1="680" y1="712" x2="680" y2="720"/><rect id="cf_d16" class="symf coilfill" x="652" y="688" width="56" height="24"/><text class="t" x="688" y="676">A1</text><text class="t" x="688" y="736">A2</text><text class="t name" x="640" y="706" text-anchor="end">-KM1</text><g id="g_S2" class="hit" tabindex="0" role="button" aria-label="Pulsador S2"><rect class="hitbox" x="846" y="442" width="134" height="82"/><line class="sym" x1="950" y1="450" x2="950" y2="470"/><line class="sym" x1="950" y1="500" x2="950" y2="516"/><line id="bl_d17" class="sym blade" x1="950" y1="500" x2="930" y2="468" style="transform-origin:950px 500px"/><g id="ac_d17" class="blade"><line class="dash" x1="900" y1="484" x2="940" y2="484"/><path class="sym" d="M908 473 H900 V495 H908"/></g><text class="t" x="958" y="448">3</text><text class="t" x="958" y="530">4</text><text class="t name" x="890" y="490" text-anchor="end">-S2</text></g><line class="sym" x1="1080" y1="450" x2="1080" y2="470"/><line class="sym" x1="1080" y1="500" x2="1080" y2="516"/><line id="bl_d18" class="sym blade" x1="1080" y1="500" x2="1060" y2="468" style="transform-origin:1080px 500px"/><text class="t" x="1088" y="448">13</text><text class="t" x="1088" y="530">14</text><text class="t name" x="1052" y="490" text-anchor="end">-KM2</text><g id="g_e2" class="hit" tabindex="0" role="button" aria-label="Quitar o poner el contacto 61-62 de KM1"><rect class="hitbox" x="872" y="558" width="128" height="92"/><g id="rm_d19" class="rm"><line class="sym" x1="950" y1="568" x2="950" y2="588"/><line class="sym" x1="950" y1="618" x2="950" y2="634"/><line class="sym" x1="950" y1="588" x2="968" y2="588"/><line id="bl_d19" class="sym blade" x1="950" y1="618" x2="972" y2="582" style="transform-origin:950px 618px"/><text class="t" x="958" y="566">61</text><text class="t" x="958" y="648">62</text><text class="t name" x="922" y="608" text-anchor="end">-KM1</text></g><g id="cut_d19" style="display:none"><line x1="964" y1="590" x2="990" y2="616" stroke="#C0392B" stroke-width="4"/><line x1="990" y1="590" x2="964" y2="616" stroke="#C0392B" stroke-width="4"/></g><path id="br_d19" class="w wf bridge" d="M950 568 V634"/></g><line class="sym" x1="950" y1="680" x2="950" y2="688"/><line class="sym" x1="950" y1="712" x2="950" y2="720"/><rect id="cf_d20" class="symf coilfill" x="922" y="688" width="56" height="24"/><text class="t" x="958" y="676">A1</text><text class="t" x="958" y="736">A2</text><text class="t name" x="910" y="706" text-anchor="end">-KM2</text><circle cx="680" cy="40" r="5" fill="var(--fase)"/><circle cx="680" cy="770" r="5" fill="var(--neutro)"/><circle cx="950" cy="770" r="5" fill="var(--neutro)"/><circle cx="680" cy="420" r="5" fill="var(--fase)"/><circle cx="950" cy="420" r="5" fill="var(--fase)"/><circle cx="810" cy="420" r="5" fill="var(--fase)"/><circle cx="680" cy="542" r="5" fill="var(--fase)"/><circle cx="950" cy="542" r="5" fill="var(--fase)"/></svg></div>
+    <div class="side"><div class="card"><div style="display:flex;gap:14px;align-items:center">
+<svg class="motor" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#E9EAEC" stroke="#444" stroke-width="3"/>
+<g id="rotorR" style="transform-origin:32px 32px;display:none"><path d="M32 8 A24 24 0 0 1 56 32" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M50 24 L56 34 L62 24 Z" fill="#1F4E79"/></g><g id="rotorL" style="transform-origin:32px 32px;display:none"><path d="M32 8 A24 24 0 0 0 8 32" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M14 24 L8 34 L2 24 Z" fill="#1F4E79"/></g>
+<text x="32" y="38" text-anchor="middle" font-family="Atkinson Hyperlegible,Verdana,sans-serif" font-weight="700" font-size="15" fill="#222">M</text></svg>
+<div><div id="stxt" class="state stop"></div>
+<div class="leds" style="margin-top:6px"><span class="led"><span id="dK1" class="dot k"></span>KM1</span><span class="led"><span id="dK2" class="dot k"></span>KM2</span></div></div></div>
+<div id="alarm" class="alarm" style="margin-top:10px">¡CORTOCIRCUITO! KM1 y KM2 cerrados a la vez unen L1 con L3. Salta -Q1 de fuerza.</div></div>
+<div class="card"><div class="controls two">
+<button id="b_S1" class="g" aria-pressed="false">Derecha -S1<span class="small">mantén · tecla D</span></button>
+<button id="b_S2" class="g" aria-pressed="false">Izquierda -S2<span class="small">mantén · tecla I</span></button>
+<button id="b_S0" class="r" aria-pressed="false" style="grid-column:1 / span 2">Paro -S0<span class="small">mantén · tecla P</span></button></div>
+<div class="row" style="justify-content:space-between"><label class="toggle"><input type="checkbox" id="t_enc" checked> Con enclavamiento (61-62)</label>
+<button id="bq_Q2" style="padding:9px 12px">Abrir -Q2</button></div>
+<div class="row"><button id="bOver" style="padding:9px 12px">Provocar sobrecarga (-F2)</button><button id="bReset" style="padding:9px 12px;display:none">Rearmar -Q1 de fuerza</button></div></div></div>
+  </div>
+  <div class="boxes">
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card idea"><h2>Para qué sirve</h2><p>Para invertir el giro de un motor trifásico basta con <b>intercambiar dos fases</b>. -KM1 conecta L1-L2-L3 tal cual; -KM2 cruza <b>L1 y L3</b>.</p>
+<p>Si entraran los dos a la vez habría un cortocircuito, por eso el mando lleva <b>enclavamiento</b> (61-62) y, para cambiar de sentido, <b>primero paro</b>.</p></div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>, como si lo mantuvieras pulsado: así puedes pulsar varios a la vez con el ratón. Un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>. Toca en el esquema -Q2, el térmico <b>-F2</b> (sobrecarga), los pulsadores y los <b>61-62</b> (quitar o poner el enclavamiento). Teclado: <kbd>D</kbd> derechas, <kbd>I</kbd> izquierdas, <kbd>P</kbd> paro, <kbd>E</kbd> enclavamiento, <kbd>Esc</kbd> índice.</p>
+</main>
+<script>
+window.PAGE = {"edges": [{"t": "no", "a": "d1t", "b": "d1b", "d": "M100 110 L100 176", "dr": "M100 176 L100 110", "ctl": "QF", "rmode": "open"}, {"t": "no", "a": "d2t", "b": "d2b", "d": "M160 110 L160 176", "dr": "M160 176 L160 110", "ctl": "QF", "rmode": "open"}, {"t": "no", "a": "d3t", "b": "d3b", "d": "M220 110 L220 176", "dr": "M220 176 L220 110", "ctl": "QF", "rmode": "open"}, {"t": "no", "a": "d4t", "b": "d4b", "d": "M100 260 L100 326", "dr": "M100 326 L100 260", "ctl": "KM1", "rmode": "open"}, {"t": "no", "a": "d5t", "b": "d5b", "d": "M320 260 L320 326", "dr": "M320 326 L320 260", "ctl": "KM2", "rmode": "open"}, {"t": "no", "a": "d6t", "b": "d6b", "d": "M160 260 L160 326", "dr": "M160 326 L160 260", "ctl": "KM1", "rmode": "open"}, {"t": "no", "a": "d7t", "b": "d7b", "d": "M380 260 L380 326", "dr": "M380 326 L380 260", "ctl": "KM2", "rmode": "open"}, {"t": "no", "a": "d8t", "b": "d8b", "d": "M220 260 L220 326", "dr": "M220 326 L220 260", "ctl": "KM1", "rmode": "open"}, {"t": "no", "a": "d9t", "b": "d9b", "d": "M440 260 L440 326", "dr": "M440 326 L440 260", "ctl": "KM2", "rmode": "open"}, {"t": "q", "a": "d10t", "b": "d10b", "d": "M680 58 L680 200", "dr": "M680 200 L680 58", "id": "Q2"}, {"t": "w", "a": "L", "b": "L1", "d": "M580 40 L680 40", "dr": "M680 40 L580 40"}, {"t": "w", "a": "L1", "b": "d10t", "d": "M680 40 L680 58", "dr": "M680 58 L680 40"}, {"t": "nc", "a": "d11t", "b": "d11b", "d": "M680 236 L680 302", "dr": "M680 302 L680 236", "ctl": "F2", "rmode": "open"}, {"t": "w", "a": "d10b", "b": "d11t", "d": "M680 200 L680 236", "dr": "M680 236 L680 200"}, {"t": "nc", "a": "d12t", "b": "d12b", "d": "M680 330 L680 396", "dr": "M680 396 L680 330", "ctl": "S0", "rmode": "open"}, {"t": "w", "a": "d11b", "b": "d12t", "d": "M680 302 L680 330", "dr": "M680 330 L680 302"}, {"t": "w", "a": "d12b", "b": "j", "d": "M680 396 L680 420", "dr": "M680 420 L680 396"}, {"t": "w", "a": "j", "b": "k1", "d": "M680 420 L810 420", "dr": "M810 420 L680 420"}, {"t": "w", "a": "k1", "b": "j2", "d": "M810 420 L950 420", "dr": "M950 420 L810 420"}, {"t": "w", "a": "j2", "b": "k2", "d": "M950 420 L1080 420", "dr": "M1080 420 L950 420"}, {"t": "no", "a": "d13t", "b": "d13b", "d": "M680 450 L680 516", "dr": "M680 516 L680 450", "ctl": "S1", "rmode": "open"}, {"t": "w", "a": "j", "b": "d13t", "d": "M680 420 L680 450", "dr": "M680 450 L680 420"}, {"t": "no", "a": "d14t", "b": "d14b", "d": "M810 450 L810 516", "dr": "M810 516 L810 450", "ctl": "KM1", "rmode": "open"}, {"t": "w", "a": "k1", "b": "d14t", "d": "M810 420 L810 450", "dr": "M810 450 L810 420"}, {"t": "w", "a": "d13b", "b": "mS1", "d": "M680 516 L680 542", "dr": "M680 542 L680 516"}, {"t": "w", "a": "d14b", "b": "mS1", "d": "M810 516 L810 542 L680 542", "dr": "M680 542 L810 542 L810 516"}, {"t": "nc", "a": "d15t", "b": "d15b", "d": "M680 568 L680 634", "dr": "M680 634 L680 568", "ctl": "KM2", "rm": "enc", "rmode": "bridge"}, {"t": "w", "a": "mS1", "b": "d15t", "d": "M680 542 L680 568", "dr": "M680 568 L680 542"}, {"t": "load", "a": "d16t", "b": "d16b", "d": "M680 680 L680 720", "dr": "M680 720 L680 680", "load": true, "id": "KM1"}, {"t": "w", "a": "d15b", "b": "d16t", "d": "M680 634 L680 680", "dr": "M680 680 L680 634"}, {"t": "w", "a": "d16b", "b": "N2", "d": "M680 720 L680 770", "dr": "M680 770 L680 720"}, {"t": "w", "a": "N2", "b": "N", "d": "M680 770 L580 770", "dr": "M580 770 L680 770"}, {"t": "no", "a": "d17t", "b": "d17b", "d": "M950 450 L950 516", "dr": "M950 516 L950 450", "ctl": "S2", "rmode": "open"}, {"t": "w", "a": "j2", "b": "d17t", "d": "M950 420 L950 450", "dr": "M950 450 L950 420"}, {"t": "no", "a": "d18t", "b": "d18b", "d": "M1080 450 L1080 516", "dr": "M1080 516 L1080 450", "ctl": "KM2", "rmode": "open"}, {"t": "w", "a": "k2", "b": "d18t", "d": "M1080 420 L1080 450", "dr": "M1080 450 L1080 420"}, {"t": "w", "a": "d17b", "b": "mS2", "d": "M950 516 L950 542", "dr": "M950 542 L950 516"}, {"t": "w", "a": "d18b", "b": "mS2", "d": "M1080 516 L1080 542 L950 542", "dr": "M950 542 L1080 542 L1080 516"}, {"t": "nc", "a": "d19t", "b": "d19b", "d": "M950 568 L950 634", "dr": "M950 634 L950 568", "ctl": "KM1", "rm": "enc", "rmode": "bridge"}, {"t": "w", "a": "mS2", "b": "d19t", "d": "M950 542 L950 568", "dr": "M950 568 L950 542"}, {"t": "load", "a": "d20t", "b": "d20b", "d": "M950 680 L950 720", "dr": "M950 720 L950 680", "load": true, "id": "KM2"}, {"t": "w", "a": "d19b", "b": "d20t", "d": "M950 634 L950 680", "dr": "M950 680 L950 634"}, {"t": "w", "a": "d20b", "b": "N3", "d": "M950 720 L950 770", "dr": "M950 770 L950 720"}, {"t": "w", "a": "N3", "b": "N", "d": "M950 770 L580 770", "dr": "M580 770 L950 770"}], "devs": [{"t": "no", "key": "d1", "ctl": "QF", "btn": false, "rm": null}, {"t": "no", "key": "d2", "ctl": "QF", "btn": false, "rm": null}, {"t": "no", "key": "d3", "ctl": "QF", "btn": false, "rm": null}, {"t": "no", "key": "d4", "ctl": "KM1", "btn": false, "rm": null}, {"t": "no", "key": "d5", "ctl": "KM2", "btn": false, "rm": null}, {"t": "no", "key": "d6", "ctl": "KM1", "btn": false, "rm": null}, {"t": "no", "key": "d7", "ctl": "KM2", "btn": false, "rm": null}, {"t": "no", "key": "d8", "ctl": "KM1", "btn": false, "rm": null}, {"t": "no", "key": "d9", "ctl": "KM2", "btn": false, "rm": null}, {"t": "q", "key": "d10", "id": "Q2"}, {"t": "nc", "key": "d11", "ctl": "F2", "btn": false, "rm": null}, {"t": "nc", "key": "d12", "ctl": "S0", "btn": true, "rm": null}, {"t": "no", "key": "d13", "ctl": "S1", "btn": true, "rm": null}, {"t": "no", "key": "d14", "ctl": "KM1", "btn": false, "rm": null}, {"t": "nc", "key": "d15", "ctl": "KM2", "btn": false, "rm": "enc"}, {"t": "coil", "key": "d16", "id": "KM1"}, {"t": "no", "key": "d17", "ctl": "S2", "btn": true, "rm": null}, {"t": "no", "key": "d18", "ctl": "KM2", "btn": false, "rm": null}, {"t": "nc", "key": "d19", "ctl": "KM1", "btn": false, "rm": "enc"}, {"t": "coil", "key": "d20", "id": "KM2"}], "buttons": ["S0", "S1", "S2", "QF", "F2"], "coils": ["KM1", "KM2"], "qs": ["Q2"], "removables": [{"id": "enc", "keys": ["e1", "e2"]}], "keys": {"d": "S1", "i": "S2", "p": "S0", "e": "enc"}};
+
+function spinSet(dir){ [['rotorR','R','spinR'],['rotorL','L','spinL'],['rotFR','R','spinR'],['rotFL','L','spinL']].forEach(function(q){ var e = document.getElementById(q[0]); if (!e) return; e.style.display = dir === q[1] ? '' : 'none'; e.classList.toggle(q[2], dir === q[1]); }); }
+PAGE.init = function(st){ st.btn.QF = true; st.btn.F2 = false; };
+PAGE.after = function(st){ if (st.coil.KM1 && st.coil.KM2){ st.trip = true; st.btn.QF = false; } };
+PAGE.extra = [
+  { el:'bReset', fn:function(st){ if (!(st.coil.KM1 && st.coil.KM2)){ st.trip = false; st.btn.QF = true; st.last = 'reset'; } } },
+  { el:'bOver', fn:function(st){ st.btn.F2 = !st.btn.F2; st.last = st.btn.F2 ? 'over' : 'rearme'; } },
+  { el:'gF2', fn:function(st){ st.btn.F2 = !st.btn.F2; st.last = st.btn.F2 ? 'over' : 'rearme'; } }
+];
+PAGE.status = function(st, R, $){
+  var a = st.coil.KM1, b = st.coil.KM2, q = st.btn.QF, s = $('stxt');
+  $('dK1').classList.toggle('on', a); $('dK2').classList.toggle('on', b);
+  $('alarm').classList.toggle('on', st.trip); $('bReset').style.display = st.trip ? '' : 'none';
+  $('shortTxt').style.display = (a && b) ? '' : 'none';
+  $('bOver').textContent = st.btn.F2 ? 'Rearmar el térmico -F2' : 'Provocar sobrecarga (-F2)';
+  for (var i = 0; i < 3; i++){ $('fk1_' + i).classList.toggle('on', q && a); $('fk2_' + i).classList.toggle('on', q && b); }
+  var dir = (q && a && !b) ? 'R' : (q && b && !a) ? 'L' : ''; spinSet(dir);
+  $('motC').style.fill = (a && b) ? '#FFD6D2' : '#fff';
+  if (st.trip){ s.textContent = 'Motor parado: -Q1 disparado'; s.className = 'state bad'; }
+  else if (dir === 'R'){ s.textContent = 'Motor gira a derechas'; s.className = 'state run'; }
+  else if (dir === 'L'){ s.textContent = 'Motor gira a izquierdas'; s.className = 'state run'; }
+  else { s.textContent = 'Motor parado'; s.className = 'state stop'; }
+};
+PAGE.msg = function(st, R){
+  var a = st.coil.KM1, b = st.coil.KM2, e = !st.rm.enc, B = st.btn;
+  if (st.trip) return '<b>¡Han entrado los dos contactores!</b> En la fuerza, KM1 lleva L1 a U y KM2 lleva L3 a U: <b>L1 y L3 quedan unidas</b> a través de los dos contactores. Es un <b>cortocircuito</b> y salta <b>-Q1</b>. Pulsa paro, pon el enclavamiento y rearma -Q1.';
+  if (!st.q.Q2) return '<b>-Q2 abierto:</b> el mando se queda sin tensión y se sueltan los dos contactores. Ciérralo tocándolo.';
+  if (B.F2) return '<b>Sobrecarga:</b> el térmico -F2 ha abierto su <span class="k">95-96</span>, que está arriba del mando. Se suelta el contactor y el motor para. Rearma el térmico para volver a arrancar.';
+  if (B.S0) return '<b>Paro -S0:</b> corta las dos ramas del mando. El motor se para.';
+  if (a && B.S2 && e) return '<b>Gira a derechas y pulsas -S2.</b> El <span class="k">61-62 de -KM1</span> está abierto: <b>-KM2 no puede entrar</b>. Para cambiar de sentido, primero paro.';
+  if (b && B.S1 && e) return '<b>Gira a izquierdas y pulsas -S1.</b> El <span class="k">61-62 de -KM2</span> está abierto: <b>-KM1 no puede entrar</b>. Primero paro.';
+  if (a) return '<b>-KM1 activado:</b> en la fuerza, sus contactos llevan <b>L1 a U, L2 a V y L3 a W</b>, tal cual. El motor gira a <b>derechas</b>.';
+  if (b) return '<b>-KM2 activado:</b> en la fuerza lleva <b>L3 a U</b> y <b>L1 a W</b>; L2 sigue en V. Al <b>cambiar dos fases</b>, el motor gira a <b>izquierdas</b>.';
+  if (!e) return '<b>Sin enclavamiento</b> (hay un puente en lugar de los 61-62). Arranca un sentido y luego pulsa el otro… y mira la fuerza.';
+  return 'Motor parado. Pulsa <b>-S1</b> (derechas) o <b>-S2</b> (izquierdas) y mira en la <b>fuerza</b> por dónde llega cada fase al motor.';
+};
+</script>
+<script>
+(function(){
+var P = window.PAGE, $ = function(id){ return document.getElementById(id); };
+var st = { btn:{}, coil:{}, q:{}, rm:{}, last:'inicio', on:{} , trip:false};
+var latched = {}, lastDown = {}, skipUp = {};
+P.buttons.forEach(function(b){ st.btn[b] = false; });
+P.coils.forEach(function(c){ st.coil[c] = false; });
+P.qs.forEach(function(q){ st.q[q] = true; });
+(P.removables||[]).forEach(function(r){ st.rm[r.id] = false; });
+if (P.init) P.init(st);
+function ctlOn(c){ return st.btn.hasOwnProperty(c) ? st.btn[c] : !!st.coil[c]; }
+function closed(e){
+  if (e.t === 'w') return true;
+  if (e.t === 'q') return st.q[e.id];
+  if (e.rm && st.rm[e.rm]) return e.rmode === 'bridge';
+  var a = ctlOn(e.ctl);
+  if (e.t === 'no') return a;
+  if (e.t === 'nc') return !a;
+  if (e.t === 'cona') return a;
+  if (e.t === 'conc') return !a;
+  return false;
+}
+var E = P.edges;
+function adj(filter){ var m = {}; E.forEach(function(e, i){ if (e.load || !filter(e)) return; (m[e.a]=m[e.a]||[]).push([e.b,i]); (m[e.b]=m[e.b]||[]).push([e.a,i]); }); return m; }
+function bfs(m, s, avoid){ var seen = {}; seen[s] = 0; var q = [s]; if (avoid) seen[avoid] = -1;
+  while (q.length){ var u = q.shift(); (m[u]||[]).forEach(function(p){ if (!(p[0] in seen)){ seen[p[0]] = seen[u] + 1; q.push(p[0]); } }); }
+  if (avoid) delete seen[avoid]; return seen; }
+function compute(){
+  var m = adj(closed), fromL = bfs(m, 'L'), toN = bfs(m, 'N');
+  var loads = {}, flows = {};
+  E.forEach(function(e, i){ if (e.load){ var on = (e.a in fromL) && (e.b in toN); loads[e.id] = on; if (on) flows[i] = 1; } });
+  var tops = [], bots = [];
+  E.forEach(function(e){ if (e.load && loads[e.id]){ tops.push(e.a); bots.push(e.b); } });
+  E.forEach(function(e, i){
+    if (e.load || !closed(e)) return;
+    function side(src, targets){
+      for (var k = 0; k < targets.length; k++){
+        var t = targets[k];
+        var a1 = bfs(m, src, e.b), b1 = bfs(m, e.b, e.a);
+        if ((e.a in a1 || e.a === src) && (t in b1 || t === e.b)) return 1;
+        var a2 = bfs(m, src, e.a), b2 = bfs(m, e.a, e.b);
+        if ((e.b in a2 || e.b === src) && (t in b2 || t === e.a)) return -1;
+      }
+      return 0;
+    }
+    var d = side('L', tops); if (!d){ d = -side('N', bots); }
+    if (d) flows[i] = d;
+  });
+  return { loads: loads, flows: flows };
+}
+var timer = null, R = null;
+function settle(){
+  R = compute();
+  var ch = null;
+  for (var k = 0; k < P.coils.length; k++){ var c = P.coils[k]; if (!!R.loads[c] !== !!st.coil[c]){ ch = c; break; } }
+  render();
+  if (ch === null) return;
+  clearTimeout(timer);
+  var want = !!R.loads[ch];
+  timer = setTimeout(function(){ st.coil[ch] = want; if (P.after) P.after(st); settle(); }, want ? 260 : 160);
+}
+function rot(el, deg){ if (el) el.style.transform = 'rotate(' + deg + 'deg)'; }
+function render(){
+  R = R || compute();
+  E.forEach(function(e, i){
+    var f = $('fl' + i); if (!f) return;
+    var d = R.flows[i];
+    f.classList.toggle('on', !!d);
+    if (d) f.setAttribute('d', d === -1 ? e.dr : e.d);
+  });
+  P.devs.forEach(function(v){
+    var a = v.ctl ? ctlOn(v.ctl) : false;
+    if (v.t === 'no') rot($('bl_' + v.key), a ? 32 : 0);
+    if (v.t === 'nc') rot($('bl_' + v.key), a ? -45 : 0);
+    if (v.t === 'co') rot($('bl_' + v.key), a ? 64 : 0);
+    if (v.btn){ var ac = $('ac_' + v.key); if (ac) ac.style.transform = a ? 'translateX(12px)' : ''; }
+    if (v.t === 'q'){ rot($('bl_' + v.key), st.q[v.id] ? 0 : -32); $('ac_' + v.key).style.transform = st.q[v.id] ? '' : 'translateX(-10px)'; }
+    if (v.t === 'coil'){ $('cf_' + v.key).style.fill = st.coil[v.id] ? '#FFE9A8' : '#fff'; }
+    if (v.t === 'lamp'){ $('gl_' + v.key).classList.toggle('on', !!R.loads[v.id]); }
+    if (v.rm){ var g = $('rm_' + v.key); g.classList.toggle('off', !!st.rm[v.rm]); $('cut_' + v.key).style.display = st.rm[v.rm] ? '' : 'none';
+      var br = $('br_' + v.key); if (br) br.classList.toggle('on', !!st.rm[v.rm]); }
+  });
+  P.buttons.forEach(function(b){ var el = $('b_' + b); if (el){ el.classList.toggle('on', st.btn[b]); el.classList.toggle('latched', !!latched[b]); el.setAttribute('aria-pressed', st.btn[b]); }
+    var g = $('g_' + b); if (g) g.classList.toggle('latched', !!latched[b]); });
+  (P.removables||[]).forEach(function(r){ var c = $('t_' + r.id); if (c) c.checked = !st.rm[r.id]; });
+  P.qs.forEach(function(q){ var b = $('bq_' + q); if (b) b.textContent = (st.q[q] ? 'Abrir ' : 'Cerrar ') + '-' + q; });
+  if (P.status) P.status(st, R, $);
+  $('explain').innerHTML = P.msg(st, R);
+}
+function press(b, down){ if (st.btn[b] === down) return; st.btn[b] = down; st.last = b + (down ? 'On' : 'Off'); if (P.onpress) P.onpress(st, b, down); settle(); }
+function hold(el, b){
+  if (!el) return;
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    var now = Date.now();
+    if (latched[b]){ latched[b] = false; skipUp[b] = true; press(b, false); render(); return; }
+    if (now - (lastDown[b] || 0) < 380){ latched[b] = true; skipUp[b] = true; lastDown[b] = 0; press(b, true); render(); return; }
+    lastDown[b] = now; press(b, true);
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){
+    if (skipUp[b]){ if (ev !== 'lostpointercapture') skipUp[b] = false; return; }
+    if (latched[b]) return;
+    press(b, false);
+  }); });
+  el.addEventListener('dblclick', function(e){ e.preventDefault(); });
+  el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(b, true); } });
+  el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched[b]) press(b, false); });
+}
+function click(el, fn){ if (!el) return; el.addEventListener('click', fn); el.addEventListener('keydown', function(e){ if (el.tagName !== 'BUTTON' && (e.key === ' ' || e.key === 'Enter')){ e.preventDefault(); fn(); } }); }
+P.buttons.forEach(function(b){ hold($('b_' + b), b); hold($('g_' + b), b); });
+P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q'; settle(); }; click($('bq_' + q), f); click($('g_' + q), f); });
+(P.removables||[]).forEach(function(r){
+  var f = function(){ st.rm[r.id] = !st.rm[r.id]; st.last = 'rm_' + r.id; settle(); };
+  (r.keys||[]).forEach(function(k){ click($('g_' + k), f); });
+  var c = $('t_' + r.id); if (c) c.addEventListener('change', function(){ st.rm[r.id] = !this.checked; st.last = 'rm_' + r.id; settle(); });
+});
+(P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
+var keymap = P.keys || {};
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = 'index.html'; } } });
+document.addEventListener('keydown', function(e){
+  if (e.repeat) return;
+  var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
+  var k = keymap[e.key.toLowerCase()]; if (!k) return;
+  if (st.btn.hasOwnProperty(k)) press(k, true);
+  else if (st.q.hasOwnProperty(k)){ st.q[k] = !st.q[k]; settle(); }
+  else if (st.rm.hasOwnProperty(k)){ st.rm[k] = !st.rm[k]; st.last = 'rm_' + k; settle(); }
+});
+document.addEventListener('keyup', function(e){ var k = keymap[e.key.toLowerCase()]; if (k && st.btn.hasOwnProperty(k)) press(k, false); });
+settle();
+})();
+</script>
+</body>
+</html>
