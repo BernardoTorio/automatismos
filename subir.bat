@@ -6,7 +6,6 @@ cd /d "%~dp0"
 
 set "REPO=BernardoTorio/automatismos"
 set "WEB=https://bernardotorio.github.io/automatismos/"
-set "ZIP=%USERPROFILE%\Downloads\automatismos.zip"
 
 echo ============================================
 echo   Subir animaciones de Automatismos a GitHub
@@ -14,17 +13,22 @@ echo   Carpeta: %CD%
 echo ============================================
 echo.
 
-rem --- 1. Si hay un automatismos.zip nuevo en Descargas, se descomprime aqui ---
-if not exist "%ZIP%" goto sinzip
-echo Encontrado automatismos.zip en Descargas: descomprimiendo...
+rem --- 1. Busca el automatismos*.zip mas reciente en Descargas (tambien "automatismos (1).zip") ---
+set "ZIP="
+for /f "delims=" %%f in ('dir /b /o-d "%USERPROFILE%\Downloads\automatismos*.zip" 2^>nul ^| findstr /v /i "_subido_"') do if not defined ZIP set "ZIP=%USERPROFILE%\Downloads\%%f"
+if not defined ZIP goto sinzip
+echo Encontrado en Descargas: %ZIP%
+echo Descomprimiendo...
 tar -xf "%ZIP%" -C "%CD%"
 if errorlevel 1 (
   echo ERROR al descomprimir el zip.
   goto fin
 )
-for /f %%d in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmm"') do set "STAMP=%%d"
+for /f %%d in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set "STAMP=%%d"
 ren "%ZIP%" "automatismos_subido_%STAMP%.zip"
 echo Zip descomprimido. En Descargas queda como automatismos_subido_%STAMP%.zip
+rem Si quedan mas zips sin subir (copias antiguas), se marcan para que no molesten
+for /f "delims=" %%f in ('dir /b "%USERPROFILE%\Downloads\automatismos*.zip" 2^>nul ^| findstr /v /i "_subido_"') do ren "%USERPROFILE%\Downloads\%%f" "viejo_%%f"
 echo.
 :sinzip
 
