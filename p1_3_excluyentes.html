@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Práctica 1 · 1.3 Dos pulsadores en paralelo, pero excluyentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;padding:8px 14px;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700}
+.back:hover,.back:focus-visible{border-color:#1F4E79;outline:none}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 16px;max-width:75ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:74vh;min-width:320px}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.boxes{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(250px,1fr);gap:16px;margin-top:16px}
+@media (max-width:820px){.boxes{grid-template-columns:1fr}}
+.boxes h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.explain{min-height:6.5em;font-size:1.08rem}
+.explain .k,.idea .k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.idea{border-left:6px solid #548235}
+.idea p{margin:0 0 6px}
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.controls.two{grid-template-columns:1fr 1fr}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:11px 6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.g{border-color:#2E8B3E} button.g.on{background:#2E8B3E;color:#fff}
+button.r{border-color:#C0392B} button.r.on{background:#C0392B;color:#fff}
+.small{font-size:.8rem;font-weight:400;display:block;opacity:.8}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.toggle{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700}
+.toggle input{width:22px;height:22px;accent-color:#2E8B3E}
+.leds{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.led{display:flex;align-items:center;gap:8px;font-weight:700}
+.dot{width:26px;height:26px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .2s,box-shadow .2s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.r.on{background:#E0413A;box-shadow:0 0 14px #E0413A}
+.dot.y.on{background:#FFD23F;box-shadow:0 0 14px #FFD23F}
+.dot.k.on{background:#F2B400;box-shadow:0 0 14px #F2B400}
+.state{font-size:1.1rem;font-weight:700}
+.state.run{color:var(--ok)} .state.stop{color:var(--muted)} .state.bad{color:var(--warn)}
+.alarm{display:none;background:#C0392B;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700}
+.alarm.on{display:block}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .18s ease}
+.rm{transition:opacity .25s} .rm.off{opacity:.18}
+.bridge{display:none} .bridge.on{display:inline}
+.glow{opacity:0;transition:opacity .2s} .glow.on{opacity:.9}
+.coilfill{transition:fill .2s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4;rx:8}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+.motor{width:64px;height:64px;flex:none}
+.spinR{animation:spin .8s linear infinite} .spinL{animation:spin .8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinR,.spinL{animation:none}}
+
+main{max-width:1640px}
+.w.wf{stroke:#D0191C;opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.tabs a{padding:6px 12px;border-radius:999px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700;font-size:.95rem}
+.tabs a.sel{border-color:#1F4E79;background:#1F4E79;color:#fff}
+.tabs a:hover{border-color:#1F4E79}
+.sheet{margin-bottom:4px}
+.sheet svg{max-height:none}
+.boxes3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.1fr);gap:16px;margin-top:16px;align-items:start}
+@media (max-width:980px){.boxes3{grid-template-columns:1fr}}
+.boxes3 h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.why{border-left:6px solid #BF9000}
+.why p,.idea p{margin:0 0 6px}
+.sol{display:inline-block;background:#548235;color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem;font-weight:700;letter-spacing:.04em;margin-left:6px;vertical-align:middle}
+
+/* ---- barra superior: volver, dónde estás, tema ---- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs a:hover{color:var(--ink)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1}
+/* ---- cables con tensión ---- */
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.wlive{fill:none;stroke:#FF1F1F;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:0;pointer-events:none;transition:opacity .15s}
+.wlive.live{opacity:1;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.howto{border-left:6px solid #1F4E79}
+.howto h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.howto ul{margin:4px 0 0;padding-left:20px}
+.howto li{margin:3px 0}
+.lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
+.lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
+.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver (tecla Esc)" aria-label="Volver">←</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Prácticas</a><span class="sep">›</span><a href="index.html#practicas">Práctica 1</a><span class="sep">›</span><b id="crumbLast">1.3 Excluyentes</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="tabs" aria-label="Apartados de la práctica"><a href="p1_1_serie.html">1.1 Serie</a><a href="p1_2_paralelo.html">1.2 Paralelo</a><a href="p1_3_excluyentes.html" class="sel">1.3 Excluyentes</a></nav>
+  <h1>1.3 Dos pulsadores en paralelo, pero excluyentes<span class="sol">SOLUCIÓN</span></h1>
+  <p class="sub">El contactor se activa con <b>solo uno</b> de los dos pulsadores. Si se pulsan <b>‑S3 y ‑S4 a la vez</b>, la bobina no se activa (y si estaba activada, se suelta). Señalización: la fase va <b>directa</b> al 53 y al 61 de ‑KM1; piloto <b>verde</b> en el 54 (activado) y <b>rojo</b> en el 62 (desactivado).</p>
+  <div class="sheet"><svg viewBox="0 0 680 710" role="img" aria-labelledby="svgt" style="max-width:680px;margin:0 auto;min-width:422px"><title id="svgt">1.3 Pulsadores S3 y S4 en paralelo pero excluyentes, con señalización</title><line class="w wf" x1="40" y1="40" x2="150" y2="40"/><text class="t name" x="30" y="46" text-anchor="end" style="fill:var(--fase)">L</text><text class="t name" x="30" y="686" text-anchor="end" style="fill:var(--neutro)">N</text><path id="w0" class="w wf" d="M40 40 L150 40"/><path id="w2" class="w wf" d="M150 40 L150 58"/><path id="w3" class="w wf" d="M150 222 L290 222"/><path id="w4" class="w wf" d="M290 222 L450 222"/><path id="w5" class="w wf" d="M450 222 L570 222"/><path id="w6" class="w wf" d="M150 200 L150 222"/><path id="w8" class="w wf" d="M150 222 L150 256"/><path id="w10" class="w wf" d="M150 322 L150 380"/><path id="w12" class="w wf" d="M290 222 L290 256"/><path id="w14" class="w wf" d="M290 322 L290 380"/><path id="w15" class="w wf" d="M150 446 L150 476"/><path id="w16" class="w wf" d="M290 446 L290 476 L150 476"/><path id="w18" class="w wn" d="M150 626 L150 680"/><path id="w19" class="w wf" d="M150 476 L150 574"/><path id="w21" class="w wf" d="M450 222 L450 380"/><path id="w23" class="w wn" d="M450 626 L450 680"/><path id="w24" class="w wf" d="M450 446 L450 574"/><path id="w26" class="w wf" d="M570 222 L570 380"/><path id="w28" class="w wn" d="M570 626 L570 680"/><path id="w29" class="w wf" d="M570 446 L570 574"/><path id="w30" class="w wn" d="M40 680 L150 680"/><path id="w31" class="w wn" d="M150 680 L450 680"/><path id="w32" class="w wn" d="M450 680 L570 680"/><circle cx="150" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="290" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="450" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="150" cy="476" r="5.5" style="fill:var(--fase)"/><circle cx="150" cy="680" r="5.5" style="fill:var(--neutro)"/><circle cx="450" cy="680" r="5.5" style="fill:var(--neutro)"/><path id="fl0" class="flow" d="M40 40 L150 40"/><path id="fl1" class="flow" d="M150 58 L150 200"/><path id="fl2" class="flow" d="M150 40 L150 58"/><path id="fl3" class="flow" d="M150 222 L290 222"/><path id="fl4" class="flow" d="M290 222 L450 222"/><path id="fl5" class="flow" d="M450 222 L570 222"/><path id="fl6" class="flow" d="M150 200 L150 222"/><path id="fl7" class="flow" d="M150 256 L150 322"/><path id="fl8" class="flow" d="M150 222 L150 256"/><path id="fl9" class="flow" d="M150 380 L150 446"/><path id="fl10" class="flow" d="M150 322 L150 380"/><path id="fl11" class="flow" d="M290 256 L290 322"/><path id="fl12" class="flow" d="M290 222 L290 256"/><path id="fl13" class="flow" d="M290 380 L290 446"/><path id="fl14" class="flow" d="M290 322 L290 380"/><path id="fl15" class="flow" d="M150 446 L150 476"/><path id="fl16" class="flow" d="M290 446 L290 476 L150 476"/><path id="fl17" class="flow" d="M150 574 L150 626"/><path id="fl18" class="flow" d="M150 626 L150 680"/><path id="fl19" class="flow" d="M150 476 L150 574"/><path id="fl20" class="flow" d="M450 380 L450 446"/><path id="fl21" class="flow" d="M450 222 L450 380"/><path id="fl22" class="flow" d="M450 574 L450 626"/><path id="fl23" class="flow" d="M450 626 L450 680"/><path id="fl24" class="flow" d="M450 446 L450 574"/><path id="fl25" class="flow" d="M570 380 L570 446"/><path id="fl26" class="flow" d="M570 222 L570 380"/><path id="fl27" class="flow" d="M570 574 L570 626"/><path id="fl28" class="flow" d="M570 626 L570 680"/><path id="fl29" class="flow" d="M570 446 L570 574"/><path id="fl30" class="flow" d="M40 680 L150 680"/><path id="fl31" class="flow" d="M150 680 L450 680"/><path id="fl32" class="flow" d="M450 680 L570 680"/><g id="g_Q1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q1: abrir o cerrar">
+<rect class="hitbox" x="68" y="50" width="120" height="156"/>
+<line class="sym" x1="150" y1="58" x2="150" y2="76"/>
+<line class="sym" x1="142" y1="68" x2="158" y2="84" style="stroke-width:2.4"/>
+<line class="sym" x1="142" y1="84" x2="158" y2="68" style="stroke-width:2.4"/>
+<line id="bl_d1" class="sym blade" x1="150" y1="110" x2="150" y2="78" style="transform-origin:150px 110px"/>
+<line class="sym" x1="150" y1="110" x2="150" y2="124"/>
+<rect class="symf" x="136" y="124" width="28" height="30"/>
+<path class="sym" d="M150 124 V135 H158 V143 H150 V154" style="stroke-width:2.4"/>
+<line class="sym" x1="150" y1="154" x2="150" y2="162"/>
+<rect class="symf" x="136" y="162" width="28" height="26"/>
+<text class="t" x="150" y="180" text-anchor="middle" style="font-size:13px;font-weight:700">I&gt;</text>
+<line class="sym" x1="150" y1="188" x2="150" y2="200"/>
+<g id="ac_d1" class="blade"><line class="dash" x1="100" y1="94" x2="142" y2="94"/><line class="sym" x1="100" y1="82" x2="100" y2="106"/></g>
+<text class="t" x="158" y="58">1</text><text class="t" x="158" y="214">2</text>
+<text class="t name" x="90" y="100" text-anchor="end">-Q1</text></g><g id="g_S3" data-btn="S3" class="hit" tabindex="0" role="button" aria-label="Pulsador S3"><rect class="hitbox" x="46" y="248" width="134" height="82"/><line class="sym" x1="150" y1="256" x2="150" y2="276"/><line class="sym" x1="150" y1="306" x2="150" y2="322"/><line id="bl_d2" class="sym blade" x1="150" y1="306" x2="130" y2="274" style="transform-origin:150px 306px"/><g id="ac_d2" class="blade"><line class="dash" x1="100" y1="290" x2="140" y2="290"/><path class="sym" d="M108 279 H100 V301 H108"/></g><text class="t" x="158" y="254">3</text><text class="t" x="158" y="336">4</text><text class="t name" x="90" y="296" text-anchor="end">-S3</text></g><g id="g_S4" data-btn="S4" class="hit" tabindex="0" role="button" aria-label="Pulsador S4"><rect class="hitbox" x="46" y="372" width="134" height="82"/><line class="sym" x1="150" y1="380" x2="150" y2="400"/><line class="sym" x1="150" y1="430" x2="150" y2="446"/><line class="sym" x1="150" y1="400" x2="168" y2="400"/><line id="bl_d3" class="sym blade" x1="150" y1="430" x2="172" y2="394" style="transform-origin:150px 430px"/><g id="ac_d3" class="blade"><line class="dash" x1="100" y1="413" x2="158" y2="413"/><path class="sym" d="M108 402 H100 V424 H108"/></g><text class="t" x="158" y="378">1</text><text class="t" x="158" y="460">2</text><text class="t name" x="90" y="420" text-anchor="end">-S4</text></g><g id="g_S4_2" data-btn="S4" class="hit" tabindex="0" role="button" aria-label="Pulsador S4"><rect class="hitbox" x="186" y="248" width="134" height="82"/><line class="sym" x1="290" y1="256" x2="290" y2="276"/><line class="sym" x1="290" y1="306" x2="290" y2="322"/><line id="bl_d4" class="sym blade" x1="290" y1="306" x2="270" y2="274" style="transform-origin:290px 306px"/><g id="ac_d4" class="blade"><line class="dash" x1="240" y1="290" x2="280" y2="290"/><path class="sym" d="M248 279 H240 V301 H248"/></g><text class="t" x="298" y="254">3</text><text class="t" x="298" y="336">4</text><text class="t name" x="230" y="296" text-anchor="end">-S4</text></g><g id="g_S3_2" data-btn="S3" class="hit" tabindex="0" role="button" aria-label="Pulsador S3"><rect class="hitbox" x="186" y="372" width="134" height="82"/><line class="sym" x1="290" y1="380" x2="290" y2="400"/><line class="sym" x1="290" y1="430" x2="290" y2="446"/><line class="sym" x1="290" y1="400" x2="308" y2="400"/><line id="bl_d5" class="sym blade" x1="290" y1="430" x2="312" y2="394" style="transform-origin:290px 430px"/><g id="ac_d5" class="blade"><line class="dash" x1="240" y1="413" x2="298" y2="413"/><path class="sym" d="M248 402 H240 V424 H248"/></g><text class="t" x="298" y="378">1</text><text class="t" x="298" y="460">2</text><text class="t name" x="230" y="420" text-anchor="end">-S3</text></g><line class="sym" x1="150" y1="574" x2="150" y2="588"/><line class="sym" x1="150" y1="612" x2="150" y2="626"/><rect id="cf_d6" class="symf coilfill" x="122" y="588" width="56" height="24"/><text class="t" x="158" y="570">A1</text><text class="t" x="158" y="642">A2</text><text class="t name" x="110" y="606" text-anchor="end">-KM1</text><line class="sym" x1="450" y1="380" x2="450" y2="400"/><line class="sym" x1="450" y1="430" x2="450" y2="446"/><line id="bl_d7" class="sym blade" x1="450" y1="430" x2="430" y2="398" style="transform-origin:450px 430px"/><text class="t" x="458" y="378">53</text><text class="t" x="458" y="460">54</text><text class="t name" x="422" y="420" text-anchor="end">-KM1</text><circle id="gl_d8" class="glow" cx="450" cy="600" r="30" style="fill:#8FE08F"/><line class="sym" x1="450" y1="574" x2="450" y2="582"/><line class="sym" x1="450" y1="618" x2="450" y2="626"/><circle class="symf" cx="450" cy="600" r="18" style="fill:transparent"/><line class="sym" x1="437" y1="587" x2="463" y2="613"/><line class="sym" x1="437" y1="613" x2="463" y2="587"/><text class="t" x="458" y="570">X1</text><text class="t" x="458" y="642">X2</text><text class="t name" x="420" y="606" text-anchor="end">-H1</text><text class="t" x="420" y="624" text-anchor="end" style="font-size:13px">verde</text><line class="sym" x1="570" y1="380" x2="570" y2="400"/><line class="sym" x1="570" y1="430" x2="570" y2="446"/><line class="sym" x1="570" y1="400" x2="588" y2="400"/><line id="bl_d9" class="sym blade" x1="570" y1="430" x2="592" y2="394" style="transform-origin:570px 430px"/><text class="t" x="578" y="378">61</text><text class="t" x="578" y="460">62</text><text class="t name" x="542" y="420" text-anchor="end">-KM1</text><circle id="gl_d10" class="glow" cx="570" cy="600" r="30" style="fill:#FF9C9C"/><line class="sym" x1="570" y1="574" x2="570" y2="582"/><line class="sym" x1="570" y1="618" x2="570" y2="626"/><circle class="symf" cx="570" cy="600" r="18" style="fill:transparent"/><line class="sym" x1="557" y1="587" x2="583" y2="613"/><line class="sym" x1="557" y1="613" x2="583" y2="587"/><text class="t" x="578" y="570">X1</text><text class="t" x="578" y="642">X2</text><text class="t name" x="540" y="606" text-anchor="end">-H2</text><text class="t" x="540" y="624" text-anchor="end" style="font-size:13px">rojo</text></svg></div>
+  <div class="boxes3">
+    <div class="card"><h2>Mandos</h2><div class="leds"><span class="led"><span id="dK_KM1" class="dot k"></span>KM1</span></div><div id="stxt" class="state stop" style="margin:8px 0 10px"></div>
+      <div class="controls two"><button id="b_S3" class="g" aria-pressed="false">Marcha ‑S3<span class="small">mantén · tecla 3</span></button><button id="b_S4" class="g" aria-pressed="false">Marcha ‑S4<span class="small">mantén · tecla 4</span></button></div>
+      <div class="row"><button id="bq_Q1" style="padding:9px 12px">Abrir -Q1</button></div></div>
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div style="display:flex;flex-direction:column;gap:16px"><div class="card idea"><h2>Idea clave</h2><p>Cada pulsador usa <b>sus dos contactos</b>: el NA 3-4 en su rama y el NC 1-2 en la rama del otro.</p><p>Por eso ‑S3 y ‑S4 aparecen <b>dos veces</b> en el esquema: es el mismo pulsador.</p></div></div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>, como si lo mantuvieras pulsado: así puedes pulsar varios a la vez con el ratón. Un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>. Toca -Q1 para abrirlo o cerrarlo. Teclado: <kbd>3</kbd> -S3, <kbd>4</kbd> -S4, <kbd>Q</kbd> magnetotérmico, <kbd>Esc</kbd> volver al índice. Los <b>bornes</b> son los tornillos del aparato.</p>
+</main>
+<script>
+window.PAGE = {"edges": [{"t": "w", "a": "L", "b": "L1", "d": "M40 40 L150 40", "dr": "M150 40 L40 40"}, {"t": "q", "a": "d1t", "b": "d1b", "id": "Q1", "d": "M150 58 L150 200", "dr": "M150 200 L150 58"}, {"t": "w", "a": "L1", "b": "d1t", "d": "M150 40 L150 58", "dr": "M150 58 L150 40"}, {"t": "w", "a": "D150", "b": "D290", "d": "M150 222 L290 222", "dr": "M290 222 L150 222"}, {"t": "w", "a": "D290", "b": "D450", "d": "M290 222 L450 222", "dr": "M450 222 L290 222"}, {"t": "w", "a": "D450", "b": "D570", "d": "M450 222 L570 222", "dr": "M570 222 L450 222"}, {"t": "w", "a": "d1b", "b": "D150", "d": "M150 200 L150 222", "dr": "M150 222 L150 200"}, {"t": "no", "a": "d2t", "b": "d2b", "ctl": "S3", "d": "M150 256 L150 322", "dr": "M150 322 L150 256"}, {"t": "w", "a": "D150", "b": "d2t", "d": "M150 222 L150 256", "dr": "M150 256 L150 222"}, {"t": "nc", "a": "d3t", "b": "d3b", "ctl": "S4", "d": "M150 380 L150 446", "dr": "M150 446 L150 380"}, {"t": "w", "a": "d2b", "b": "d3t", "d": "M150 322 L150 380", "dr": "M150 380 L150 322"}, {"t": "no", "a": "d4t", "b": "d4b", "ctl": "S4", "d": "M290 256 L290 322", "dr": "M290 322 L290 256"}, {"t": "w", "a": "D290", "b": "d4t", "d": "M290 222 L290 256", "dr": "M290 256 L290 222"}, {"t": "nc", "a": "d5t", "b": "d5b", "ctl": "S3", "d": "M290 380 L290 446", "dr": "M290 446 L290 380"}, {"t": "w", "a": "d4b", "b": "d5t", "d": "M290 322 L290 380", "dr": "M290 380 L290 322"}, {"t": "w", "a": "d3b", "b": "J150", "d": "M150 446 L150 476", "dr": "M150 476 L150 446"}, {"t": "w", "a": "d5b", "b": "J150", "d": "M290 446 L290 476 L150 476", "dr": "M150 476 L290 476 L290 446"}, {"t": "l", "load": true, "id": "KM1", "a": "d6t", "b": "d6b", "d": "M150 574 L150 626", "dr": "M150 626 L150 574"}, {"t": "w", "a": "d6b", "b": "N_150", "d": "M150 626 L150 680", "dr": "M150 680 L150 626"}, {"t": "w", "a": "J150", "b": "d6t", "d": "M150 476 L150 574", "dr": "M150 574 L150 476"}, {"t": "no", "a": "d7t", "b": "d7b", "ctl": "KM1", "d": "M450 380 L450 446", "dr": "M450 446 L450 380"}, {"t": "w", "a": "D450", "b": "d7t", "d": "M450 222 L450 380", "dr": "M450 380 L450 222"}, {"t": "l", "load": true, "id": "H1", "a": "d8t", "b": "d8b", "d": "M450 574 L450 626", "dr": "M450 626 L450 574"}, {"t": "w", "a": "d8b", "b": "N_450", "d": "M450 626 L450 680", "dr": "M450 680 L450 626"}, {"t": "w", "a": "d7b", "b": "d8t", "d": "M450 446 L450 574", "dr": "M450 574 L450 446"}, {"t": "nc", "a": "d9t", "b": "d9b", "ctl": "KM1", "d": "M570 380 L570 446", "dr": "M570 446 L570 380"}, {"t": "w", "a": "D570", "b": "d9t", "d": "M570 222 L570 380", "dr": "M570 380 L570 222"}, {"t": "l", "load": true, "id": "H2", "a": "d10t", "b": "d10b", "d": "M570 574 L570 626", "dr": "M570 626 L570 574"}, {"t": "w", "a": "d10b", "b": "N_570", "d": "M570 626 L570 680", "dr": "M570 680 L570 626"}, {"t": "w", "a": "d9b", "b": "d10t", "d": "M570 446 L570 574", "dr": "M570 574 L570 446"}, {"t": "w", "a": "N", "b": "N_150", "d": "M40 680 L150 680", "dr": "M150 680 L40 680"}, {"t": "w", "a": "N_150", "b": "N_450", "d": "M150 680 L450 680", "dr": "M450 680 L150 680"}, {"t": "w", "a": "N_450", "b": "N_570", "d": "M450 680 L570 680", "dr": "M570 680 L450 680"}], "devs": [{"t": "q", "key": "d1", "id": "Q1"}, {"t": "no", "key": "d2", "ctl": "S3", "btn": true, "rm": null}, {"t": "nc", "key": "d3", "ctl": "S4", "btn": true, "rm": null}, {"t": "no", "key": "d4", "ctl": "S4", "btn": true, "rm": null}, {"t": "nc", "key": "d5", "ctl": "S3", "btn": true, "rm": null}, {"t": "coil", "key": "d6", "id": "KM1"}, {"t": "no", "key": "d7", "ctl": "KM1", "btn": false, "rm": null}, {"t": "lamp", "key": "d8", "id": "H1"}, {"t": "nc", "key": "d9", "ctl": "KM1", "btn": false, "rm": null}, {"t": "lamp", "key": "d10", "id": "H2"}], "buttons": ["S3", "S4"], "coils": ["KM1"], "qs": ["Q1"], "back": "index.html#practicas", "keys": {"3": "S3", "4": "S4", "q": "Q1"}};
+PAGE.status = function(st, R, $){
+  var L = ["KM1"], on = [];
+  L.forEach(function(c){ $('dK_' + c).classList.toggle('on', !!st.coil[c]); if (st.coil[c]) on.push('-' + c); });
+  var s = $('stxt'); s.textContent = on.length ? 'Activados: ' + on.join(', ') : 'Todo en reposo';
+  s.className = 'state ' + (on.length ? 'run' : 'stop');
+};
+PAGE.msg = function(st, R){
+  var B = st.btn, K = st.coil, Ld = R.loads;
+  if (!st.q.Q1) return '<b>-Q1 abierto:</b> todo el mando y los pilotos se quedan sin tensión. Ciérralo tocándolo.';
+  var piloto;
+  if (K.KM1) piloto = ' Su <span class="k">53-54</span> se cierra y se enciende el piloto <b>verde ‑H1</b>; su <span class="k">61-62</span> se abre y se apaga el <b>rojo ‑H2</b>.';
+  else piloto = ' El <span class="k">61-62</span> de ‑KM1 está cerrado: piloto <b>rojo ‑H2</b> encendido.';
+
+  if (B.S3 && B.S4) return '<b>‑S3 y ‑S4 a la vez:</b> cada pulsador abre su <span class="k">NC 1-2</span>, que está en la rama del otro. Las <b>dos ramas quedan cortadas</b> y ‑KM1 no se activa.' + piloto;
+  if (K.KM1 && B.S3) return '<b>Solo ‑S3:</b> en la rama de la izquierda se cierra su <span class="k">NA 3-4</span> y el <span class="k">NC 1-2 de ‑S4</span> sigue cerrado. ‑KM1 activado.' + piloto;
+  if (K.KM1 && B.S4) return '<b>Solo ‑S4:</b> en la rama de la derecha se cierra su <span class="k">NA 3-4</span> y el <span class="k">NC 1-2 de ‑S3</span> sigue cerrado. ‑KM1 activado.' + piloto;
+  return '‑KM1 en reposo.' + piloto + ' Pulsa ‑S3 o ‑S4 de uno en uno, y luego los dos a la vez.';
+};
+</script>
+<script>
+(function(){
+var P = window.PAGE, $ = function(id){ return document.getElementById(id); };
+var st = { btn:{}, coil:{}, q:{}, rm:{}, last:'inicio', on:{} , trip:false};
+var latched = {}, lastDown = {}, skipUp = {};
+P.buttons.forEach(function(b){ st.btn[b] = false; });
+P.coils.forEach(function(c){ st.coil[c] = false; });
+P.qs.forEach(function(q){ st.q[q] = true; });
+(P.removables||[]).forEach(function(r){ st.rm[r.id] = false; });
+if (P.init) P.init(st);
+function ctlOn(c){ return st.btn.hasOwnProperty(c) ? st.btn[c] : !!st.coil[c]; }
+function closed(e){
+  if (e.t === 'w') return true;
+  if (e.t === 'q') return st.q[e.id];
+  if (e.rm && st.rm[e.rm]) return e.rmode === 'bridge';
+  var a = ctlOn(e.ctl);
+  if (e.t === 'no') return a;
+  if (e.t === 'nc') return !a;
+  if (e.t === 'cona') return a;
+  if (e.t === 'conc') return !a;
+  return false;
+}
+var E = P.edges;
+function adj(filter){ var m = {}; E.forEach(function(e, i){ if (e.load || !filter(e)) return; (m[e.a]=m[e.a]||[]).push([e.b,i]); (m[e.b]=m[e.b]||[]).push([e.a,i]); }); return m; }
+function bfs(m, s, avoid){ var seen = {}; seen[s] = 0; var q = [s]; if (avoid) seen[avoid] = -1;
+  while (q.length){ var u = q.shift(); (m[u]||[]).forEach(function(p){ if (!(p[0] in seen)){ seen[p[0]] = seen[u] + 1; q.push(p[0]); } }); }
+  if (avoid) delete seen[avoid]; return seen; }
+function compute(){
+  var m = adj(closed), fromL = bfs(m, 'L'), toN = bfs(m, 'N');
+  var loads = {}, flows = {};
+  E.forEach(function(e, i){ if (e.load){ var on = (e.a in fromL) && (e.b in toN); loads[e.id] = on; if (on) flows[i] = 1; } });
+  var tops = [], bots = [];
+  E.forEach(function(e){ if (e.load && loads[e.id]){ tops.push(e.a); bots.push(e.b); } });
+  E.forEach(function(e, i){
+    if (e.load || !closed(e)) return;
+    function side(src, targets){
+      for (var k = 0; k < targets.length; k++){
+        var t = targets[k];
+        var a1 = bfs(m, src, e.b), b1 = bfs(m, e.b, e.a);
+        if ((e.a in a1 || e.a === src) && (t in b1 || t === e.b)) return 1;
+        var a2 = bfs(m, src, e.a), b2 = bfs(m, e.a, e.b);
+        if ((e.b in a2 || e.b === src) && (t in b2 || t === e.a)) return -1;
+      }
+      return 0;
+    }
+    var d = side('L', tops); if (!d){ d = -side('N', bots); }
+    if (d) flows[i] = d;
+  });
+  return { loads: loads, flows: flows, live: fromL };
+}
+var timer = null, R = null;
+function settle(){
+  // Los contactores cambian al instante: un toque corto en un paro o una marcha ya actúa,
+  // como en un contactor real (ms). Se resuelve la cadena completa (relés -> contactores).
+  for (var n = 0; n < 40; n++){
+    R = compute();
+    var ch = null;
+    for (var k = 0; k < P.coils.length; k++){ var c = P.coils[k]; if (!!R.loads[c] !== !!st.coil[c]){ ch = c; break; } }
+    if (ch === null) break;
+    st.coil[ch] = !!R.loads[ch]; if (P.after) P.after(st);
+  }
+  R = compute();
+  render();
+}
+function rot(el, deg){ if (el) el.style.transform = 'rotate(' + deg + 'deg)'; }
+function render(){
+  R = R || compute();
+  E.forEach(function(e, i){
+    var wl = $('w' + i); if (wl) wl.classList.toggle('live', e.a in R.live && e.b in R.live);
+    var f = $('fl' + i); if (!f) return;
+    var d = R.flows[i];
+    f.classList.toggle('on', !!d);
+    if (d) f.setAttribute('d', d === -1 ? e.dr : e.d);
+  });
+  P.devs.forEach(function(v){
+    var a = v.ctl ? ctlOn(v.ctl) : false;
+    if (v.t === 'no') rot($('bl_' + v.key), a ? 32 : 0);
+    if (v.t === 'nc') rot($('bl_' + v.key), a ? -45 : 0);
+    if (v.t === 'co') rot($('bl_' + v.key), a ? 64 : 0);
+    if (v.btn){ var ac = $('ac_' + v.key); if (ac) ac.style.transform = a ? 'translateX(12px)' : ''; }
+    if (v.t === 'q'){ rot($('bl_' + v.key), st.q[v.id] ? 0 : -32); $('ac_' + v.key).style.transform = st.q[v.id] ? '' : 'translateX(-10px)'; }
+    if (v.t === 'coil'){ $('cf_' + v.key).style.fill = st.coil[v.id] ? '#FFE9A8' : '#fff'; }
+    if (v.t === 'lamp'){ $('gl_' + v.key).classList.toggle('on', !!R.loads[v.id]); }
+    if (v.rm){ var g = $('rm_' + v.key); g.classList.toggle('off', !!st.rm[v.rm]); $('cut_' + v.key).style.display = st.rm[v.rm] ? '' : 'none';
+      var br = $('br_' + v.key); if (br) br.classList.toggle('on', !!st.rm[v.rm]); }
+  });
+  P.buttons.forEach(function(b){ var el = $('b_' + b); if (el){ el.classList.toggle('on', st.btn[b]); el.classList.toggle('latched', !!latched[b]); el.setAttribute('aria-pressed', st.btn[b]); }
+    document.querySelectorAll('[data-btn="' + b + '"]').forEach(function(g){ g.classList.toggle('latched', !!latched[b]); }); });
+  (P.removables||[]).forEach(function(r){ var c = $('t_' + r.id); if (c) c.checked = !st.rm[r.id]; });
+  P.qs.forEach(function(q){ var b = $('bq_' + q); if (b) b.textContent = (st.q[q] ? 'Abrir ' : 'Cerrar ') + '-' + q; });
+  if (P.status) P.status(st, R, $);
+  $('explain').innerHTML = P.msg(st, R);
+}
+function press(b, down){ if (st.btn[b] === down) return; st.btn[b] = down; st.last = b + (down ? 'On' : 'Off'); if (P.onpress) P.onpress(st, b, down); settle(); }
+function hold(el, b){
+  if (!el) return;
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    var now = Date.now();
+    if (latched[b]){ latched[b] = false; skipUp[b] = true; press(b, false); render(); return; }
+    if (now - (lastDown[b] || 0) < 380){ latched[b] = true; skipUp[b] = true; lastDown[b] = 0; press(b, true); render(); return; }
+    lastDown[b] = now; press(b, true);
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){
+    if (skipUp[b]){ if (ev !== 'lostpointercapture') skipUp[b] = false; return; }
+    if (latched[b]) return;
+    press(b, false);
+  }); });
+  el.addEventListener('dblclick', function(e){ e.preventDefault(); });
+  el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(b, true); } });
+  el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched[b]) press(b, false); });
+}
+function click(el, fn){ if (!el) return; el.addEventListener('click', fn); el.addEventListener('keydown', function(e){ if (el.tagName !== 'BUTTON' && (e.key === ' ' || e.key === 'Enter')){ e.preventDefault(); fn(); } }); }
+P.buttons.forEach(function(b){ hold($('b_' + b), b); document.querySelectorAll('[data-btn="' + b + '"]').forEach(function(g){ hold(g, b); }); });
+P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q'; settle(); }; click($('bq_' + q), f); click($('g_' + q), f); });
+(P.removables||[]).forEach(function(r){
+  var f = function(){ st.rm[r.id] = !st.rm[r.id]; st.last = 'rm_' + r.id; settle(); };
+  (r.keys||[]).forEach(function(k){ click($('g_' + k), f); });
+  var c = $('t_' + r.id); if (c) c.addEventListener('change', function(){ st.rm[r.id] = !this.checked; st.last = 'rm_' + r.id; settle(); });
+});
+(P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
+var keymap = P.keys || {};
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
+document.addEventListener('keydown', function(e){
+  if (e.repeat) return;
+  var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
+  var k = keymap[e.key.toLowerCase()]; if (!k) return;
+  if (st.btn.hasOwnProperty(k)) press(k, true);
+  else if (st.q.hasOwnProperty(k)){ st.q[k] = !st.q[k]; settle(); }
+  else if (st.rm.hasOwnProperty(k)){ st.rm[k] = !st.rm[k]; st.last = 'rm_' + k; settle(); }
+});
+document.addEventListener('keyup', function(e){ var k = keymap[e.key.toLowerCase()]; if (k && st.btn.hasOwnProperty(k)) press(k, false); });
+settle();
+})();
+</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>

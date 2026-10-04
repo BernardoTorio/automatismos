@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Enclavamiento entre dos contactores</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -91,11 +92,37 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 .spinR{animation:spin .8s linear infinite} .spinL{animation:spin .8s linear infinite reverse}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spinR,.spinL{animation:none}}
+
+/* ---- barra superior: volver, dónde estás, tema ---- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs a:hover{color:var(--ink)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1}
+/* ---- cables con tensión ---- */
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.wlive{fill:none;stroke:#FF1F1F;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:0;pointer-events:none;transition:opacity .15s}
+.wlive.live{opacity:1;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.howto{border-left:6px solid #1F4E79}
+.howto h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.howto ul{margin:4px 0 0;padding-left:20px}
+.howto li{margin:3px 0}
+.lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
+.lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
+.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
 </style>
 </head>
 <body>
 <main>
-  <a class="back" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver (tecla Esc)" aria-label="Volver">←</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 3</a><span class="sep">›</span><b id="crumbLast">3.6 Enclavamiento entre dos contactores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <h1>Enclavamiento entre dos contactores</h1>
   <p class="sub">Dos marchas con realimentación: -S1 activa -KM1 (derecha) y -S2 activa -KM2 (izquierda). Arranca uno y prueba a arrancar el otro. Luego quita el enclavamiento y repite.</p>
   <div class="grid">
@@ -167,7 +194,17 @@ PAGE.msg = function(st, R){
   return 'Los dos contactores en reposo: sus <span class="k">61-62</span> están <b>cerrados</b>. Pulsa <b>-S1</b> (derecha) o <b>-S2</b> (izquierda).';
 };
 </script>
-<script>
+<script>(function(){ // trazos de "cable con tensión" sobre cada cable
+  var P = window.PAGE, svg = document.querySelector('.sheet svg'); if (!P || !svg) return;
+  var first = svg.querySelector('.flow');
+  P.edges.forEach(function(e, i){
+    if (e.t !== 'w' || !e.d || document.getElementById('w' + i)) return;
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', e.d); p.setAttribute('id', 'w' + i); p.setAttribute('class', 'wlive');
+    svg.insertBefore(p, first);
+  });
+})();
+
 (function(){
 var P = window.PAGE, $ = function(id){ return document.getElementById(id); };
 var st = { btn:{}, coil:{}, q:{}, rm:{}, last:'inicio', on:{} , trip:false};
@@ -215,23 +252,26 @@ function compute(){
     var d = side('L', tops); if (!d){ d = -side('N', bots); }
     if (d) flows[i] = d;
   });
-  return { loads: loads, flows: flows };
+  return { loads: loads, flows: flows, live: fromL };
 }
 var timer = null, R = null;
 function settle(){
+  // Contactores y relés cambian al instante (un toque corto en un paro ya actúa).
+  for (var n = 0; n < 40; n++){
+    R = compute();
+    var ch = null;
+    for (var k = 0; k < P.coils.length; k++){ var c = P.coils[k]; if (!!R.loads[c] !== !!st.coil[c]){ ch = c; break; } }
+    if (ch === null) break;
+    st.coil[ch] = !!R.loads[ch]; if (P.after) P.after(st);
+  }
   R = compute();
-  var ch = null;
-  for (var k = 0; k < P.coils.length; k++){ var c = P.coils[k]; if (!!R.loads[c] !== !!st.coil[c]){ ch = c; break; } }
   render();
-  if (ch === null) return;
-  clearTimeout(timer);
-  var want = !!R.loads[ch];
-  timer = setTimeout(function(){ st.coil[ch] = want; if (P.after) P.after(st); settle(); }, want ? 260 : 160);
 }
 function rot(el, deg){ if (el) el.style.transform = 'rotate(' + deg + 'deg)'; }
 function render(){
   R = R || compute();
   E.forEach(function(e, i){
+    var wl = $('w' + i); if (wl) wl.classList.toggle('live', e.a in R.live && e.b in R.live);
     var f = $('fl' + i); if (!f) return;
     var d = R.flows[i];
     f.classList.toggle('on', !!d);
@@ -298,5 +338,15 @@ document.addEventListener('keyup', function(e){ var k = keymap[e.key.toLowerCase
 settle();
 })();
 </script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
 </body>
 </html>
