@@ -115,6 +115,14 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
 .lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
+.card.tension{border-left:6px solid #FF1F1F}
+.card.tension h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.card.tension p{margin:4px 0}
+.swr{display:inline-block;width:28px;height:7px;border-radius:4px;vertical-align:middle;margin-right:4px;background:#FF1F1F;box-shadow:0 0 4px rgba(255,40,40,.6)}
+.swp{display:inline-block;width:28px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px;background:#D0191C;opacity:.42}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
 </style>
 
 </head>
@@ -291,7 +299,8 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
         </div>
       </div>
 
-      <div class="card explain" id="explain" aria-live="polite"></div>
+      <div class="card tension"><h2>¿Qué quiere decir el rojo vivo?</h2><p><span class="swr"></span>Un cable en <b>rojo vivo y grueso</b> tiene <b>tensión</b>: está unido a la fase <b>L</b> a través de contactos <b>cerrados</b>. Si pusieras el polímetro entre ese cable y el neutro <b>N</b>, marcaría <b>230 V</b>.</p><p><span class="swp"></span>Un cable <b>pálido</b> no tiene tensión: hay un contacto <b>abierto</b> entre él y la fase.</p><p><b>Tener tensión no es lo mismo que pasar corriente.</b> El cable que llega a ‑S1 sin pulsar, o al 13-14 abierto, está en rojo vivo (tiene tensión), pero no pasa corriente. Cuando ‑KM1 se activa y se cierra su 13-14, el rojo vivo pasa también por él. La corriente (la línea amarilla) solo aparece cuando el circuito se cierra hasta el <b>N</b> a través de una bobina o un piloto.</p></div>
+    <div class="card explain" id="explain" aria-live="polite"></div>
 
       <div class="card">
         <div class="controls">
@@ -303,7 +312,7 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
           <button id="bQ1" style="padding:10px 12px">Abrir magnetotérmico -Q1</button>
         </div>
       </div>
-      <p class="foot">La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul. Puedes tocar <b>-Q1</b>, <b>-S0</b>, <b>-S1</b> y el <b>13-14 de -KM1</b> (para quitarlo o ponerlo) en el propio esquema. Teclado: <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>Q</kbd> magnetotérmico, <kbd>R</kbd> realimentación.</p>
+      <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>. Fase en rojo, neutro en azul. Puedes tocar <b>-Q1</b>, <b>-S0</b>, <b>-S1</b> y el <b>13-14 de -KM1</b> (para quitarlo o ponerlo) en el propio esquema. Teclado: <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>Q</kbd> magnetotérmico, <kbd>R</kbd> realimentación.</p>
     </div>
   </div>
 </main>
@@ -317,7 +326,7 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
   var timer = null;
   function settle(){
     // cambio instantáneo: un toque corto en el paro ya para
-    for (var n = 0; n < 10; n++){ var want = pathOK(); if (want === st.coil) break; st.coil = want; }
+    for (var n = 0; n < 40; n++){ var want = pathOK(); if (want === st.coil) break; st.coil = want; }
     render();
   }
   var WIRES = Array.prototype.slice.call(document.querySelector('svg').querySelectorAll('.w.wf'));
@@ -372,12 +381,25 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     last = (which === 's1' && !down && !st.fb) ? 'soltarSinFb' : which + (down ? 'On' : 'Off');
     settle();
   }
+  var latched = {}, lastDown = {}, skipUp = {};
+  function markLatched(){ ['s1','s0'].forEach(function(k){ ['b','g'].forEach(function(p){ var el = document.getElementById(p + (k === 's1' ? 'S1' : 'S0')); if (el) el.classList.toggle('latched', !!latched[k]); }); }); }
   function hold(el, which){
-    el.addEventListener('pointerdown', function(e){ e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){} press(which, true); });
-    ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){ press(which, false); }); });
+    el.addEventListener('pointerdown', function(e){
+      e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      var now = Date.now();
+      if (latched[which]){ latched[which] = false; skipUp[which] = true; press(which, false); markLatched(); return; }
+      if (now - (lastDown[which] || 0) < 380){ latched[which] = true; skipUp[which] = true; lastDown[which] = 0; press(which, true); markLatched(); return; }
+      lastDown[which] = now; press(which, true);
+    });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){ el.addEventListener(ev, function(){
+      if (skipUp[which]){ skipUp[which] = false; return; }
+      if (latched[which]) return;
+      press(which, false);
+    }); });
     el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(which, true); } });
-    el.addEventListener('keyup', function(e){ if (e.key === ' ' || e.key === 'Enter'){ press(which, false); } });
+    el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched[which]){ press(which, false); } });
   }
+
   hold($('bS1'), 's1'); hold($('bS0'), 's0');
   hold($('gS1'), 's1'); hold($('gS0'), 's0');
   function toggleQ1(){ st.q1 = !st.q1; last = 'q1'; settle(); }
@@ -399,8 +421,8 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
   });
   document.addEventListener('keyup', function(e){
     var k = e.key.toLowerCase();
-    if (k === 'm') press('s1', false);
-    if (k === 'p') press('s0', false);
+    if (k === 'm' && !latched.s1) press('s1', false);
+    if (k === 'p' && !latched.s0) press('s0', false);
   });
   render();
 })();
