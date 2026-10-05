@@ -70,6 +70,16 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
 .lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
+/* ---- rúbrica de las prácticas ---- */
+.rub{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:12px;padding:6px 16px 12px;margin:0 0 18px}
+.rub table{border-collapse:collapse;width:100%;font-size:.98rem}
+.rub th,.rub td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;vertical-align:top}
+.rub thead th{color:var(--muted);font-size:.85rem}
+.rub td b{display:block;color:var(--ink)}
+.rub td{color:var(--muted)}
+.rub .p{text-align:right;white-space:nowrap;font-weight:700;color:var(--acc)}
+.rub tr.blq th,.rub tr.blq td{background:var(--bg);color:var(--green);font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-size:.9rem}
+.rubnota{margin:10px 0 0;color:var(--muted);font-size:.92rem}
 </style>
 </head>
 <body>
@@ -109,6 +119,22 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="ico">PDF</div>
     <div>Práctica 2 · Cableados iniciales II<small>Realimentación, prioridad al paro y a la marcha, marchas y paros totales con relé auxiliar y activación condicionada</small></div>
   </a>
+    <h2 class="sec" style="margin-top:26px">Cómo se valoran las prácticas</h2>
+  <div class="rub">
+  <table>
+  <thead><tr><th scope="col">Qué se mira</th><th scope="col" class="p">Peso</th></tr></thead>
+  <tbody>
+  <tr class="blq"><th scope="rowgroup">Memoria</th><td class="p">50 %</td></tr>
+  <tr><td><b>Presentación</b>Limpieza, orden, esquemas bien dibujados, letra clara.</td><td class="p">20 %</td></tr>
+  <tr><td><b>Contenido</b>Está todo lo que se pide y está bien respondido.</td><td class="p">30 %</td></tr>
+  <tr class="blq"><th scope="rowgroup">Práctica</th><td class="p">50 %</td></tr>
+  <tr><td><b>Acabados</b>Cables de la longitud correcta (ni cortos ni sobrantes), bien metidos en la canaleta y en los bornes (tornillos), sin pisar el aislante y sin cobre a la vista; recorridos ordenados y montaje limpio.</td><td class="p">30 %</td></tr>
+  <tr><td><b>Funcionamiento</b>El circuito hace lo que pide el enunciado la primera vez que se enseña al profesor.</td><td class="p">10 %</td></tr>
+  <tr><td><b>Medidas</b>Comprobaciones y medidas con el polímetro.</td><td class="p">10 %</td></tr>
+  </tbody>
+  </table>
+  <p class="rubnota">Cada apartado se puntúa de 0 a 10. La nota de la práctica es la suma de cada apartado por su peso.</p>
+  </div>
     <h2 class="sec" style="margin-top:26px">Práctica 1 · soluciones animadas</h2>
   <a class="card" href="p1_1_serie.html">
     <div class="num">1.1</div>
