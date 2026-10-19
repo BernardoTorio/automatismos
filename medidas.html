@@ -130,6 +130,7 @@ text{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111}
         <div class="card"><h2>QUÉ ESTÁS MIDIENDO</h2><div class="explain" id="explain"></div></div>
         <div class="card"><h2>PARA QUÉ SIRVE ESTE CIRCUITO</h2><div id="desc"></div></div>
       </div>
+      <div class="card" style="margin-top:14px;border-left:6px solid #C0392B"><h2>¡OJO! TENSIONES FANTASMA</h2>En clase decimos «0 V» cuando a un punto no le llega la fase. Pero con un polímetro digital muchas veces verás <b>20-30 V</b> en un cable que se ha quedado «al aire» (sin fase y sin camino al neutro): es una <b>tensión fantasma</b>, que el cable recoge de los cables de al lado. <b>Trátala como 0 V</b>: ahí no hay fase. Cuando sí llega la fase, el polímetro marca unos <b>230 V</b>.</div>
       <div class="card" style="margin-top:14px"><h2>PRACTICA · PREGUNTAS DEL TEST</h2><div id="tasks"></div></div>
     </div>
     <div class="side">
@@ -152,7 +153,7 @@ text{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111}
       <div class="card"><h2>ESTADO</h2><div class="leds" id="leds"></div></div>
     </div>
   </div>
-  <p class="foot">Teclas: <b>Esc</b> o <b>Retroceso</b> vuelven al índice. Borne = tornillo del aparato. Recuerda: la continuidad (Ω, el pitido) se mide siempre <b>sin tensión</b>, con la clavija desenchufada.</p>
+  <p class="foot">Teclas: <b>Esc</b> o <b>Retroceso</b> vuelven al índice. Borne = tornillo del aparato. Recuerda: la continuidad (Ω, el pitido) se mide siempre <b>sin tensión</b>, con el magnetotérmico <b>bajado</b>.</p>
 </main>
 
 <script>
@@ -394,10 +395,13 @@ function step(){
     if (same) break;
   }
 }
+function ghost(n){ let h = 0; for (const c of n) h = (h*31 + c.charCodeAt(0)) % 997; return 19 + (h % 120)/10; }
 function readV(a, b){
   const pa = POT[a]||null, pb = POT[b]||null;
   const tri = p=>p&&p[0]==='L'&&p.length===2, mono = p=>p==='L'||p==='N';
   if ((tri(pa)&&mono(pb))||(mono(pa)&&tri(pb))) return {v:null, why:'otro'};
+  if (C.fuerza && (C.fuerza.includes(a) !== C.fuerza.includes(b))) return {v:null, why:'otro'};
+  if (S.plug && C.supply && ((!pa && pb==='N') || (!pb && pa==='N'))) return {v:ghost(!pa?a:b), why:'fantasma'};
   if (!pa || !pb) return {v:0, why: (!pa && !pb) ? 'nada' : 'unlado'};
   if (pa===pb) return {v:0, why:'igual'};
   return {v:230, why:'tension'};
@@ -456,9 +460,10 @@ function updateMeter(){
     lastBeep='';
     const r = readV(a.net, b.net);
     if (r.v===null){ setLCD('----','V'); ex.innerHTML = where + 'Esas dos puntas están en circuitos distintos (fuerza y mando). Mide siempre dentro del mismo circuito.'; return; }
-    setLCD(r.v ? '230' : '0,0', 'V');
+    setLCD(r.why==='fantasma' ? fmt(r.v,1) : r.v ? '230' : '0,0', 'V');
     let why = '';
-    if (!S.plug) why = 'La clavija está desenchufada: no hay tensión en ningún punto.';
+    if (!S.plug) why = 'Estos aparatos están sueltos: no hay tensión en ningún punto.';
+    else if (r.why==='fantasma') why = `Marca <b>${fmt(r.v,1)} V</b>: es una <b>tensión fantasma</b>. Ese tornillo se ha quedado «al aire»: no le llega la fase (hay un contacto abierto antes) y tampoco está unido al neutro. El cable recoge un poco de tensión de los cables de al lado y el polímetro digital la marca. <b>A efectos prácticos es 0 V</b>: ahí no hay fase.`;
     else if (r.v){ const ph = PHANTOM[a.net]||PHANTOM[b.net];
       why = ph ? `Hay <b>230 V</b>: la fase llega a ese punto <b>a través de ${ph}</b>. El polímetro marca tensión aunque el consumo no funcione, porque por el otro lado tiene la fase.`
                : 'Hay <b>230 V</b>: una punta tiene fase y la otra neutro (o dos fases distintas).'; }
@@ -468,7 +473,12 @@ function updateMeter(){
     ex.innerHTML = where + why; return;
   }
   // Ω
-  if (S.plug && C.supply){ setLCD('----','Ω','⚠'); lastBeep=''; ex.innerHTML = where + '<div class="warnbox"><b>¡Hay tensión!</b> La continuidad se mide siempre <b>sin tensión</b>. Desenchufa la clavija antes de medir.</div>'; return; }
+  if (C.supply){
+    const up = C.els.filter(e=>(e.t==='mt1'||e.t==='mt3') && S.q[e.id]).map(e=>e.name);
+    if (up.length){ setLCD('----','Ω','⚠'); lastBeep=''; ex.innerHTML = where + `<div class="warnbox"><b>¡Hay tensión!</b> La continuidad se mide siempre <b>sin tensión</b>. Baja ${up.join(' y ')} antes de medir.</div>`; return; }
+    const fase = n=>hasPot(n) && POT[n]!=='N';
+    if (fase(a.net) || fase(b.net)){ setLCD('----','Ω','⚠'); lastBeep=''; ex.innerHTML = where + '<div class="warnbox"><b>¡Hay tensión en una punta!</b> Ese tornillo está antes del magnetotérmico y sigue con fase aunque lo bajes. Mide después del magnetotérmico.</div>'; return; }
+  }
   const r = readR(a.net, b.net);
   if (!isFinite(r.r)){ setLCD('OL','Ω'); lastBeep=''; ex.innerHTML = where + 'Marca <b>OL</b> (fuera de escala): <b>no hay camino</b> entre las dos puntas. Hay algún contacto abierto o un cable que no llega. No pita.'; return; }
   const beepOn = r.r < 40;
@@ -558,7 +568,8 @@ function renderControls(){
   const row = ()=>{ const r=document.createElement('div'); r.className='row'; r.style.marginBottom='8px'; box.appendChild(r); return r; };
   const btn = (r, label, on, fn, title)=>{ const b=document.createElement('button'); b.textContent=label; if (on) b.classList.add('on'); if (title) b.title=title; b.onclick=fn; r.appendChild(b); return b; };
   if (C.supply){
-    const r = row(); btn(r, S.plug ? '🔌 Clavija enchufada' : '🔌 Clavija desenchufada', S.plug, ()=>{ S.plug=!S.plug; S.pressed.clear(); S.latched.clear(); S.testigo.clear(); S.on={}; render(); }, 'Con la clavija desenchufada no hay tensión: es como hay que medir la continuidad');
+    const r = row(); const nota = document.createElement('div'); nota.style.fontSize='.9rem'; nota.style.color='var(--muted)';
+    nota.innerHTML = 'El cuadro está siempre conectado. Para quitar la tensión, <b>baja el magnetotérmico</b> (tócalo en el esquema o usa su botón).'; r.appendChild(nota);
   }
   const qs = C.els.filter(e=>e.t==='mt1'||e.t==='mt3');
   if (qs.length){ const r = row(); qs.forEach(e=>btn(r, `${e.name} ${S.q[e.id]?'subido':'bajado'}`, S.q[e.id], ()=>toggleQ(e.id))); }
@@ -572,7 +583,7 @@ function renderControls(){
   for (const k of C.testigos||[]){
     const r = row();
     btn(r, S.testigo.has(k) ? `Soltar el testigo de -${k}` : `Empujar el testigo de -${k}`, S.testigo.has(k), ()=>{
-      if (S.plug && C.supply){ alertBox('El testigo solo se empuja <b>sin tensión</b>, para comprobar los contactos con el polímetro. Desenchufa antes la clavija.'); return; }
+      if (C.supply && C.els.some(e=>(e.t==='mt1'||e.t==='mt3') && S.q[e.id])){ alertBox('El testigo solo se empuja <b>sin tensión</b>, para comprobar los contactos con el polímetro. Baja antes el magnetotérmico.'); return; }
       S.testigo.has(k) ? S.testigo.delete(k) : S.testigo.add(k); render(); }, 'Con un destornillador aislado se hunde la armadura y cambian los contactos');
   }
   for (const k of C.faults||[]){
@@ -585,7 +596,7 @@ function alertBox(html){ document.getElementById('explain').innerHTML = '<div cl
 function renderLeds(){
   const L = document.getElementById('leds'); L.innerHTML = '';
   const add = (txt,on)=>{ const s=document.createElement('span'); s.className='led'+(on?' on':''); s.innerHTML='<i></i>'+txt; L.appendChild(s); };
-  if (C.supply) add(S.plug ? 'Con tensión' : 'Sin tensión', S.plug);
+  if (C.supply){ const on = C.els.some(e=>(e.t==='mt1'||e.t==='mt3') && S.q[e.id]); add(on ? 'Con tensión' : 'Magnetotérmico bajado', on); }
   C.els.filter(e=>e.t==='coil').forEach(e=>add(e.name+(S.on[e.id]?' activado':' en reposo'), !!S.on[e.id]));
   C.els.filter(e=>e.t==='pilot').forEach(e=>add(e.name+(S.lit[e.id]?' encendido':' apagado'), !!S.lit[e.id]));
   if (C.els.some(e=>e.t==='motor')) add(S.motor?'Motor girando':'Motor parado', S.motor);
@@ -655,8 +666,9 @@ function circuitos(){
     tasks:[
       {key:'tornillo 3 de -S1', q:'Todo en reposo. V~: punta negra en N y roja en el tornillo 3 de -S1.', a:'<b>230 V</b>: el 95-96 y el 1-2 de -S0 están cerrados, la fase llega hasta ahí.'},
       {key:'roja en A1 de -KM1', q:'Todo en reposo. V~: punta negra en N y roja en A1 de -KM1.', a:'<b>0 V</b>: -S1 y el 13-14 están abiertos. (El polímetro dice "0 V" aunque A1 está unido al N a través de la bobina.)'},
-      {q:'Pulsa TEST del térmico. V~: negra en N y roja en el 96 de -F2. Después, en el 98.', a:'En el 96, <b>0 V</b> (el 95-96 se ha abierto). En el 98, <b>230 V</b> (el 97-98 se ha cerrado y -H1 se enciende).'},
-      {q:'Desenchufa la clavija. Ω: puntas en el 13 y el 14 de -KM1. Luego en el 61 y el 62.', a:'13-14: <b>OL</b>, no pita (NA abierto). 61-62: <b>pita</b> (NC cerrado).'},
+      {q:'Pulsa TEST del térmico. V~: negra en N y roja en el 96 de -F2. Después, en el 98.', a:'En el 96, unos <b>20-30 V</b>: tensión fantasma, es decir, <b>0 V a efectos prácticos</b> (el 95-96 se ha abierto). En el 98, <b>230 V</b> (el 97-98 se ha cerrado y -H1 se enciende).'},
+      {q:'Con todo en reposo, pulsa y mantén -S0. V~: negra en N y roja en el 2 de -S0.', a:'Unos <b>20-30 V</b>: tensión fantasma. El 2 de -S0 se ha quedado «al aire» (paro abierto, marcha y 13-14 abiertos). A efectos prácticos, <b>0 V</b>.'},
+      {q:'Baja -Q1. Ω: puntas en el 13 y el 14 de -KM1. Luego en el 61 y el 62.', a:'13-14: <b>OL</b>, no pita (NA abierto). 61-62: <b>pita</b> (NC cerrado).'},
     ]});
   // ---------- 2. Cascada ----------
   const c2 = { id:'cascada', title:'Activación condicionada (cascada)', supply:true, W:10.6, H:10.4,
@@ -707,6 +719,7 @@ function circuitos(){
   // ---------- 4. Arranque directo ----------
   const xs=[2.2,2.75,3.3], xm=6.6, xk=8.1;
   L.push({ id:'arranque', title:'Arranque directo: fuerza y mando', supply:true, W:9.4, H:10.0,
+    fuerza:['L1','L2','L3','a1','a2','a3','b1','b2','b3','c1','c2','c3'],
     desc:'Fuerza (izquierda) y mando (derecha) de un motor (T4 · 4.1, P3). Con la <b>pinza</b> verás la diferencia entre la corriente de una bobina y la de un motor. Con el polímetro, que los contactos principales de -KM1 son NA.',
     thermals:['F2'], testigos:['KM1'],
     els:[
@@ -738,12 +751,12 @@ function circuitos(){
       {key:'entre U y V del motor', q:'-Q1 subido y -KM1 en reposo. V~: puntas en U1 y V1 del motor.', a:'<b>0 V</b>: los contactos principales de -KM1 están abiertos. Arranca con -S1 y vuelve a medir: <b>230 V</b> (en el aula, entre fases).'},
       {key:'solo el cable que va a A1', q:'Arranca el motor. Pinza en el cable que llega a A1 de -KM1.', a:'Unas <b>centésimas de amperio</b> (0,03-0,05 A).'},
       {key:'los tres cables del motor a la vez', q:'Con el motor en marcha, abraza con la pinza los tres cables del motor a la vez. Luego, uno solo.', a:'Los tres a la vez: <b>0 A</b> (se anulan). Uno solo: <b>amperios</b>.'},
-      {key:'entre 1/L1 y 2/T1 de -KM1 en reposo', q:'Desenchufa la clavija. Ω: puntas en 1/L1 y 2/T1 de -KM1. Luego empuja el testigo de -KM1 y repite.', a:'En reposo <b>OL</b>, no pita (NA abierto). Con el testigo empujado, <b>pita</b>.'},
-      {q:'Desenchufa la clavija. Ω: puntas en U1 y V1 del motor.', a:'Unos <b>17 Ω</b>: es la resistencia de las bobinas del motor (en el aula van en triángulo).'},
+      {key:'entre 1/L1 y 2/T1 de -KM1 en reposo', q:'Baja -Q1 y -Q2. Ω: puntas en 1/L1 y 2/T1 de -KM1. Luego empuja el testigo de -KM1 y repite.', a:'En reposo <b>OL</b>, no pita (NA abierto). Con el testigo empujado, <b>pita</b>.'},
+      {q:'Baja -Q1 y -Q2. Ω: puntas en U1 y V1 del motor.', a:'Unos <b>17 Ω</b>: es la resistencia de las bobinas del motor (en el aula van en triángulo).'},
     ]});
   // ---------- 5. P1 1.3 ----------
   L.push({ id:'p1excluyentes', title:'P1 · 1.3 Pulsadores excluyentes', supply:true, W:7.6, H:10.4,
-    desc:'Antes de enchufar un montaje, la Práctica 1 pide comprobar con el polímetro en <b>continuidad</b> (sin tensión) que no hay cortocircuito entre L y N, y que al pulsar aparece la bobina.',
+    desc:'Antes de dar tensión a un montaje, la Práctica 1 pide comprobar con el polímetro en <b>continuidad</b> (sin tensión) que no hay cortocircuito entre L y N, y que al pulsar aparece la bobina.',
     els:[
       {t:'mt1',id:'Q1',name:'-Q1',x:1.5,y:.6,nets:['L','q']},
       {t:'NA',act:'push',id:'S3',name:'-S3',x:1.5,y:3.15,n:['3','4'],nets:['q','p']},
@@ -763,8 +776,8 @@ function circuitos(){
     dots:[[1.5,.6],[1.5,2.9],[3.1,2.9],[5.0,2.9],[1.5,5.55],[1.5,9.8,'N'],[5.0,9.8,'N']],
     texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']], clamps:[],
     tasks:[
-      {key:'pones las puntas en L y N. ¿Qué tiene que pasar', q:'Desenchufa la clavija. Ω: puntas en L y N, todo en reposo.', a:'<b>OL</b> y no pita: no hay cortocircuito. Si pitara, no se puede enchufar.'},
-      {key:'mantienes -S3 pulsado', q:'Sin tensión, puntas en L y N, y mantén pulsado -S3. Después pulsa -S3 y -S4 a la vez (doble toque para dejarlos fijos).', a:'Con -S3: la resistencia de la bobina, unos <b>560 Ω</b>, nunca 0. Con los dos: vuelve a <b>OL</b>, porque cada uno abre la rama del otro.'},
+      {key:'pones las puntas en L y N. ¿Qué tiene que pasar', q:'Baja -Q1. Ω: puntas en el 2 de -Q1 y en N, todo en reposo.', a:'<b>OL</b> y no pita: no hay cortocircuito. Si pitara, no se puede subir -Q1.'},
+      {key:'mantienes -S3 pulsado', q:'Con -Q1 bajado, puntas en el 2 de -Q1 y en N, y mantén pulsado -S3. Después pulsa -S3 y -S4 a la vez (doble toque para dejarlos fijos).', a:'Con -S3: la resistencia de la bobina, unos <b>560 Ω</b>, nunca 0. Con los dos: vuelve a <b>OL</b>, porque cada uno abre la rama del otro.'},
     ]});
   // ---------- 6. P3 3.1 ----------
   const p3 = { id:'p3termicos', title:'P3 · 3.1 Tres térmicos en serie', supply:true, wide:true, W:25.2, H:11.8,
@@ -783,7 +796,7 @@ function circuitos(){
     dots:[[1.5,.6],[1.5,2.75]], texts:[[.35,.6,'L'],[.35,11.3,'N']], hots:[[.9,.6,'L','L'],[.9,11.3,'N','N']], clamps:[],
     tasks:[
       {key:'roja en el 96 de -F3', q:'Todo en reposo. V~: negra en N y roja en el 96 de -F3.', a:'<b>230 V</b>: los tres 95-96 están cerrados y la fase llega hasta ahí.'},
-      {q:'Pulsa TEST en -F2 (sin decírselo a tu compañero). V~: mide en el 96 de -F3, luego en el 96 de -F2 y luego en el 96 de -F1.', a:'96 de -F3: <b>0 V</b>. 96 de -F2: <b>0 V</b>. 96 de -F1: <b>230 V</b>. La tensión se pierde en -F2: ese es el que ha saltado.'},
+      {q:'Pulsa TEST en -F2 (sin decírselo a tu compañero). V~: mide en el 96 de -F3, luego en el 96 de -F2 y luego en el 96 de -F1.', a:'96 de -F3 y 96 de -F2: unos <b>20-30 V</b> (tensión fantasma = 0 V). 96 de -F1: <b>230 V</b>. La fase se pierde en -F2: ese es el que ha saltado.'},
       {q:'Arranca los tres motores y pulsa TEST en uno de los térmicos.', a:'Se paran <b>los tres</b>: los 95-96 están en serie antes de -S4. -H1 se apaga y -H2 se enciende.'},
     ]};
   [3.4,8.1,12.8].forEach((x,i)=>{ const n=i+1, xk=x+1.35, xr=x+3.2, p='p'+n;
@@ -830,7 +843,7 @@ function circuitos(){
   return L;
 }
 const CIRCS = circuitos();
-const QNUM = {"tornillo 3 de -S1": "Test 28 de octubre · pregunta Nº 34", "roja en A1 de -KM1": "Test 28 de octubre · pregunta Nº 35", "roja en el 54 de -KM1 (rama de -KM2)": "Test 28 de octubre · pregunta Nº 51", "roja en el 24 de -KA1": "Test 28 de octubre · pregunta Nº 54", "entre U y V del motor": "Test de diciembre · pregunta Nº 1", "solo el cable que va a A1": "Test de diciembre · pregunta Nº 2", "los tres cables del motor a la vez": "Test de diciembre · pregunta Nº 3", "entre 1/L1 y 2/T1 de -KM1 en reposo": "Test de diciembre · pregunta Nº 4", "pones las puntas en L y N. ¿Qué tiene que pasar": "Test 28 de octubre · pregunta Nº 17", "mantienes -S3 pulsado": "Test 28 de octubre · pregunta Nº 18", "roja en el 96 de -F3": "Test de diciembre · pregunta Nº 6", "mides la bobina de un contactor entre A1 y A2": "Test 28 de octubre · pregunta Nº 10", "después de pulsar TEST, ¿entre qué tornillos": "Test de diciembre · pregunta Nº 5"};
+const QNUM = {"tornillo 3 de -S1": "Test 28 de octubre · pregunta Nº 35", "roja en A1 de -KM1": "Test 28 de octubre · pregunta Nº 36", "roja en el 54 de -KM1 (rama de -KM2)": "Test 28 de octubre · pregunta Nº 52", "roja en el 24 de -KA1": "Test 28 de octubre · pregunta Nº 55", "entre U y V del motor": "Test de diciembre · pregunta Nº 1", "solo el cable que va a A1": "Test de diciembre · pregunta Nº 2", "los tres cables del motor a la vez": "Test de diciembre · pregunta Nº 3", "entre 1/L1 y 2/T1 de -KM1 en reposo": "Test de diciembre · pregunta Nº 4", "pones las puntas en L y N. ¿Qué tiene que pasar": "Test 28 de octubre · pregunta Nº 18", "mantienes -S3 pulsado": "Test 28 de octubre · pregunta Nº 19", "roja en el 96 de -F3": "Test de diciembre · pregunta Nº 6", "mides la bobina de un contactor entre A1 y A2": "Test 28 de octubre · pregunta Nº 11", "después de pulsar TEST, ¿entre qué tornillos": "Test de diciembre · pregunta Nº 5"};
 CIRCS.forEach(c=>c.tasks.forEach(t=>{ if (t.key) t.n = QNUM[t.key]||null; }));
 // pestañas
 const tabs = document.getElementById('tabs');
