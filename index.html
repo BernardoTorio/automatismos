@@ -80,6 +80,20 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .rub .p{text-align:right;white-space:nowrap;font-weight:700;color:var(--acc)}
 .rub tr.blq th,.rub tr.blq td{background:var(--bg);color:var(--green);font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-size:.9rem}
 .rubnota{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+
+/* ---- animaciones: partes desplegables a dos columnas ---- */
+details.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px}
+details.grp summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;font-weight:700;font-size:1.1rem;color:var(--acc)}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary::before{content:"▸";display:inline-block;transition:transform .15s;color:var(--muted)}
+details.grp[open] summary::before{transform:rotate(90deg)}
+details.grp summary .gt{flex:1}
+details.grp summary small{font-weight:400;color:var(--muted);font-size:.85em}
+details.grp summary .gn{font-weight:400;font-size:.9rem;color:var(--muted);white-space:nowrap}
+details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg);border-radius:12px;outline:none}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 14px 14px}
+.cards2 a.card{margin-bottom:0}
+@media (max-width:700px){.cards2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -149,7 +163,10 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
   </table>
   <p class="rubnota">Cada apartado se puntúa de 0 a 10. La nota de la práctica es la suma de cada apartado por su peso.</p>
   </div>
-    <h2 class="sec" style="margin-top:26px">Práctica 1 · soluciones animadas</h2>
+    <h2 class="sec" style="margin-top:26px">Animaciones de las soluciones · toca una práctica para verlas</h2>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p1_1_serie.html">
     <div class="num">1.1</div>
     <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
@@ -162,7 +179,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">1.3</div>
     <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 2 · soluciones animadas</h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p2_1_prioridades.html">
     <div class="num">2.1</div>
     <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
@@ -179,7 +200,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">2.4</div>
     <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 3 · soluciones animadas <span style="font-weight:400;font-size:.85em;color:var(--muted)">(provisional)</span></h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones <small>(provisional)</small></span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p3_1_termicos_serie.html">
     <div class="num">3.1</div>
     <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
@@ -192,9 +217,14 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">3.3</div>
     <div><h2>Se para todo si saltan dos o más</h2><p>Con los 97-98 y un relé por térmico: uno saltado para su motor; dos o más paran todo.</p></div>
   </a>
-      </section>
+    </div>
+  </details>
+</section>
   <section id="sec-animaciones">
-    <h2 class="sec">Tema 3 · Conexionado básico II · teoría</h2>
+    <h2 class="sec">Animaciones · toca una parte para ver sus animaciones</h2>
+  <details class="grp">
+    <summary><span class="gt">Tema 3 · Conexionado básico II · teoría</span><span class="gn">11 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="pulsadores_na.html">
     <div class="num">3.1</div>
     <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
@@ -239,7 +269,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">3.10</div>
     <div><h2>Inversión de giro de un motor</h2><p>Fuerza y mando: KM2 cruza L1 y L3. Con enclavamiento, sobrecarga y cortocircuito si lo quitas.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 1 · soluciones animadas</h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p1_1_serie.html">
     <div class="num">1.1</div>
     <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
@@ -252,7 +286,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">1.3</div>
     <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 2 · soluciones animadas</h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p2_1_prioridades.html">
     <div class="num">2.1</div>
     <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
@@ -269,7 +307,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">2.4</div>
     <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 3 · soluciones animadas <span style="font-weight:400;font-size:.85em;color:var(--muted)">(provisional)</span></h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones <small>(provisional)</small></span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p3_1_termicos_serie.html">
     <div class="num">3.1</div>
     <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
@@ -282,6 +324,8 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">3.3</div>
     <div><h2>Se para todo si saltan dos o más</h2><p>Con los 97-98 y un relé por térmico: uno saltado para su motor; dos o más paran todo.</p></div>
   </a>
+    </div>
+  </details>
     <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
   </section>
   <section id="sec-tests">
