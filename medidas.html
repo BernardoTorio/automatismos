@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medidas con polímetro y pinza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff; --acc:#1F4E79; --green:#6A9A1F;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; --acc:#8EC1F0; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; --acc:#8EC1F0; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1240px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
+.sub{color:var(--muted);margin:0 0 14px;max-width:80ch}
+/* barra superior (igual que el resto de la web) */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1}
+/* pestañas de circuitos */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.tab{font:inherit;font-size:.95rem;font-weight:700;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+.tab.sel{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:18px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:80vh}
+.sheet.wide svg{min-width:1350px;max-height:none}
+.side{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h2{font-size:1rem;margin:0 0 8px;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 10px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+:root[data-theme="dark"] button.on{color:#10202e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.on{color:#10202e}}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{flex:1 1 auto;min-width:0}
+/* aparato de medida */
+.meter{background:#2b2f33;border-radius:16px;padding:14px;color:#fff;border:3px solid #F2B400}
+.meter.pinza{border-color:#E06C00}
+.lcd{background:#c9d6b8;color:#1b2414;border-radius:8px;padding:8px 12px;font-family:"Courier New",monospace;font-weight:700;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;min-height:72px}
+.lcd .v{font-size:2.6rem;line-height:1}
+.lcd .u{font-size:1.3rem}
+.lcd .ic{font-size:1.4rem;margin-right:auto;font-family:inherit}
+.lcd.off .v,.lcd.off .u,.lcd.off .ic{opacity:0}
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.modes button{background:#3b4046;color:#fff;border-color:#555;padding:8px 4px;font-size:.92rem}
+.modes button.on{background:#F2B400;color:#1a1a1a;border-color:#F2B400}
+.probes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.probes button{padding:8px 4px;font-size:.9rem;background:#3b4046;color:#fff;border-color:#555}
+.probes button.red.on{background:#D0191C;border-color:#fff}
+.probes button.blk.on{background:#000;border-color:#fff}
+.hint{font-size:.88rem;color:#ddd;margin:8px 0 0}
+.explain{font-size:1.02rem;min-height:4.5em}
+.warnbox{border-left:6px solid var(--warn);background:rgba(192,57,43,.1);padding:8px 12px;border-radius:6px;margin-top:8px}
+.leds{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:.95rem}
+.led{display:inline-flex;align-items:center;gap:6px}
+.led i{width:14px;height:14px;border-radius:50%;background:#9aa3ab;display:inline-block;border:1px solid #0003}
+.led.on i{background:#F2B400;box-shadow:0 0 6px #F2B400}
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:900px){.boxes{grid-template-columns:1fr}}
+.task{border-top:1px solid var(--line);padding:9px 0}
+.task:first-of-type{border-top:none}
+.task .tq{font-weight:700}
+.task .tn{color:var(--acc);font-size:.85rem;font-weight:700}
+.task button{padding:4px 10px;font-size:.85rem;margin-top:4px}
+.task .ans{display:none;margin-top:4px;background:rgba(46,139,62,.12);border-left:5px solid var(--ok);padding:6px 10px;border-radius:6px}
+.task.show .ans{display:block}
+.foot{color:var(--muted);font-size:.9rem;margin-top:14px}
+/* dibujo */
+.wire{fill:none;stroke-width:.05;stroke-linecap:round;stroke-linejoin:round}
+.wl{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.wire.live{stroke:#FF1F1F;stroke-width:.095;filter:drop-shadow(0 0 .03px rgba(255,40,40,.7))}
+.sym{fill:none;stroke:#111;stroke-width:.045;stroke-linecap:round;stroke-linejoin:round}
+.symt{stroke-width:.03}
+.dash{fill:none;stroke:#111;stroke-width:.03;stroke-dasharray:.09 .06}
+.symfill{fill:#fff;stroke:#111;stroke-width:.045}
+text{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111}
+.num{font-size:.24px}
+.nm{font-size:.29px;font-weight:700}
+.lbl{font-size:.3px;font-weight:700}
+.cap{font-size:.3px;font-weight:700;fill:#56606b}
+.hot{fill:#fff;fill-opacity:.01;stroke:#1F4E79;stroke-width:.025;stroke-opacity:.35;cursor:crosshair}
+.hot:hover{fill:#F2B400;fill-opacity:.45;stroke-opacity:1}
+.mode-pinza .hot,.mode-off .hot{display:none}
+.clamp{fill:#E06C00;fill-opacity:.12;stroke:#E06C00;stroke-width:.03;stroke-dasharray:.07 .05;cursor:pointer;display:none}
+.mode-pinza .clamp{display:inline}
+.clamp:hover,.clamp.sel{fill-opacity:.4;stroke-dasharray:none}
+.act{cursor:pointer}
+.act:hover .actbox{fill:#F2B400;fill-opacity:.25}
+.actbox{fill:#fff;fill-opacity:.01}
+.latched{fill:#FFE27A;stroke:#F2B400;stroke-width:.04}
+.probe{stroke:#fff;stroke-width:.03}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#medidas" title="Volver (tecla Esc)" aria-label="Volver">←</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#medidas">Medidas</a><span class="sep">›</span><b id="crumbLast">Polímetro y pinza</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <h1>Medidas con el polímetro y la pinza</h1>
+  <p class="sub">Elige un circuito. Toca los pulsadores (doble toque para dejarlos fijos), sube o baja los magnetotérmicos, elige qué mides y pon las puntas tocando los <b>tornillos</b> (bornes) del esquema.</p>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="grid">
+    <div>
+      <div class="sheet" id="sheet"></div>
+      <div class="boxes">
+        <div class="card"><h2>QUÉ ESTÁS MIDIENDO</h2><div class="explain" id="explain"></div></div>
+        <div class="card"><h2>PARA QUÉ SIRVE ESTE CIRCUITO</h2><div id="desc"></div></div>
+      </div>
+      <div class="card" style="margin-top:14px"><h2>PRACTICA · PREGUNTAS DEL TEST</h2><div id="tasks"></div></div>
+    </div>
+    <div class="side">
+      <div class="meter" id="meter">
+        <div class="lcd off" id="lcd"><span class="ic" id="lcdic"></span><span class="v" id="lcdv">0</span><span class="u" id="lcdu">V</span></div>
+        <div class="modes" id="modes">
+          <button data-m="off">OFF</button>
+          <button data-m="v">V~</button>
+          <button data-m="r">Ω 🔊</button>
+          <button data-m="pinza">Pinza A~</button>
+        </div>
+        <div class="probes" id="probes">
+          <button class="red" data-p="red">Punta roja</button>
+          <button class="blk" data-p="black">Punta negra</button>
+          <button data-p="clear">Quitar</button>
+        </div>
+        <p class="hint" id="hint"></p>
+      </div>
+      <div class="card"><h2>ALIMENTACIÓN Y APARATOS</h2><div id="controls"></div></div>
+      <div class="card"><h2>ESTADO</h2><div class="leds" id="leds"></div></div>
+    </div>
+  </div>
+  <p class="foot">Teclas: <b>Esc</b> o <b>Retroceso</b> vuelven al índice. Borne = tornillo del aparato. Recuerda: la continuidad (Ω, el pitido) se mide siempre <b>sin tensión</b>, con la clavija desenchufada.</p>
+</main>
+
+<script>
+/* =================== DIBUJO =================== */
+const NS = 'http://www.w3.org/2000/svg';
+let svg, gW, gS, gH, gP;
+function el(tag, at, parent){ const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); (parent || gS).appendChild(e); return e; }
+function ln(x1,y1,x2,y2,cls='sym',p){ return el('line',{x1,y1,x2,y2,class:cls},p); }
+function tx(x,y,s,cls='num',anchor='start',p){ const t = el('text',{x,y,class:cls,'text-anchor':anchor,'dominant-baseline':'middle'},p); t.textContent = s; return t; }
+function nameL(x,y,s){ tx(x,y,s,'nm','end'); }
+
+const HOTS = [];   // {x,y,net,label}
+function hot(x,y,net,label){ HOTS.push({x,y,net,label}); }
+
+function actPush(xl, ym, xm, nm, id, pressed){
+  const g = el('g',{class:'act','data-push':id});
+  const dx = pressed ? .1 : 0;
+  if (S.latched.has(id)) el('rect',{x:xl-.08+dx,y:ym-.2,width:.32,height:.4,class:'latched',rx:.04},g);
+  el('rect',{x:xl-.9,y:ym-.3,width:(xm-xl)+1.0,height:.6,class:'actbox'},g);
+  ln(xl+dx,ym-.14,xl+dx,ym+.14,'sym',g); ln(xl+dx,ym-.14,xl+.08+dx,ym-.14,'sym',g); ln(xl+dx,ym+.14,xl+.08+dx,ym+.14,'sym',g);
+  el('line',{x1:xl+dx,y1:ym,x2:xm,y2:ym,class:'dash'},g);
+  if (nm){ const t = tx(xl-.1,ym,nm,'nm','end',g); }
+}
+function actTherm(xl, ym, xm, nm){
+  const s=.34; ln(0,0,0,0);
+  el('rect',{x:xl-s,y:ym-s/2,width:s,height:s,class:'symfill'});
+  el('polyline',{points:`${xl-s*.72},${ym+s/2} ${xl-s*.72},${ym-.06} ${xl-s*.5},${ym-.06} ${xl-s*.5},${ym+.06} ${xl-s*.28},${ym+.06} ${xl-s*.28},${ym-s/2}`,class:'sym symt'});
+  el('line',{x1:xl,y1:ym,x2:xm,y2:ym,class:'dash'});
+  if (nm) nameL(xl-s-.08,ym,nm);
+}
+/* contacto NA: y = arriba, ocupa 1 de alto */
+function dNA(e, closed){
+  const {x,y} = e;
+  ln(x,y,x,y+.3); ln(x,y+.72,x,y+1);
+  if (e.arc) el('path',{d:`M ${x-.07} ${y+.3} A .07 .07 0 0 0 ${x+.07} ${y+.3}`,class:'sym symt'});
+  const tip = closed ? [x-.02,y+.3] : [x-.22,y+.26];
+  ln(x,y+.72,tip[0],tip[1]);
+  tx(x+.08,y+.13,e.n[0]); tx(x+.08,y+.9,e.n[1]);
+  const xm = closed ? x-.01 : x-.11, ym = y+.49;
+  if (e.act==='push') actPush(x-.62, ym, xm, e.name, e.id, S.pressed.has(e.id));
+  else if (e.act==='therm') actTherm(x-.5, ym, xm, e.name);
+  else if (e.name) nameL(x-.32, ym, e.name);
+  hot(x,y,e.nets[0],`${e.n[0]} de ${e.name||e.dev}`); hot(x,y+1,e.nets[1],`${e.n[1]} de ${e.name||e.dev}`);
+}
+function dNC(e, closed){
+  const {x,y} = e;
+  ln(x,y,x,y+.3); ln(x,y+.3,x+.15,y+.3); ln(x,y+.72,x,y+1);
+  const tip = closed ? [x+.21,y+.2] : [x-.16,y+.3];
+  ln(x,y+.72,tip[0],tip[1]);
+  tx(x+.2,y+.1,e.n[0]); tx(x+.08,y+.9,e.n[1]);
+  const xm = closed ? x+.095 : x-.08, ym = y+.49;
+  if (e.act==='push') actPush(x-.62, ym, xm, e.name, e.id, S.pressed.has(e.id));
+  else if (e.act==='therm') actTherm(x-.5, ym, xm, e.name);
+  else if (e.name) nameL(x-.2, ym, e.name);
+  hot(x,y,e.nets[0],`${e.n[0]} de ${e.name||e.dev}`); hot(x,y+1,e.nets[1],`${e.n[1]} de ${e.name||e.dev}`);
+}
+function dCO(e, act){
+  const {x,y} = e, xa = x-.26, xc = x+.26;
+  ln(x,y,x,y+.28);
+  ln(xc,y+1,xc,y+.62); ln(xc,y+.62,xc-.1,y+.62);
+  ln(xa,y+1,xa,y+.7);
+  if (act) ln(x,y+.28,xa+.03,y+.7); else ln(x,y+.28,xc-.03,y+.66);
+  tx(x+.08,y+.1,e.n[0]); tx(xa-.05,y+.9,e.n[1],'num','end'); tx(xc+.06,y+.9,e.n[2]);
+  nameL(x-.48,y+.42,e.name);
+  hot(x,y,e.nets[0],`${e.n[0]} de ${e.name}`); hot(xa,y+1,e.nets[1],`${e.n[1]} de ${e.name}`); hot(xc,y+1,e.nets[2],`${e.n[2]} de ${e.name}`);
+}
+function dCoil(e, on){
+  const {x,y} = e;
+  ln(x,y,x,y+.33); ln(x,y+.67,x,y+1);
+  el('rect',{x:x-.27,y:y+.33,width:.54,height:.34,class:'symfill',style:on?'fill:#FFD84D':''});
+  tx(x+.08,y+.16,'A1'); tx(x+.08,y+.86,'A2'); nameL(x-.35,y+.5,e.name);
+  hot(x,y,e.nets[0],`A1 de ${e.name}`); hot(x,y+1,e.nets[1],`A2 de ${e.name}`);
+}
+function dPilot(e, lit){
+  const {x,y} = e, r=.2, c=y+.5, d=r*.707;
+  ln(x,y,x,c-r); ln(x,c+r,x,y+1);
+  const col = {verde:'#3BD15A', rojo:'#FF4A3D', blanco:'#FFF6C8', amarillo:'#FFD84D'}[e.color];
+  el('circle',{cx:x,cy:c,r,class:'symfill',style:lit?`fill:${col}`:''});
+  ln(x-d,c-d,x+d,c+d); ln(x-d,c+d,x+d,c-d);
+  tx(x+.08,y+.13,'X1'); tx(x+.08,y+.88,'X2'); nameL(x-.28,c,e.name);
+  hot(x,y,e.nets[0],`X1 de ${e.name}`); hot(x,y+1,e.nets[1],`X2 de ${e.name}`);
+}
+function mtBoxes(x,y){
+  const s=.3;
+  el('rect',{x:x-s/2,y:y,width:s,height:.38,class:'symfill'});
+  el('polyline',{points:`${x-.06},${y+.32} ${x-.06},${y+.19} ${x+.06},${y+.19} ${x+.06},${y+.06}`,class:'sym symt'});
+  ln(x,y+.38,x,y+.48);
+  el('rect',{x:x-s/2,y:y+.48,width:s,height:.38,class:'symfill'});
+  tx(x,y+.68,'I>','num','middle').setAttribute('style','font-size:.17px');
+}
+function mtPole(x,y,closed,n1,n2){
+  ln(x,y,x,y+.18);
+  ln(x-.08,y+.1,x+.08,y+.26); ln(x-.08,y+.26,x+.08,y+.1);
+  if (closed) ln(x,y+.68,x-.03,y+.2); else ln(x,y+.68,x-.24,y+.24);
+  ln(x,y+.68,x,y+.8); mtBoxes(x,y+.8); ln(x,y+1.66,x,y+2);
+  tx(x+.12,y+.08,n1); tx(x+.08,y+1.88,n2);
+}
+function dMT1(e, closed){
+  const {x,y} = e;
+  const g = el('g',{class:'act','data-q':e.id});
+  el('rect',{x:x-1.3,y:y,width:1.6,height:2,class:'actbox'},g);
+  const keep = gS; gS = g;
+  mtPole(x,y,closed,'1','2');
+  const ym = y+.45, xm = closed ? x-.02 : x-.12;
+  ln(x-.7,ym-.13,x-.7,ym+.13); el('line',{x1:x-.7,y1:ym,x2:xm,y2:ym,class:'dash'});
+  nameL(x-.78,ym,e.name);
+  gS = keep;
+  hot(x,y,e.nets[0],`1 de ${e.name}`); hot(x,y+2,e.nets[1],`2 de ${e.name}`);
+}
+function dMT3(e, closed){
+  const {xs,y} = e;
+  const g = el('g',{class:'act','data-q':e.id});
+  el('rect',{x:xs[0]-1.3,y:y,width:xs[2]-xs[0]+1.6,height:2,class:'actbox'},g);
+  const keep = gS; gS = g;
+  const nn=[['1','2'],['3','4'],['5','6']];
+  xs.forEach((x,i)=>mtPole(x,y,closed,nn[i][0],nn[i][1]));
+  const ym=y+.45; el('line',{x1:xs[0]-.75,y1:ym,x2:xs[2]-(closed?.02:.12),y2:ym,class:'dash'});
+  nameL(xs[0]-.8,ym,e.name);
+  gS = keep;
+  xs.forEach((x,i)=>{ hot(x,y,e.nets[i][0],`${nn[i][0]} de ${e.name}`); hot(x,y+2,e.nets[i][1],`${nn[i][1]} de ${e.name}`); });
+}
+function dKM3(e, closed){
+  const nn=[['1/L1','2/T1'],['3/L2','4/T2'],['5/L3','6/T3']], sh=[['1','2'],['3','4'],['5','6']];
+  e.xs.forEach((x,i)=>dNA({x,y:e.y,n:sh[i],arc:true,nets:[e.nets[i][0],e.nets[i][1]],dev:e.name,hotn:nn[i]}, closed));
+  // las etiquetas de los tornillos de fuerza: 1/L1…
+  HOTS.splice(HOTS.length-6,6);
+  e.xs.forEach((x,i)=>{ hot(x,e.y,e.nets[i][0],`${nn[i][0]} de ${e.name}`); hot(x,e.y+1,e.nets[i][1],`${nn[i][1]} de ${e.name}`); });
+  const ym=e.y+.49; el('line',{x1:e.xs[0]-.75,y1:ym,x2:e.xs[2]-(closed?.01:.11),y2:ym,class:'dash'});
+  nameL(e.xs[0]-.8,ym,e.name);
+}
+function dTH3(e){
+  const s=.3, nn=[['1','2'],['3','4'],['5','6']], hn=[['1','2/T1'],['3','4/T2'],['5','6/T3']];
+  e.xs.forEach((x,i)=>{
+    ln(x,e.y,x,e.y+.3); ln(x,e.y+.7,x,e.y+1);
+    el('rect',{x:x-s/2,y:e.y+.3,width:s,height:.4,class:'symfill'});
+    el('polyline',{points:`${x},${e.y+.3} ${x},${e.y+.4} ${x-.08},${e.y+.4} ${x-.08},${e.y+.6} ${x},${e.y+.6} ${x},${e.y+.7}`,class:'sym symt'});
+    tx(x+.08,e.y+.12,nn[i][0]); tx(x+.08,e.y+.88,nn[i][1]);
+    hot(x,e.y,e.nets[i][0],`${hn[i][0]} de ${e.name}`); hot(x,e.y+1,e.nets[i][1],`${hn[i][1]} de ${e.name}`);
+  });
+  const ym=e.y+.5; el('line',{x1:e.xs[0]-.75,y1:ym,x2:e.xs[0]-s/2,y2:ym,class:'dash'});
+  for (let i=0;i<2;i++) el('line',{x1:e.xs[i]+s/2,y1:ym,x2:e.xs[i+1]-s/2,y2:ym,class:'dash'});
+  nameL(e.xs[0]-.8,ym,e.name);
+}
+function dBorn(e){
+  e.xs.forEach((x,i)=>{ el('circle',{cx:x,cy:e.y,r:.09,class:'symfill'}); tx(x+.13,e.y,String(i+1)); hot(x,e.y,e.nets[i],`${e.name}:${i+1}`); });
+  nameL(e.xs[0]-.3,e.y,e.name);
+}
+function dMotor(e, run){
+  const xc=(e.xs[0]+e.xs[2])/2, r=.48, yc=e.y+.3+r;
+  e.xs.forEach((x,i)=>{ const dx=x-xc; const yy=yc-Math.sqrt(Math.max(r*r-dx*dx,0)); ln(x,e.y,x,yy); tx(x-.04,e.y-.1,['U1','V1','W1'][i],'num','end').setAttribute('style','font-size:.18px'); hot(x,e.y,e.nets[i],`${['U1','V1','W1'][i]} de ${e.name}`); });
+  el('circle',{cx:xc,cy:yc,r,class:'symfill'});
+  tx(xc,yc-.08,'M','nm','middle').setAttribute('style','font-size:.38px');
+  tx(xc,yc+.22,'3~','num','middle');
+  if (run){ const g=el('g',{class:'spin'}); el('path',{d:`M ${xc+r*.8} ${yc} A ${r*.8} ${r*.8} 0 0 1 ${xc} ${yc+r*.8}`,style:'fill:none;stroke:#2E8B3E;stroke-width:.05'},g); el('circle',{cx:xc,cy:yc,r:r*.8,style:'fill:none;stroke:none'},g); }
+  nameL(e.xs[0]-.45,yc,e.name);
+}
+
+/* =================== SIMULACIÓN =================== */
+let C, S;  // circuito actual y estado
+const R_KM = 560, R_KA = 8200, R_MOT = 25;
+function freshState(){
+  return { pressed:new Set(), latched:new Set(), on:{}, lit:{}, motor:false, tripped:{}, q:{}, plug:true, testigo:new Set(), fault:{}, short:false };
+}
+function devAct(id){ return !!S.on[id] || S.testigo.has(id); }
+function closedOf(e){
+  if (e.t==='NA'||e.t==='NC'){
+    let a;
+    if (e.act==='push') a = S.pressed.has(e.id);
+    else if (e.act==='therm') a = !!S.tripped[e.dev];
+    else a = devAct(e.dev);
+    return e.t==='NA' ? a : !a;
+  }
+  return true;
+}
+function edges(){
+  // devuelve {sw:[[a,b]], loads:[{a,b,R,kind,id}]}
+  const sw=[], loads=[];
+  for (const e of C.els){
+    if (e.t==='NA'||e.t==='NC'){ if (closedOf(e)) sw.push([e.nets[0],e.nets[1]]); }
+    else if (e.t==='CO'){ sw.push(devAct(e.dev) ? [e.nets[0],e.nets[1]] : [e.nets[0],e.nets[2]]); }
+    else if (e.t==='mt1'){ if (S.q[e.id]) sw.push(e.nets); }
+    else if (e.t==='mt3'){ if (S.q[e.id]) e.nets.forEach(p=>sw.push(p)); }
+    else if (e.t==='km3'){ if (devAct(e.dev)) e.nets.forEach(p=>sw.push(p)); }
+    else if (e.t==='th3'){ e.nets.forEach(p=>sw.push(p)); }
+    else if (e.t==='coil'){
+      const f = S.fault[e.id]||'ok';
+      const R = e.relay ? R_KA : R_KM;
+      if (f==='ok') loads.push({a:e.nets[0],b:e.nets[1],R,kind:'coil',id:e.id,name:e.name});
+      if (f==='corto') loads.push({a:e.nets[0],b:e.nets[1],R:.3,kind:'coil',id:e.id,name:e.name});
+    }
+    else if (e.t==='pilot'){ loads.push({a:e.nets[0],b:e.nets[1],R:Infinity,kind:'pilot',id:e.id,name:e.name}); }
+    else if (e.t==='motor'){ const n=e.nets; [[0,1],[1,2],[2,0]].forEach(([i,j])=>loads.push({a:n[i],b:n[j],R:R_MOT,kind:'motor',id:e.id,name:e.name})); }
+  }
+  return {sw,loads};
+}
+function UF(){ const p={}; const f=x=>{ if(p[x]===undefined) p[x]=x; while(p[x]!==x){ p[x]=p[p[x]]; x=p[x]; } return x; }; return {f, u:(a,b)=>{ p[f(a)]=f(b); }}; }
+let POT = {}, PHANTOM = {};
+const SOURCES = ['L','N','L1','L2','L3'];
+function solveV(){
+  const {sw,loads} = edges(); const uf = UF();
+  sw.forEach(([a,b])=>uf.u(a,b));
+  const sp = {};   // supernodo -> potencial
+  let short = false;
+  if (S.plug && C.supply){ for (const s of SOURCES){ if (!C.nets.has(s)) continue; const r = uf.f(s); if (sp[r] && sp[r]!==s) short = true; sp[r] = s; } }
+  POT = {}; PHANTOM = {};
+  for (const n of C.nets){ const r = uf.f(n); if (sp[r]) POT[n] = sp[r]; }
+  // potencial "a través" de un consumo (lo que marca el polímetro aunque no pase corriente)
+  for (const n of C.nets){
+    if (POT[n]) continue;
+    const r = uf.f(n), seen = new Set();
+    for (const ld of loads){
+      let other = null;
+      if (uf.f(ld.a)===r) other = ld.b; else if (uf.f(ld.b)===r) other = ld.a;
+      if (other!==null && sp[uf.f(other)]) seen.add(sp[uf.f(other)]+'|'+ld.name);
+    }
+    const pots = new Set([...seen].map(s=>s.split('|')[0]));
+    if (pots.size===1){ POT[n] = [...pots][0]; PHANTOM[n] = [...seen][0].split('|')[1]; }
+  }
+  return {short, uf, loads};
+}
+function hasPot(n){ return POT[n] && !PHANTOM[n]; }
+function step(){
+  let guard = 0;
+  while (guard++ < 30){
+    const {short} = solveV();
+    if (short){
+      for (const e of C.els) if ((e.t==='mt1'||e.t==='mt3') && S.q[e.id]) S.q[e.id] = false;
+      S.short = true; S.on = {}; continue;
+    }
+    const on = {}, lit = {}; let motor = false;
+    for (const e of C.els){
+      if (e.t==='coil' && (S.fault[e.id]||'ok')==='ok'){ const a=e.nets[0], b=e.nets[1]; on[e.id] = hasPot(a) && hasPot(b) && POT[a]!==POT[b]; }
+      if (e.t==='pilot'){ const a=e.nets[0], b=e.nets[1]; lit[e.id] = hasPot(a) && hasPot(b) && POT[a]!==POT[b]; }
+      if (e.t==='motor'){ const p = e.nets.map(n=>hasPot(n)?POT[n]:null); motor = p.every(x=>x) && new Set(p).size===3; }
+    }
+    S.lit = lit; S.motor = motor;
+    const same = Object.keys(on).every(k=>!!on[k]===!!S.on[k]) && Object.keys(S.on).every(k=>!!on[k]===!!S.on[k]);
+    S.on = on;
+    if (same) break;
+  }
+}
+function readV(a, b){
+  const pa = POT[a]||null, pb = POT[b]||null;
+  const tri = p=>p&&p[0]==='L'&&p.length===2, mono = p=>p==='L'||p==='N';
+  if ((tri(pa)&&mono(pb))||(mono(pa)&&tri(pb))) return {v:null, why:'otro'};
+  if (!pa || !pb) return {v:0, why: (!pa && !pb) ? 'nada' : 'unlado'};
+  if (pa===pb) return {v:0, why:'igual'};
+  return {v:230, why:'tension'};
+}
+function readR(a, b){
+  const {sw,loads} = edges(); const uf = UF(); sw.forEach(([x,y])=>uf.u(x,y));
+  const A = uf.f(a), B = uf.f(b);
+  if (A===B) return {r:0.1, path:[]};
+  const ls = loads.filter(l=>isFinite(l.R)).map(l=>({...l, A:uf.f(l.a), B:uf.f(l.b)})).filter(l=>l.A!==l.B);
+  // componente que contiene A
+  const comp = new Set([A]); let grow = true;
+  while (grow){ grow=false; for (const l of ls){ if (comp.has(l.A)&&!comp.has(l.B)){comp.add(l.B);grow=true;} if (comp.has(l.B)&&!comp.has(l.A)){comp.add(l.A);grow=true;} } }
+  if (!comp.has(B)) return {r:Infinity};
+  const nodes = [...comp].filter(x=>x!==B), idx = {}; nodes.forEach((x,i)=>idx[x]=i);
+  const n = nodes.length, M = Array.from({length:n},()=>new Array(n+1).fill(0));
+  for (const l of ls){ if (!comp.has(l.A)) continue; const g = 1/l.R;
+    const i = idx[l.A], j = idx[l.B];
+    if (i!==undefined){ M[i][i]+=g; if (j!==undefined) M[i][j]-=g; }
+    if (j!==undefined){ M[j][j]+=g; if (i!==undefined) M[j][i]-=g; } }
+  M[idx[A]][n] = 1;
+  for (let c=0;c<n;c++){ let p=c; for (let r=c+1;r<n;r++) if (Math.abs(M[r][c])>Math.abs(M[p][c])) p=r; [M[c],M[p]]=[M[p],M[c]];
+    for (let r=0;r<n;r++){ if (r===c) continue; const f=M[r][c]/M[c][c]; for (let k=c;k<=n;k++) M[r][k]-=f*M[c][k]; } }
+  const via = ls.filter(l=>comp.has(l.A)).map(l=>l.name);
+  return {r: M[idx[A]][n]/M[idx[A]][idx[A]], via:[...new Set(via)]};
+}
+
+/* =================== INTERFAZ =================== */
+let mode = 'v', active = 'red', probes = {red:null, black:null}, clampSel = null;
+const fmt = (x,d)=>x.toFixed(d).replace('.',',');
+function setLCD(v,u,ic=''){ const l=document.getElementById('lcd'); l.classList.toggle('off', mode==='off'); document.getElementById('lcdv').textContent=v; document.getElementById('lcdu').textContent=u; document.getElementById('lcdic').textContent=ic; }
+let lastBeep = '';
+function beep(key){
+  if (key===lastBeep) return; lastBeep = key;
+  try { const ac = beep.ac || (beep.ac = new (window.AudioContext||window.webkitAudioContext)()); const o=ac.createOscillator(), g=ac.createGain(); o.frequency.value=2400; g.gain.value=.05; o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+.35); } catch(e){}
+}
+function hotLabel(p){ return p ? p.label : '—'; }
+function updateMeter(){
+  const ex = document.getElementById('explain');
+  document.getElementById('meter').classList.toggle('pinza', mode==='pinza');
+  document.getElementById('probes').style.display = (mode==='v'||mode==='r') ? '' : 'none';
+  const hint = document.getElementById('hint');
+  if (mode==='off'){ setLCD('','',''); ex.innerHTML='El aparato está apagado. Elige <b>V~</b> para medir tensión, <b>Ω</b> para continuidad o <b>Pinza</b> para intensidad.'; hint.textContent=''; lastBeep=''; return; }
+  if (mode==='pinza'){
+    hint.textContent = 'Toca uno de los recuadros naranjas del esquema: es donde abrazas el cable con la pinza.';
+    if (!clampSel){ setLCD('0,00','A'); ex.innerHTML = C.clamps.length ? 'Pinza en <b>A~</b>. Abraza un cable tocando un recuadro naranja.' : 'En este circuito no hay cables para medir con la pinza: los aparatos están sueltos y sin tensión.'; return; }
+    const I = S.plug ? clampSel.f(S) : 0;
+    setLCD(fmt(I,2),'A');
+    ex.innerHTML = `Pinza abrazando <b>${clampSel.label}</b>: <b>${fmt(I,2)} A</b>. ${clampSel.why(S,I)}`;
+    return;
+  }
+  hint.textContent = `Toca un tornillo del esquema para poner la punta ${active==='red'?'roja':'negra'}.`;
+  const a = probes.red, b = probes.black;
+  if (!a || !b){ setLCD(mode==='v'?'0,0':'OL', mode==='v'?'V':'Ω'); ex.innerHTML = `Punta roja: <b>${hotLabel(a)}</b>. Punta negra: <b>${hotLabel(b)}</b>. Pon las dos puntas para medir.`; lastBeep=''; return; }
+  const where = `Punta roja en <b>${a.label}</b>, negra en <b>${b.label}</b>. `;
+  if (mode==='v'){
+    lastBeep='';
+    const r = readV(a.net, b.net);
+    if (r.v===null){ setLCD('----','V'); ex.innerHTML = where + 'Esas dos puntas están en circuitos distintos (fuerza y mando). Mide siempre dentro del mismo circuito.'; return; }
+    setLCD(r.v ? '230' : '0,0', 'V');
+    let why = '';
+    if (!S.plug) why = 'La clavija está desenchufada: no hay tensión en ningún punto.';
+    else if (r.v){ const ph = PHANTOM[a.net]||PHANTOM[b.net];
+      why = ph ? `Hay <b>230 V</b>: la fase llega a ese punto <b>a través de ${ph}</b>. El polímetro marca tensión aunque el consumo no funcione, porque por el otro lado tiene la fase.`
+               : 'Hay <b>230 V</b>: una punta tiene fase y la otra neutro (o dos fases distintas).'; }
+    else if (r.why==='igual' && (PHANTOM[a.net]||PHANTOM[b.net]) && POT[a.net]==='N') why = `Marca <b>0 V</b>: a ese punto no le llega la fase. Solo está unido al neutro <b>a través de ${PHANTOM[a.net]||PHANTOM[b.net]}</b>, porque el contacto que tiene encima está abierto.`;
+    else if (r.why==='igual') why = (POT[a.net]==='N') ? 'Las dos puntas están en el neutro: <b>0 V</b>.' : 'Las dos puntas tienen la misma fase: no hay diferencia de tensión, <b>0 V</b>.';
+    else why = 'Uno de los puntos no tiene tensión: hay un contacto abierto antes, o un magnetotérmico bajado. Por eso marca <b>0 V</b>.';
+    ex.innerHTML = where + why; return;
+  }
+  // Ω
+  if (S.plug && C.supply){ setLCD('----','Ω','⚠'); lastBeep=''; ex.innerHTML = where + '<div class="warnbox"><b>¡Hay tensión!</b> La continuidad se mide siempre <b>sin tensión</b>. Desenchufa la clavija antes de medir.</div>'; return; }
+  const r = readR(a.net, b.net);
+  if (!isFinite(r.r)){ setLCD('OL','Ω'); lastBeep=''; ex.innerHTML = where + 'Marca <b>OL</b> (fuera de escala): <b>no hay camino</b> entre las dos puntas. Hay algún contacto abierto o un cable que no llega. No pita.'; return; }
+  const beepOn = r.r < 40;
+  const val = r.r < 10 ? fmt(r.r,1) : r.r < 1000 ? String(Math.round(r.r)) : fmt(r.r/1000,2)+'k';
+  const unit = r.r >= 1000 ? 'kΩ' : 'Ω';
+  setLCD(r.r >= 1000 ? fmt(r.r/1000,2) : val, unit, beepOn ? '🔊' : '');
+  if (beepOn) beep(a.net+b.net+r.r.toFixed(1)); else lastBeep='';
+  if (r.r < 1) ex.innerHTML = where + '<b>Pita</b> y marca casi 0 Ω: hay un camino directo, sin consumos (contactos cerrados o cables).';
+  else if (r.via && r.via.length) ex.innerHTML = where + `Marca <b>${val.replace('k','')} ${unit}</b>${beepOn?' y pita':''}: el camino pasa por un consumo (${r.via.join(', ')}). Si un consumo marcara 0 Ω estaría en cortocircuito; si marcara OL, cortado.`;
+  else ex.innerHTML = where + `Marca <b>${val} ${unit}</b>.`;
+}
+function render(){
+  step();
+  const sh = document.getElementById('sheet');
+  sh.classList.toggle('wide', !!C.wide);
+  sh.innerHTML = '';
+  svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox', `0 0 ${C.W} ${C.H}`);
+  svg.setAttribute('class', 'mode-'+mode);
+  svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Esquema: '+C.title);
+  sh.appendChild(svg);
+  gW = el('g',{},svg); gS = el('g',{},svg); gH = el('g',{},svg); gP = el('g',{},svg);
+  HOTS.length = 0;
+  // cables
+  for (const w of C.wires){
+    const live = S.plug && w.k==='L' && hasPot(w.net);
+    el('polyline',{points:w.pts.map(p=>p.join(',')).join(' '),class:`wire ${w.k==='N'?'wn':'wl'}${live?' live':''}`},gW);
+  }
+  for (const d of C.dots||[]) el('circle',{cx:d[0],cy:d[1],r:.07,style:`fill:${d[2]==='N'?'var(--neutro)':'var(--fase)'}`},gW);
+  for (const t of C.texts||[]) tx(t[0],t[1],t[2],t[3]||'lbl',t[4]||'start');
+  for (const l of C.lines||[]) el('line',{x1:l[0],y1:l[1],x2:l[2],y2:l[3],style:'stroke:#999;stroke-width:.03;stroke-dasharray:.1 .1'});
+  // símbolos
+  for (const e of C.els){
+    if (e.t==='NA') dNA(e, closedOf(e));
+    else if (e.t==='NC') dNC(e, closedOf(e));
+    else if (e.t==='CO') dCO(e, devAct(e.dev));
+    else if (e.t==='coil') dCoil(e, !!S.on[e.id] || (S.fault[e.id]==='testigo'));
+    else if (e.t==='pilot') dPilot(e, !!S.lit[e.id]);
+    else if (e.t==='mt1') dMT1(e, !!S.q[e.id]);
+    else if (e.t==='mt3') dMT3(e, !!S.q[e.id]);
+    else if (e.t==='km3') dKM3(e, devAct(e.dev));
+    else if (e.t==='th3') dTH3(e);
+    else if (e.t==='born') dBorn(e);
+    else if (e.t==='motor') dMotor(e, S.motor);
+  }
+  for (const h of C.hots||[]) hot(h[0],h[1],h[2],h[3]);
+  // tornillos (puntos de medida)
+  for (const h of HOTS){
+    const c = el('circle',{cx:h.x,cy:h.y,r:.12,class:'hot'},gH);
+    const t = document.createElementNS(NS,'title'); t.textContent = 'Tornillo: '+h.label; c.appendChild(t);
+    c.addEventListener('click', ()=>{ if (mode!=='v'&&mode!=='r') return; probes[active] = h; active = active==='red' ? (probes.black?'red':'black') : (probes.red?'black':'red'); paintProbes(); updateMeter(); drawProbes(); });
+  }
+  // pinza
+  for (const cl of C.clamps||[]){
+    const r = el('rect',{x:cl.x-cl.w/2,y:cl.y-.17,width:cl.w,height:.34,rx:.17,class:'clamp'+(clampSel===cl?' sel':'')},gH);
+    const t = document.createElementNS(NS,'title'); t.textContent = 'Pinza: '+cl.label; r.appendChild(t);
+    r.addEventListener('click', ()=>{ clampSel = cl; render(); });
+  }
+  drawProbes();
+  // eventos de pulsadores y magnetotérmicos
+  svg.querySelectorAll('[data-push]').forEach(g=>bindPush(g, g.getAttribute('data-push')));
+  svg.querySelectorAll('[data-q]').forEach(g=>g.addEventListener('click', ()=>toggleQ(g.getAttribute('data-q'))));
+  updateMeter(); renderControls(); renderLeds();
+}
+function drawProbes(){
+  gP.innerHTML = '';
+  if (mode!=='v' && mode!=='r') return;
+  for (const [k,col,dx] of [['red','#D0191C',.16],['black','#111',-.16]]){
+    const p = probes[k]; if (!p) continue;
+    el('line',{x1:p.x,y1:p.y,x2:p.x+dx*2.2,y2:p.y-.55,style:`stroke:${col};stroke-width:.07;stroke-linecap:round`},gP);
+    el('circle',{cx:p.x,cy:p.y,r:.1,class:'probe',style:`fill:${col}`},gP);
+  }
+}
+const lastTap = {};
+function bindPush(g, id){
+  const down = ev=>{ ev.preventDefault();
+    const now = Date.now(), dbl = lastTap[id] && now - lastTap[id] < 380; lastTap[id] = now;
+    if (dbl){ if (S.latched.has(id)){ S.latched.delete(id); S.pressed.delete(id); } else { S.latched.add(id); S.pressed.add(id); } lastTap[id] = 0; render(); return; }
+    if (S.latched.has(id)) return; S.pressed.add(id); render(); };
+  const up = ()=>{ if (S.latched.has(id)) return; if (S.pressed.delete(id)) render(); };
+  g.addEventListener('pointerdown', down);
+  g.addEventListener('pointerup', up); g.addEventListener('pointerleave', up); g.addEventListener('pointercancel', up);
+}
+function toggleQ(id){ S.q[id] = !S.q[id]; S.short = false; render(); }
+function renderControls(){
+  const box = document.getElementById('controls'); box.innerHTML = '';
+  const row = ()=>{ const r=document.createElement('div'); r.className='row'; r.style.marginBottom='8px'; box.appendChild(r); return r; };
+  const btn = (r, label, on, fn, title)=>{ const b=document.createElement('button'); b.textContent=label; if (on) b.classList.add('on'); if (title) b.title=title; b.onclick=fn; r.appendChild(b); return b; };
+  if (C.supply){
+    const r = row(); btn(r, S.plug ? '🔌 Clavija enchufada' : '🔌 Clavija desenchufada', S.plug, ()=>{ S.plug=!S.plug; S.pressed.clear(); S.latched.clear(); S.testigo.clear(); S.on={}; render(); }, 'Con la clavija desenchufada no hay tensión: es como hay que medir la continuidad');
+  }
+  const qs = C.els.filter(e=>e.t==='mt1'||e.t==='mt3');
+  if (qs.length){ const r = row(); qs.forEach(e=>btn(r, `${e.name} ${S.q[e.id]?'subido':'bajado'}`, S.q[e.id], ()=>toggleQ(e.id))); }
+  const pushes = [...new Set(C.els.filter(e=>e.act==='push').map(e=>e.id))];
+  if (pushes.length){ const r = row(); pushes.forEach(id=>{ const b = btn(r, '-'+id, S.pressed.has(id), ()=>{}); b.title='Mantén pulsado. Doble toque: lo deja fijo'; b.onclick=null; bindPush(b, id); if (S.latched.has(id)) b.style.background='#FFE27A', b.style.color='#1a1a1a'; }); }
+  for (const f of C.thermals||[]){
+    const r = row();
+    btn(r, `TEST ${f}`, false, ()=>{ S.tripped[f]=true; render(); }, 'Simula el disparo del térmico');
+    btn(r, `RESET ${f}`, false, ()=>{ S.tripped[f]=false; render(); }, 'Rearma el térmico');
+  }
+  for (const k of C.testigos||[]){
+    const r = row();
+    btn(r, S.testigo.has(k) ? `Soltar el testigo de -${k}` : `Empujar el testigo de -${k}`, S.testigo.has(k), ()=>{
+      if (S.plug && C.supply){ alertBox('El testigo solo se empuja <b>sin tensión</b>, para comprobar los contactos con el polímetro. Desenchufa antes la clavija.'); return; }
+      S.testigo.has(k) ? S.testigo.delete(k) : S.testigo.add(k); render(); }, 'Con un destornillador aislado se hunde la armadura y cambian los contactos');
+  }
+  for (const k of C.faults||[]){
+    const r = row(); const lab = document.createElement('div'); lab.style.width='100%'; lab.style.fontSize='.9rem'; lab.textContent = `Bobina de -${k}:`; r.appendChild(lab);
+    [['ok','bien'],['corto','en cortocircuito'],['cortada','cortada']].forEach(([v,t])=>btn(r, t, (S.fault[k]||'ok')===v, ()=>{ S.fault[k]=v; render(); }));
+  }
+  const r = row(); btn(r, '↺ Volver a empezar', false, ()=>{ load(C.id); });
+}
+function alertBox(html){ document.getElementById('explain').innerHTML = '<div class="warnbox">'+html+'</div>'; }
+function renderLeds(){
+  const L = document.getElementById('leds'); L.innerHTML = '';
+  const add = (txt,on)=>{ const s=document.createElement('span'); s.className='led'+(on?' on':''); s.innerHTML='<i></i>'+txt; L.appendChild(s); };
+  if (C.supply) add(S.plug ? 'Con tensión' : 'Sin tensión', S.plug);
+  C.els.filter(e=>e.t==='coil').forEach(e=>add(e.name+(S.on[e.id]?' activado':' en reposo'), !!S.on[e.id]));
+  C.els.filter(e=>e.t==='pilot').forEach(e=>add(e.name+(S.lit[e.id]?' encendido':' apagado'), !!S.lit[e.id]));
+  if (C.els.some(e=>e.t==='motor')) add(S.motor?'Motor girando':'Motor parado', S.motor);
+  (C.thermals||[]).forEach(f=>add(`-${f} ${S.tripped[f]?'disparado':'sin disparar'}`, !!S.tripped[f]));
+  if (S.short) add('¡Cortocircuito! Ha saltado el magnetotérmico', true);
+}
+function renderTasks(){
+  const T = document.getElementById('tasks'); T.innerHTML='';
+  C.tasks.forEach(t=>{
+    const d = document.createElement('div'); d.className='task';
+    d.innerHTML = `<div class="tn">${t.n ? t.n : 'Práctica extra'}</div><div class="tq">${t.q}</div><button>¿Qué debe marcar?</button><div class="ans">${t.a}</div>`;
+    d.querySelector('button').onclick = ()=>d.classList.toggle('show');
+    T.appendChild(d);
+  });
+}
+function load(id){
+  C = CIRCS.find(c=>c.id===id) || CIRCS[0];
+  // recoger todas las redes
+  C.nets = new Set();
+  for (const e of C.els){ const add = n=>{ if (Array.isArray(n)) n.forEach(add); else if (n) C.nets.add(n); }; add(e.nets); }
+  for (const w of C.wires) C.nets.add(w.net);
+  if (C.supply) SOURCES.forEach(s=>{ if (C.nets.has(s)) {} });
+  S = freshState();
+  for (const e of C.els) if (e.t==='mt1'||e.t==='mt3') S.q[e.id] = true;
+  if (!C.supply) S.plug = false;
+  probes = {red:null, black:null}; active='red'; clampSel=null; lastBeep='';
+  document.getElementById('desc').innerHTML = C.desc;
+  document.getElementById('crumbLast').textContent = C.title;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('sel', b.dataset.id===C.id));
+  try { history.replaceState(null,'','#'+C.id); } catch(e){}
+  renderTasks(); render();
+}
+function paintProbes(){ document.querySelectorAll('#probes button').forEach(b=>b.classList.toggle('on', b.dataset.p===active)); }
+document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m; document.querySelectorAll('#modes button').forEach(x=>x.classList.toggle('on',x===b)); render(); });
+document.querySelectorAll('#probes button').forEach(b=>b.onclick=()=>{ if (b.dataset.p==='clear'){ probes={red:null,black:null}; active='red'; } else active=b.dataset.p; paintProbes(); updateMeter(); drawProbes(); });
+
+/* =================== CIRCUITOS =================== */
+const W = (net,k,...pts)=>({net,k,pts});
+function circuitos(){
+  const L=[];
+  // ---------- 1. Marcha-paro con térmico y pilotos ----------
+  L.push({ id:'marcha', title:'Marcha-paro con térmico y pilotos', supply:true, W:8.5, H:10.4,
+    desc:'El marcha-paro de siempre (T3 · 3.3) con el 95-96 del térmico arriba del todo. -H1 (rojo) avisa de que ha saltado el térmico (97-98), -H2 (verde) de que -KM1 está en marcha (53-54) y -H3 de que está parado (61-62). Mide con <b>V~</b> cómo va llegando la fase de tornillo en tornillo.',
+    thermals:['F2'],
+    els:[
+      {t:'mt1',id:'Q1',name:'-Q1',x:1.5,y:.6,nets:['L','q']},
+      {t:'NC',act:'therm',dev:'F2',name:'-F2',x:1.5,y:3.15,n:['95','96'],nets:['q','a']},
+      {t:'NC',act:'push',id:'S0',name:'-S0',x:1.5,y:4.35,n:['1','2'],nets:['a','b']},
+      {t:'NA',act:'push',id:'S1',name:'-S1',x:1.5,y:5.75,n:['3','4'],nets:['b','c']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:3.0,y:5.75,n:['13','14'],nets:['b','c']},
+      {t:'coil',id:'KM1',name:'-KM1',x:1.5,y:8.3,nets:['c','N']},
+      {t:'NA',act:'therm',dev:'F2',name:'-F2',x:4.1,y:3.15,n:['97','98'],nets:['q','d']},
+      {t:'pilot',id:'H1',name:'-H1',color:'rojo',x:4.1,y:8.3,nets:['d','N']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:5.75,y:3.15,n:['53','54'],nets:['q','e']},
+      {t:'pilot',id:'H2',name:'-H2',color:'verde',x:5.75,y:8.3,nets:['e','N']},
+      {t:'NC',dev:'KM1',name:'-KM1',x:7.4,y:3.15,n:['61','62'],nets:['q','f']},
+      {t:'pilot',id:'H3',name:'-H3',color:'amarillo',x:7.4,y:8.3,nets:['f','N']},
+    ],
+    wires:[ W('L','L',[.6,.6],[8.0,.6]), W('q','L',[1.5,2.6],[1.5,3.15]), W('q','L',[1.5,2.9],[7.4,2.9],[7.4,3.15]), W('q','L',[4.1,2.9],[4.1,3.15]), W('q','L',[5.75,2.9],[5.75,3.15]),
+      W('a','L',[1.5,4.15],[1.5,4.35]), W('b','L',[1.5,5.35],[1.5,5.75]), W('b','L',[1.5,5.55],[3.0,5.55],[3.0,5.75]),
+      W('c','L',[1.5,6.75],[1.5,8.3]), W('c','L',[3.0,6.75],[3.0,6.95],[1.5,6.95]),
+      W('d','L',[4.1,4.15],[4.1,8.3]), W('e','L',[5.75,4.15],[5.75,8.3]), W('f','L',[7.4,4.15],[7.4,8.3]),
+      W('N','N',[.6,9.8],[8.0,9.8]), W('N','N',[1.5,9.3],[1.5,9.8]), W('N','N',[4.1,9.3],[4.1,9.8]), W('N','N',[5.75,9.3],[5.75,9.8]), W('N','N',[7.4,9.3],[7.4,9.8]) ],
+    dots:[[1.5,.6],[1.5,2.9],[4.1,2.9],[5.75,2.9],[1.5,5.55],[1.5,6.95],[1.5,9.8,'N'],[4.1,9.8,'N'],[5.75,9.8,'N']],
+    texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']],
+    clamps:[{x:1.5,y:7.75,w:.5,label:'el cable que llega a A1 de -KM1',f:s=>s.on.KM1?0.04:0,why:(s,I)=>I?'Es la corriente de la bobina: muy pequeña, unas centésimas de amperio.':'-KM1 está en reposo: por su bobina no pasa corriente.'}],
+    tasks:[
+      {key:'tornillo 3 de -S1', q:'Todo en reposo. V~: punta negra en N y roja en el tornillo 3 de -S1.', a:'<b>230 V</b>: el 95-96 y el 1-2 de -S0 están cerrados, la fase llega hasta ahí.'},
+      {key:'roja en A1 de -KM1', q:'Todo en reposo. V~: punta negra en N y roja en A1 de -KM1.', a:'<b>0 V</b>: -S1 y el 13-14 están abiertos. (El polímetro dice "0 V" aunque A1 está unido al N a través de la bobina.)'},
+      {q:'Pulsa TEST del térmico. V~: negra en N y roja en el 96 de -F2. Después, en el 98.', a:'En el 96, <b>0 V</b> (el 95-96 se ha abierto). En el 98, <b>230 V</b> (el 97-98 se ha cerrado y -H1 se enciende).'},
+      {q:'Desenchufa la clavija. Ω: puntas en el 13 y el 14 de -KM1. Luego en el 61 y el 62.', a:'13-14: <b>OL</b>, no pita (NA abierto). 61-62: <b>pita</b> (NC cerrado).'},
+    ]});
+  // ---------- 2. Cascada ----------
+  const c2 = { id:'cascada', title:'Activación condicionada (cascada)', supply:true, W:10.6, H:10.4,
+    desc:'Tres contactores en cascada (P2 · 2.4, T3 · 3.5): -KM2 solo entra si -KM1 está en marcha, y -KM3 solo si -KM2 lo está. Mide dónde hay tensión con los contactores en distintos estados.',
+    els:[{t:'mt1',id:'Q1',name:'-Q1',x:1.5,y:.6,nets:['L','q']},{t:'NC',act:'push',id:'S4',name:'-S4',x:1.5,y:2.85,n:['1','2'],nets:['q','s']},],
+    wires:[W('L','L',[.6,.6],[10.2,.6]),W('q','L',[1.5,2.6],[1.5,2.85]),W('s','L',[1.5,3.85],[1.5,4.1]),W('s','L',[1.5,4.1],[9.4,4.1]),W('N','N',[.6,9.8],[10.2,9.8])],
+    dots:[[1.5,.6],[1.5,4.1]], texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']], clamps:[],
+    tasks:[
+      {key:'roja en el 54 de -KM1 (rama de -KM2)', q:'Arranca -KM1 con -S1 y deja -KM2 parado. V~: negra en N y roja en el 54 de -KM1 (rama de -KM2).', a:'<b>0 V</b>: el 53-54 está cerrado, pero antes de él la fase solo llega por -S2 o por el 13-14 de -KM2, y los dos están abiertos.'},
+      {q:'Con -KM1 en marcha, mide en el 53 de -KM1 (rama de -KM2) mientras mantienes pulsado -S2.', a:'<b>230 V</b>: -S2 deja pasar la fase y, como -KM1 está activado, -KM2 entra.'},
+    ]};
+  [1.5,4.7,7.9].forEach((x,i)=>{ const xk=x+1.5, n=i+1, p='p'+n, c=i?'c'+n:p;
+    c2.wires.push(W('s','L',[x,4.1],[x,4.35]),W('s','L',[xk,4.1],[xk,4.35]),W(p,'L',[xk,5.35],[xk,5.55],[x,5.55]),W(p,'L',[x,5.35],[x,i?6.0:8.3]),W('N','N',[x,9.3],[x,9.8]));
+    c2.els.push({t:'NA',act:'push',id:'S'+n,name:'-S'+n,x,y:4.35,n:['3','4'],nets:['s',p]},{t:'NA',dev:'KM'+n,name:'-KM'+n,x:xk,y:4.35,n:['13','14'],nets:['s',p]});
+    if (i){ c2.els.push({t:'NA',dev:'KM'+i,name:'-KM'+i,x,y:6.0,n:['53','54'],nets:[p,c]}); c2.wires.push(W(c,'L',[x,7.0],[x,8.3])); }
+    c2.els.push({t:'coil',id:'KM'+n,name:'-KM'+n,x,y:8.3,nets:[c,'N']});
+    c2.dots.push([x,5.55],[x,9.8,'N']); if (i) c2.dots.push([x,4.1]); if (i<2) c2.dots.push([xk,4.1]);
+  });
+  L.push(c2);
+  // ---------- 3. Relé auxiliar ----------
+  L.push({ id:'rele', title:'El relé auxiliar reparte la orden', supply:true, W:9.6, H:10.4,
+    desc:'-KA1 (T3 · 3.7) se sujeta con su 11-14 y, con sus otros conmutados, activa -KM1 (21-24), apaga -H2 (21-22) y enciende -H1 (31-34). Mide en los tornillos 22 y 24 antes y después de dar marcha.',
+    els:[
+      {t:'mt1',id:'Q1',name:'-Q1',x:1.5,y:.6,nets:['L','q']},
+      {t:'NC',act:'push',id:'S0',name:'-S0',x:1.5,y:3.15,n:['1','2'],nets:['q','a']},
+      {t:'NA',act:'push',id:'S1',name:'-S1',x:1.5,y:4.55,n:['3','4'],nets:['a','b']},
+      {t:'CO',dev:'KA1',name:'-KA1',x:3.5,y:4.55,n:['11','14','12'],nets:['a','b','k12']},
+      {t:'coil',id:'KA1',relay:true,name:'-KA1',x:1.5,y:8.3,nets:['b','N']},
+      {t:'CO',dev:'KA1',name:'-KA1',x:5.6,y:4.55,n:['21','24','22'],nets:['q','r24','r22']},
+      {t:'coil',id:'KM1',name:'-KM1',x:5.34,y:8.3,nets:['r24','N']},
+      {t:'pilot',id:'H2',name:'-H2',color:'rojo',x:6.9,y:8.3,nets:['r22','N']},
+      {t:'CO',dev:'KA1',name:'-KA1',x:8.4,y:4.55,n:['31','34','32'],nets:['q','r34','r32']},
+      {t:'pilot',id:'H1',name:'-H1',color:'verde',x:8.14,y:8.3,nets:['r34','N']},
+    ],
+    wires:[W('L','L',[.6,.6],[9.2,.6]),W('q','L',[1.5,2.6],[1.5,3.15]),W('q','L',[1.5,2.9],[8.4,2.9],[8.4,4.55]),W('q','L',[5.6,2.9],[5.6,4.55]),
+      W('a','L',[1.5,4.15],[1.5,4.55]),W('a','L',[1.5,4.35],[3.5,4.35],[3.5,4.55]),
+      W('b','L',[3.24,5.55],[3.24,5.75],[1.5,5.75]),W('b','L',[1.5,5.55],[1.5,8.3]),
+      W('r24','L',[5.34,5.55],[5.34,8.3]),W('r22','L',[5.86,5.55],[5.86,6.2],[6.9,6.2],[6.9,8.3]),W('r34','L',[8.14,5.55],[8.14,8.3]),
+      W('N','N',[.6,9.8],[9.2,9.8]),W('N','N',[1.5,9.3],[1.5,9.8]),W('N','N',[5.34,9.3],[5.34,9.8]),W('N','N',[6.9,9.3],[6.9,9.8]),W('N','N',[8.14,9.3],[8.14,9.8])],
+    dots:[[1.5,.6],[1.5,2.9],[5.6,2.9],[1.5,4.35],[1.5,5.75],[1.5,9.8,'N'],[5.34,9.8,'N'],[6.9,9.8,'N']],
+    texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']],
+    clamps:[{x:5.34,y:7.75,w:.5,label:'el cable que llega a A1 de -KM1',f:s=>s.on.KM1?0.04:0,why:(s,I)=>I?'Corriente de la bobina de -KM1: centésimas de amperio.':'-KM1 está en reposo.'},
+            {x:1.5,y:7.75,w:.5,label:'el cable que llega a A1 de -KA1',f:s=>s.on.KA1?0.01:0,why:(s,I)=>I?'La bobina del relé consume todavía menos que la del contactor.':'-KA1 está en reposo.'}],
+    tasks:[
+      {key:'roja en el 24 de -KA1', q:'Todo en reposo. V~: punta negra en N y roja en el 24 de -KA1.', a:'<b>0 V</b>: el 21 sí tiene fase, pero en reposo la lámina toca el 22, no el 24.'},
+      {q:'Todo en reposo. V~: negra en N y roja en el 22 de -KA1. Después pulsa -S1 y vuelve a medir.', a:'En reposo <b>230 V</b> (-H2 encendido). Tras pulsar -S1, <b>0 V</b>: la lámina pasa al 24.'},
+    ]});
+  // ---------- 4. Arranque directo ----------
+  const xs=[2.2,2.75,3.3], xm=6.6, xk=8.1;
+  L.push({ id:'arranque', title:'Arranque directo: fuerza y mando', supply:true, W:9.4, H:10.0,
+    desc:'Fuerza (izquierda) y mando (derecha) de un motor (T4 · 4.1, P3). Con la <b>pinza</b> verás la diferencia entre la corriente de una bobina y la de un motor. Con el polímetro, que los contactos principales de -KM1 son NA.',
+    thermals:['F2'], testigos:['KM1'],
+    els:[
+      {t:'mt3',id:'Q1',name:'-Q1',xs,y:1.0,nets:[['L1','a1'],['L2','a2'],['L3','a3']]},
+      {t:'km3',dev:'KM1',name:'-KM1',xs,y:3.3,nets:[['a1','b1'],['a2','b2'],['a3','b3']]},
+      {t:'th3',name:'-F2',xs,y:4.6,nets:[['b1','c1'],['b2','c2'],['b3','c3']]},
+      {t:'born',name:'-X1',xs,y:6.1,nets:['c1','c2','c3']},
+      {t:'motor',id:'M1',name:'-M1',xs,y:6.8,nets:['c1','c2','c3']},
+      {t:'mt1',id:'Q2',name:'-Q2',x:xm,y:1.0,nets:['L','m1']},
+      {t:'NC',act:'therm',dev:'F2',name:'-F2',x:xm,y:3.25,n:['95','96'],nets:['m1','m2']},
+      {t:'NC',act:'push',id:'S0',name:'-S0',x:xm,y:4.45,n:['1','2'],nets:['m2','m3']},
+      {t:'NA',act:'push',id:'S1',name:'-S1',x:xm,y:5.85,n:['3','4'],nets:['m3','m4']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:xk,y:5.85,n:['13','14'],nets:['m3','m4']},
+      {t:'coil',id:'KM1',name:'-KM1',x:xm,y:7.6,nets:['m4','N']},
+    ],
+    wires:[...xs.map((x,i)=>W('L'+(i+1),'L',[x,.7],[x,1.0])), ...xs.map((x,i)=>W('a'+(i+1),'L',[x,3.0],[x,3.3])), ...xs.map((x,i)=>W('b'+(i+1),'L',[x,4.3],[x,4.6])), ...xs.map((x,i)=>W('c'+(i+1),'L',[x,5.6],[x,6.8])),
+      W('L','L',[xm,.7],[xm,1.0]),W('m1','L',[xm,3.0],[xm,3.25]),W('m2','L',[xm,4.25],[xm,4.45]),W('m3','L',[xm,5.45],[xm,5.85]),W('m3','L',[xm,5.65],[xk,5.65],[xk,5.85]),
+      W('m4','L',[xk,6.85],[xk,7.05],[xm,7.05]),W('m4','L',[xm,6.85],[xm,7.6]),W('N','N',[xm,8.6],[xm,9.0]),W('N','N',[5.9,9.0],[8.6,9.0])],
+    dots:[[xm,5.65],[xm,7.05]],
+    texts:[[2.75,.25,'FUERZA','cap','middle'],[7.1,.25,'MANDO','cap','middle'],...xs.map((x,i)=>[x,.52,'L'+(i+1),'lbl','middle']),[xm,.52,'L','lbl','middle'],[5.7,9.0,'N','lbl','end']],
+    lines:[[5.0,.2,5.0,9.8]],
+    hots:[...xs.map((x,i)=>[x,.75,'L'+(i+1),'L'+(i+1)]),[xm,.75,'L','L'],[6.2,9.0,'N','N']],
+    clamps:[
+      {x:xm,y:7.35,w:.5,label:'el cable que llega a A1 de -KM1',f:s=>s.on.KM1?0.04:0,why:(s,I)=>I?'Es la corriente de la bobina: <b>centésimas de amperio</b>. Por eso el mando va con cable fino.':'-KM1 en reposo: la bobina no consume.'},
+      ...xs.map((x,i)=>({x,y:5.85,w:.42,label:`el cable de -X1:${i+1} (una sola fase del motor)`,f:s=>s.motor?1.6:0,why:(s,I)=>I?'Corriente de una fase del motor en vacío: <b>amperios</b>, muchísimo más que la bobina. Compárala con la In de la placa y con la ruleta Ir del térmico.':'El motor está parado: no consume.'})),
+      {x:2.75,y:6.48,w:1.55,label:'los tres cables del motor a la vez',f:s=>0,why:(s,I)=>s.motor?'Marca <b>0 A</b> aunque el motor gira: las tres corrientes se anulan entre sí. Con la pinza se abraza <b>un solo cable</b>.':'El motor está parado (y aunque girara, con los tres cables marcaría 0 A).'},
+    ],
+    tasks:[
+      {key:'entre U y V del motor', q:'-Q1 subido y -KM1 en reposo. V~: puntas en U1 y V1 del motor.', a:'<b>0 V</b>: los contactos principales de -KM1 están abiertos. Arranca con -S1 y vuelve a medir: <b>230 V</b> (en el aula, entre fases).'},
+      {key:'solo el cable que va a A1', q:'Arranca el motor. Pinza en el cable que llega a A1 de -KM1.', a:'Unas <b>centésimas de amperio</b> (0,03-0,05 A).'},
+      {key:'los tres cables del motor a la vez', q:'Con el motor en marcha, abraza con la pinza los tres cables del motor a la vez. Luego, uno solo.', a:'Los tres a la vez: <b>0 A</b> (se anulan). Uno solo: <b>amperios</b>.'},
+      {key:'entre 1/L1 y 2/T1 de -KM1 en reposo', q:'Desenchufa la clavija. Ω: puntas en 1/L1 y 2/T1 de -KM1. Luego empuja el testigo de -KM1 y repite.', a:'En reposo <b>OL</b>, no pita (NA abierto). Con el testigo empujado, <b>pita</b>.'},
+      {q:'Desenchufa la clavija. Ω: puntas en U1 y V1 del motor.', a:'Unos <b>17 Ω</b>: es la resistencia de las bobinas del motor (en el aula van en triángulo).'},
+    ]});
+  // ---------- 5. P1 1.3 ----------
+  L.push({ id:'p1excluyentes', title:'P1 · 1.3 Pulsadores excluyentes', supply:true, W:7.6, H:10.4,
+    desc:'Antes de enchufar un montaje, la Práctica 1 pide comprobar con el polímetro en <b>continuidad</b> (sin tensión) que no hay cortocircuito entre L y N, y que al pulsar aparece la bobina.',
+    els:[
+      {t:'mt1',id:'Q1',name:'-Q1',x:1.5,y:.6,nets:['L','q']},
+      {t:'NA',act:'push',id:'S3',name:'-S3',x:1.5,y:3.15,n:['3','4'],nets:['q','p']},
+      {t:'NA',act:'push',id:'S4',name:'-S4',x:3.1,y:3.15,n:['3','4'],nets:['q','r']},
+      {t:'NC',act:'push',id:'S4',name:'-S4',x:1.5,y:4.35,n:['1','2'],nets:['p','c']},
+      {t:'NC',act:'push',id:'S3',name:'-S3',x:3.1,y:4.35,n:['1','2'],nets:['r','c']},
+      {t:'coil',id:'KM1',name:'-KM1',x:1.5,y:8.3,nets:['c','N']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:5.0,y:3.15,n:['53','54'],nets:['q','e']},
+      {t:'pilot',id:'H1',name:'-H1',color:'verde',x:5.0,y:8.3,nets:['e','N']},
+      {t:'NC',dev:'KM1',name:'-KM1',x:6.5,y:3.15,n:['61','62'],nets:['q','f']},
+      {t:'pilot',id:'H2',name:'-H2',color:'rojo',x:6.5,y:8.3,nets:['f','N']},
+    ],
+    wires:[W('L','L',[.6,.6],[7.2,.6]),W('q','L',[1.5,2.6],[1.5,3.15]),W('q','L',[1.5,2.9],[6.5,2.9],[6.5,3.15]),W('q','L',[3.1,2.9],[3.1,3.15]),W('q','L',[5.0,2.9],[5.0,3.15]),
+      W('p','L',[1.5,4.15],[1.5,4.35]),W('r','L',[3.1,4.15],[3.1,4.35]),W('c','L',[1.5,5.35],[1.5,8.3]),W('c','L',[3.1,5.35],[3.1,5.55],[1.5,5.55]),
+      W('e','L',[5.0,4.15],[5.0,8.3]),W('f','L',[6.5,4.15],[6.5,8.3]),
+      W('N','N',[.6,9.8],[7.2,9.8]),W('N','N',[1.5,9.3],[1.5,9.8]),W('N','N',[5.0,9.3],[5.0,9.8]),W('N','N',[6.5,9.3],[6.5,9.8])],
+    dots:[[1.5,.6],[1.5,2.9],[3.1,2.9],[5.0,2.9],[1.5,5.55],[1.5,9.8,'N'],[5.0,9.8,'N']],
+    texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']], clamps:[],
+    tasks:[
+      {key:'pones las puntas en L y N. ¿Qué tiene que pasar', q:'Desenchufa la clavija. Ω: puntas en L y N, todo en reposo.', a:'<b>OL</b> y no pita: no hay cortocircuito. Si pitara, no se puede enchufar.'},
+      {key:'mantienes -S3 pulsado', q:'Sin tensión, puntas en L y N, y mantén pulsado -S3. Después pulsa -S3 y -S4 a la vez (doble toque para dejarlos fijos).', a:'Con -S3: la resistencia de la bobina, unos <b>560 Ω</b>, nunca 0. Con los dos: vuelve a <b>OL</b>, porque cada uno abre la rama del otro.'},
+    ]});
+  // ---------- 6. P3 3.1 ----------
+  const p3 = { id:'p3termicos', title:'P3 · 3.1 Tres térmicos en serie', supply:true, wide:true, W:25.2, H:11.8,
+    desc:'Mando de la Práctica 3 (3.1): los tres 95-96 en serie antes del paro total -S4. Si salta cualquier térmico se para todo. Mide la tensión en el 96 de cada térmico para encontrar cuál ha saltado (medida 5 de la P3).',
+    thermals:['F1','F2','F3'],
+    els:[ {t:'mt1',id:'Q2',name:'-Q2',x:1.5,y:.6,nets:['L','t']},
+      {t:'NC',act:'therm',dev:'F1',name:'-F1',x:1.5,y:2.95,n:['95','96'],nets:['t','f1']},
+      {t:'NC',act:'therm',dev:'F2',name:'-F2',x:1.5,y:4.1,n:['95','96'],nets:['f1','f2']},
+      {t:'NC',act:'therm',dev:'F3',name:'-F3',x:1.5,y:5.25,n:['95','96'],nets:['f2','f3']},
+      {t:'NC',act:'push',id:'S4',name:'-S4',x:1.5,y:6.4,n:['1','2'],nets:['f3','s']},
+      {t:'NA',act:'push',id:'S5',name:'-S5',x:17.9,y:7.9,n:['3','4'],nets:['s','k']},
+      {t:'coil',id:'KA1',relay:true,name:'-KA1',x:17.9,y:9.8,nets:['k','N']} ],
+    wires:[W('L','L',[.6,.6],[24.8,.6]),W('t','L',[1.5,2.6],[1.5,2.95]),W('t','L',[1.5,2.75],[24.4,2.75],[24.4,2.95]),
+      W('f1','L',[1.5,3.95],[1.5,4.1]),W('f2','L',[1.5,5.1],[1.5,5.25]),W('f3','L',[1.5,6.25],[1.5,6.4]),W('s','L',[1.5,7.4],[1.5,7.65],[17.9,7.65],[17.9,7.9]),
+      W('k','L',[17.9,8.9],[17.9,9.8]),W('N','N',[.6,11.3],[24.8,11.3])],
+    dots:[[1.5,.6],[1.5,2.75]], texts:[[.35,.6,'L'],[.35,11.3,'N']], hots:[[.9,.6,'L','L'],[.9,11.3,'N','N']], clamps:[],
+    tasks:[
+      {key:'roja en el 96 de -F3', q:'Todo en reposo. V~: negra en N y roja en el 96 de -F3.', a:'<b>230 V</b>: los tres 95-96 están cerrados y la fase llega hasta ahí.'},
+      {q:'Pulsa TEST en -F2 (sin decírselo a tu compañero). V~: mide en el 96 de -F3, luego en el 96 de -F2 y luego en el 96 de -F1.', a:'96 de -F3: <b>0 V</b>. 96 de -F2: <b>0 V</b>. 96 de -F1: <b>230 V</b>. La tensión se pierde en -F2: ese es el que ha saltado.'},
+      {q:'Arranca los tres motores y pulsa TEST en uno de los térmicos.', a:'Se paran <b>los tres</b>: los 95-96 están en serie antes de -S4. -H1 se apaga y -H2 se enciende.'},
+    ]};
+  [3.4,8.1,12.8].forEach((x,i)=>{ const n=i+1, xk=x+1.35, xr=x+3.2, p='p'+n;
+    p3.wires.push(W('s','L',[x,7.65],[x,7.9]),W('s','L',[xk,7.65],[xk,7.9]),W('s','L',[xr,7.65],[xr,7.9]),
+      W(p,'L',[x,8.9],[x,9.8]),W(p,'L',[xk,8.9],[xk,9.1],[x,9.1]),W(p,'L',[xr-.26,8.9],[xr-.26,9.1],[xk,9.1]),W('N','N',[x,10.8],[x,11.3]));
+    p3.els.push({t:'NA',act:'push',id:'S'+n,name:'-S'+n,x,y:7.9,n:['3','4'],nets:['s',p]},{t:'NA',dev:'KM'+n,name:'-KM'+n,x:xk,y:7.9,n:['13','14'],nets:['s',p]},
+      {t:'CO',dev:'KA1',name:'-KA1',x:xr,y:7.9,n:[n+'1',n+'4',n+'2'],nets:['s',p,'ka'+n+'2']},{t:'coil',id:'KM'+n,name:'-KM'+n,x,y:9.8,nets:[p,'N']});
+    p3.dots.push([x,7.65],[xk,7.65],[xr,7.65],[x,9.1],[xk,9.1],[x,11.3,'N']);
+  });
+  p3.wires.push(W('N','N',[17.9,10.8],[17.9,11.3])); p3.dots.push([17.9,11.3,'N']);
+  // pilotos: H1 con 53-54 en serie, H2 con 61-62 en paralelo
+  const xh1=19.6;
+  p3.els.push({t:'NA',dev:'KM1',name:'-KM1',x:xh1,y:2.95,n:['53','54'],nets:['t','h1a']},{t:'NA',dev:'KM2',name:'-KM2',x:xh1,y:4.1,n:['53','54'],nets:['h1a','h1b']},{t:'NA',dev:'KM3',name:'-KM3',x:xh1,y:5.25,n:['53','54'],nets:['h1b','h1c']},{t:'pilot',id:'H1',name:'-H1',color:'verde',x:xh1,y:9.8,nets:['h1c','N']});
+  p3.wires.push(W('t','L',[xh1,2.75],[xh1,2.95]),W('h1a','L',[xh1,3.95],[xh1,4.1]),W('h1b','L',[xh1,5.1],[xh1,5.25]),W('h1c','L',[xh1,6.25],[xh1,9.8]),W('N','N',[xh1,10.8],[xh1,11.3]));
+  const xh2=[21.2,22.8,24.4];
+  xh2.forEach((x,i)=>{ p3.els.push({t:'NC',dev:'KM'+(i+1),name:'-KM'+(i+1),x,y:2.95,n:['61','62'],nets:['t','h2']}); if (i<2) p3.wires.push(W('t','L',[x,2.75],[x,2.95])); p3.wires.push(W('h2','L',[x,3.95],[x,4.15])); });
+  p3.wires.push(W('h2','L',[21.2,4.15],[24.4,4.15]),W('h2','L',[21.2,4.15],[21.2,9.8]),W('N','N',[21.2,10.8],[21.2,11.3]));
+  p3.els.push({t:'pilot',id:'H2',name:'-H2',color:'rojo',x:21.2,y:9.8,nets:['h2','N']});
+  p3.dots.push([xh1,2.75],[21.2,2.75],[22.8,2.75],[21.2,4.15],[22.8,4.15],[xh1,11.3,'N']);
+  L.push(p3);
+  // ---------- 7. Aparatos sueltos ----------
+  const kx=[3.7,4.25,4.8], bx=[6.4,7.85,9.3,10.75,12.2];
+  L.push({ id:'aparatos', title:'Contactor y térmico sueltos (sin tensión)', supply:false, W:13.0, H:6.0,
+    desc:'Así se comprueban los aparatos antes de montarlos (T2 · 2.9, ejemplo 3, y medidas de la P3): bobina con el polímetro en Ω, contactos en continuidad, empujando el testigo del contactor y pulsando TEST en el térmico. Aquí no hay tensión: los aparatos están sueltos.',
+    thermals:['F2'], testigos:['KM1'], faults:['KM1'],
+    els:[
+      {t:'coil',id:'KM1',name:'-KM1',x:1.5,y:.9,nets:['kA1','kA2']},
+      {t:'km3',dev:'KM1',name:'-KM1',xs:kx,y:.9,nets:[['k1','k2'],['k3','k4'],['k5','k6']]},
+      {t:'NA',dev:'KM1',name:'-KM1',x:bx[0],y:.9,n:['13','14'],nets:['k13','k14']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:bx[1],y:.9,n:['53','54'],nets:['k53','k54']},
+      {t:'NC',dev:'KM1',name:'-KM1',x:bx[2],y:.9,n:['61','62'],nets:['k61','k62']},
+      {t:'NC',dev:'KM1',name:'-KM1',x:bx[3],y:.9,n:['71','72'],nets:['k71','k72']},
+      {t:'NA',dev:'KM1',name:'-KM1',x:bx[4],y:.9,n:['83','84'],nets:['k83','k84']},
+      {t:'th3',name:'-F2',xs:kx,y:3.9,nets:[['t1','t2'],['t3','t4'],['t5','t6']]},
+      {t:'NC',act:'therm',dev:'F2',name:'-F2',x:bx[1],y:3.9,n:['95','96'],nets:['t95','t96']},
+      {t:'NA',act:'therm',dev:'F2',name:'-F2',x:bx[3],y:3.9,n:['97','98'],nets:['t97','t98']},
+    ],
+    wires:[], dots:[], texts:[[.3,.35,'Contactor -KM1 con su bloque auxiliar','cap'],[.3,3.35,'Relé térmico -F2','cap']], hots:[], clamps:[],
+    tasks:[
+      {key:'mides la bobina de un contactor entre A1 y A2', q:'Ω: puntas en A1 y A2 de -KM1. Cambia la bobina a "en cortocircuito" y a "cortada" y repite.', a:'Bien: unos <b>560 Ω</b>. En cortocircuito: <b>0 Ω</b> (pita). Cortada: <b>OL</b>.'},
+      {key:'después de pulsar TEST, ¿entre qué tornillos', q:'Continuidad en el 95-96 y en el 97-98 de -F2. Pulsa TEST y repite.', a:'En reposo: 95-96 <b>pita</b>, 97-98 <b>OL</b>. Tras TEST: 95-96 <b>OL</b>, 97-98 <b>pita</b>. RESET lo deja como al principio.'},
+      {q:'Continuidad en el 61-62 y en el 1/L1-2/T1 de -KM1. Empuja el testigo y repite.', a:'En reposo: 61-62 <b>pita</b>, 1-2 <b>OL</b>. Con el testigo: al revés.'},
+    ]});
+  return L;
+}
+const CIRCS = circuitos();
+const QNUM = {"tornillo 3 de -S1": "Test 28 de octubre · pregunta Nº 34", "roja en A1 de -KM1": "Test 28 de octubre · pregunta Nº 35", "roja en el 54 de -KM1 (rama de -KM2)": "Test 28 de octubre · pregunta Nº 51", "roja en el 24 de -KA1": "Test 28 de octubre · pregunta Nº 54", "entre U y V del motor": "Test de diciembre · pregunta Nº 1", "solo el cable que va a A1": "Test de diciembre · pregunta Nº 2", "los tres cables del motor a la vez": "Test de diciembre · pregunta Nº 3", "entre 1/L1 y 2/T1 de -KM1 en reposo": "Test de diciembre · pregunta Nº 4", "pones las puntas en L y N. ¿Qué tiene que pasar": "Test 28 de octubre · pregunta Nº 17", "mantienes -S3 pulsado": "Test 28 de octubre · pregunta Nº 18", "roja en el 96 de -F3": "Test de diciembre · pregunta Nº 6", "mides la bobina de un contactor entre A1 y A2": "Test 28 de octubre · pregunta Nº 10", "después de pulsar TEST, ¿entre qué tornillos": "Test de diciembre · pregunta Nº 5"};
+CIRCS.forEach(c=>c.tasks.forEach(t=>{ if (t.key) t.n = QNUM[t.key]||null; }));
+// pestañas
+const tabs = document.getElementById('tabs');
+CIRCS.forEach(c=>{ const b=document.createElement('button'); b.className='tab'; b.dataset.id=c.id; b.textContent=c.title; b.onclick=()=>load(c.id); tabs.appendChild(b); });
+document.querySelector('#modes button[data-m="v"]').classList.add('on'); paintProbes();
+load((location.hash||'').slice(1));
+</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '☀️' : '🌙';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){if(e.target.tagName!=='INPUT'){e.preventDefault();location.href='index.html#medidas';}}});</script>
+</body>
+</html>
