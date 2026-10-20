@@ -22,7 +22,7 @@ main{max-width:820px;margin:0 auto;padding:28px 16px 40px}
 h1{margin:4px 0 0;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.15}
 a.card{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;color:inherit;text-decoration:none;transition:transform .12s,border-color .12s}
 a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--acc);outline:none}
-.num{flex:none;width:62px;height:52px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.2rem}
+.num{flex:none;min-width:62px;padding:0 6px;height:52px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.2rem}
 .sec{font-size:1.05rem;color:var(--muted);margin:0 0 12px;font-weight:700}
 .card h2{margin:0 0 2px;font-size:1.2rem;color:var(--acc)}
 .card p{margin:0;color:var(--muted);font-size:.98rem}
@@ -32,8 +32,8 @@ a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--
 .pdf .ico{flex:none;width:44px;height:52px;border-radius:6px;background:#C0392B;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700}
 .pdf small{display:block;font-weight:400;color:var(--muted)}
 
-.folders{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
-@media (max-width:560px){.folders{grid-template-columns:1fr}}
+.folders{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:700px){.folders{grid-template-columns:repeat(2,1fr)}}
 .folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 16px;color:inherit;text-decoration:none;font-weight:700;font-size:1.1rem;cursor:pointer}
 .folder:hover,.folder:focus-visible{border-color:var(--acc);outline:none}
 .folder.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc) inset}
@@ -80,6 +80,20 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .rub .p{text-align:right;white-space:nowrap;font-weight:700;color:var(--acc)}
 .rub tr.blq th,.rub tr.blq td{background:var(--bg);color:var(--green);font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-size:.9rem}
 .rubnota{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+
+/* ---- animaciones: partes desplegables a dos columnas ---- */
+details.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px}
+details.grp summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;font-weight:700;font-size:1.1rem;color:var(--acc)}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary::before{content:"▸";display:inline-block;transition:transform .15s;color:var(--muted)}
+details.grp[open] summary::before{transform:rotate(90deg)}
+details.grp summary .gt{flex:1}
+details.grp summary small{font-weight:400;color:var(--muted);font-size:.85em}
+details.grp summary .gn{font-weight:400;font-size:.9rem;color:var(--muted);white-space:nowrap}
+details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg);border-radius:12px;outline:none}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 14px 14px}
+.cards2 a.card{margin-bottom:0}
+@media (max-width:700px){.cards2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -93,6 +107,8 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <a class="folder" href="#temas" data-f="temas"><span class="fico"></span>Temas<small>Apuntes en PDF</small></a>
     <a class="folder" href="#practicas" data-f="practicas"><span class="fico"></span>Prácticas<small>Fichas en PDF</small></a>
     <a class="folder" href="#animaciones" data-f="animaciones"><span class="fico"></span>Animaciones<small>Esquemas que se mueven</small></a>
+    <a class="folder" href="#tests" data-f="tests"><span class="fico"></span>Tests<small>Pon a prueba lo que sabes</small></a>
+    <a class="folder" href="#medidas" data-f="medidas"><span class="fico"></span>Medidas<small>Polímetro y pinza</small></a>
   </nav>
   <section id="sec-temas">
     <h2 class="sec">Temas · apuntes para descargar</h2>
@@ -147,7 +163,10 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
   </table>
   <p class="rubnota">Cada apartado se puntúa de 0 a 10. La nota de la práctica es la suma de cada apartado por su peso.</p>
   </div>
-    <h2 class="sec" style="margin-top:26px">Práctica 1 · soluciones animadas</h2>
+    <h2 class="sec" style="margin-top:26px">Animaciones de las soluciones · toca una práctica para verlas</h2>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p1_1_serie.html">
     <div class="num">1.1</div>
     <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
@@ -160,7 +179,11 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">1.3</div>
     <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 2 · soluciones animadas</h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="p2_1_prioridades.html">
     <div class="num">2.1</div>
     <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
@@ -177,14 +200,23 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">2.4</div>
     <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
   </a>
-    <h2 class="sec" style="margin-top:26px">Práctica 3 · soluciones animadas <span style="font-weight:400;font-size:.85em;color:var(--muted)">(provisional · 3.2 y 3.3 en preparación)</span></h2>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones <small>(provisional)</small></span><span class="gn">1 animación</span></summary>
+    <div class="cards2">
   <a class="card" href="p3_1_termicos_serie.html">
     <div class="num">3.1</div>
     <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
   </a>
-      </section>
+    </div>
+  </details>
+</section>
   <section id="sec-animaciones">
-    <h2 class="sec">Tema 3 · Conexionado básico II</h2>
+    <h2 class="sec">Animaciones · toca una parte para ver sus animaciones</h2>
+  <details class="grp">
+    <summary><span class="gt">Tema 3 · Conexionado básico II · teoría</span><span class="gn">11 animaciones</span></summary>
+    <div class="cards2">
   <a class="card" href="pulsadores_na.html">
     <div class="num">3.1</div>
     <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
@@ -229,7 +261,76 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div class="num">3.10</div>
     <div><h2>Inversión de giro de un motor</h2><p>Fuerza y mando: KM2 cruza L1 y L3. Con enclavamiento, sobrecarga y cortocircuito si lo quitas.</p></div>
   </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p1_1_serie.html">
+    <div class="num">1.1</div>
+    <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
+  </a>
+  <a class="card" href="p1_2_paralelo.html">
+    <div class="num">1.2</div>
+    <div><h2>Pulsadores en paralelo</h2><p>-S3 o -S4 activan -KM1: con uno basta.</p></div>
+  </a>
+  <a class="card" href="p1_3_excluyentes.html">
+    <div class="num">1.3</div>
+    <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p2_1_prioridades.html">
+    <div class="num">2.1</div>
+    <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
+  </a>
+  <a class="card" href="p2_2_compartidos.html">
+    <div class="num">2.2</div>
+    <div><h2>Marchas y paros compartidos</h2><p>-S2 para los dos; -S4 arranca -KM1 y para -KM2 a la vez.</p></div>
+  </a>
+  <a class="card" href="p2_3_totales.html">
+    <div class="num">2.3</div>
+    <div><h2>Marcha y paro totales</h2><p>Tres contactores, paro total -S4 y marcha total -S5 con un relé auxiliar de 3 contactos.</p></div>
+  </a>
+  <a class="card" href="p2_4_cascada.html">
+    <div class="num">2.4</div>
+    <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones <small>(provisional)</small></span><span class="gn">1 animación</span></summary>
+    <div class="cards2">
+  <a class="card" href="p3_1_termicos_serie.html">
+    <div class="num">3.1</div>
+    <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
+  </a>
+    </div>
+  </details>
     <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
+  </section>
+  <section id="sec-tests">
+    <h2 class="sec">Tests · repasa con preguntas tipo test</h2>
+  <a class="card" href="test_28oct.html">
+    <div class="num">28 oct</div>
+    <div><h2>Test examen 28 de octubre</h2><p>100 preguntas de los temas 1 a 4 y las prácticas 1 y 2, con esquemas. Hazlas en orden (de 25 en 25) o al azar; al responder ves por qué.</p></div>
+  </a>
+  <a class="card" href="test_diciembre.html">
+    <div class="num">Dic</div>
+    <div><h2>Test examen de diciembre</h2><p>14 preguntas de la Práctica 3: esquemas de fuerza, tres motores con sus térmicos y medidas con la pinza.</p></div>
+  </a>
+    <p class="foot">Las preguntas tienen siempre el mismo número. Al final ves tu nota y puedes repetir solo los fallos.</p>
+  </section>
+  <section id="sec-medidas">
+    <h2 class="sec">Medidas · practica con el polímetro y la pinza</h2>
+  <a class="card" href="medidas.html">
+    <div class="num">V Ω A</div>
+    <div><h2>Medidas con el polímetro y la pinza</h2><p>Siete circuitos de los temas y las prácticas: mide tensión, continuidad e intensidad tocando los tornillos del esquema. Con las preguntas de medida del test.</p></div>
+  </a>
+    <p class="foot">Recuerda: la continuidad se mide siempre sin tensión. Con la pinza se abraza un solo cable.</p>
   </section>
 </main>
 <script>
@@ -260,7 +361,7 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
   paint();
 })();</script>
 <script>(function(){
-  var N = {"temas": "Temas", "practicas": "Prácticas", "animaciones": "Animaciones"};
+  var N = {"temas": "Temas", "practicas": "Prácticas", "animaciones": "Animaciones", "tests": "Tests", "medidas": "Medidas"};
   function upd(){ var f = (location.hash || '#temas').slice(1); if (!N[f]) f = 'temas';
     document.getElementById('crumbLast').textContent = N[f]; }
   window.addEventListener('hashchange', upd);

@@ -9,7 +9,11 @@ Los alumnos entran desde **códigos QR impresos en los apuntes**, que apuntan a 
 
 ## Estructura del repositorio
 ```
-index.html                 portada con tres "carpetas": Temas, Prácticas, Animaciones
+index.html                 portada con cinco "carpetas": Temas, Prácticas, Animaciones, Tests, Medidas
+test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modo en orden y al azar)
+test_diciembre.html        test examen de diciembre (Práctica 3)
+test_repaso.html           antiguo test: ahora redirige a index.html#tests
+medidas.html               práctica de medidas: polímetro (V~, Ω) y pinza en 7 circuitos, ligada a las preguntas de medida del test
 *.html                     una animación por archivo (en la raíz)
 temas/                     apuntes en PDF
   T1_Esquemas_basicos_Automatismos.pdf
@@ -25,8 +29,10 @@ subir.bat                  publica todo con doble clic
 - El Tema 3 se llama **"Conexionado básico II"** (no "Conexionado complejo").
 
 ## index.html
-- Arriba, tres carpetas que funcionan como pestañas: `#temas` (por defecto), `#practicas` y `#animaciones`. Las secciones tienen id `sec-temas`, `sec-practicas`, `sec-animaciones` para que el navegador no salte al abrir con `#…`.
+- Arriba, cinco carpetas que funcionan como pestañas: `#temas` (por defecto), `#practicas`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-temas`, `sec-practicas`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`.
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
+- Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
+- Tests: una tarjeta por test; el test vuelve a `index.html#tests`.
 - Animaciones: una tarjeta por animación, **numerada con el apartado de los apuntes** (3.1, 3.2…) y en ese orden. Cada animación nueva se añade aquí con número, título y una línea de descripción.
 
 ## Animaciones actuales (Tema 3 · Conexionado básico II)
