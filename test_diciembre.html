@@ -88,6 +88,18 @@ figcaption{font-size:14px;color:var(--muted);font-style:italic;margin-top:4px}
 .review .ra{color:var(--ok);font-weight:700}
 .review .ry{color:var(--red)}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
+.jump{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:8px;margin:0 0 12px}
+.jump>.go{padding:8px 14px;font-size:15px}
+.jump>.go.ghost[aria-expanded=true]{border-color:var(--green);background:var(--green-soft)}
+.qgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:var(--shadow)}
+.qgrid[hidden]{display:none}
+.qgrid button{font:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:var(--btn);color:var(--ink);border-radius:8px;padding:7px 0;cursor:pointer}
+.qgrid button.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.qgrid button.ko{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.qgrid button.cur{outline:3px solid var(--green);outline-offset:1px}
+.qgrid .leg{grid-column:1/-1;font-size:13px;color:var(--muted);margin:2px 0 0}
+.qgrid .go.fin{grid-column:1/-1;margin-top:4px;color:var(--on-green);background:var(--green);border:none;padding:10px}
+@media (max-width:480px){.jump{gap:6px}.jump .tx{display:none}.jump>.go{padding:8px 10px;font-size:14px}}
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out;padding:16px}
 #zoom img{max-width:100%;max-height:100%;background:#fff;border-radius:8px;padding:8px}
 @media (max-width:560px){body{font-size:16px}.qtext{font-size:17px}h1{font-size:22px}.crumbs{font-size:12px}}
@@ -132,6 +144,10 @@ document.addEventListener('keydown', e => {
     location.href = 'index.html#tests'; return;
   }
   if (state.screen !== 'q') return;
+  if (e.key === 'ArrowLeft') { go(state.i - 1); e.preventDefault(); return; }
+  if (e.key === 'ArrowRight') { go(state.i + 1); e.preventDefault(); return; }
+  if (e.key === 'PageDown') { go(Math.min(state.list.length - 1, state.i + 10)); e.preventDefault(); return; }
+  if (e.key === 'PageUp') { go(Math.max(0, state.i - 10)); e.preventDefault(); return; }
   const k = e.key.toLowerCase();
   const idx = 'abcd'.indexOf(k) >= 0 ? 'abcd'.indexOf(k) : '1234'.indexOf(k);
   if (!state.answered && idx >= 0) { answer(idx); e.preventDefault(); }
@@ -236,7 +252,19 @@ function show(){
     <span class="tag">${TEMAS[q.tema].split(' ')[0]}</span>
     <span class="tag ${q.dif==='D'?'d':''}">${q.dif==='D'?'Difícil':'Media'}</span>
     <span class="score">Aciertos: ${state.ok}</span></div>
-  <div class="bar"><i style="width:${(state.i)/n*100}%"></i></div>
+  <div class="bar"><i style="width:${state.list.filter(x => x.pick !== null).length/n*100}%"></i></div>
+  <div class="jump">
+    <button class="go ghost" id="prev" ${state.i === 0 ? 'disabled' : ''} aria-label="Pregunta anterior">←<span class="tx"> Anterior</span></button>
+    <button class="go ghost" id="m10" ${state.i === 0 ? 'disabled' : ''} aria-label="Retroceder 10 preguntas">−10</button>
+    <button class="go ghost" id="tg" aria-expanded="false" aria-controls="qg">Ir a la pregunta… ▾</button>
+    <button class="go ghost" id="p10" ${state.i === n - 1 ? 'disabled' : ''} aria-label="Avanzar 10 preguntas">+10</button>
+    <button class="go ghost" id="nx" ${state.i === n - 1 ? 'disabled' : ''} aria-label="Pregunta siguiente"><span class="tx">Siguiente </span>→</button>
+    <div class="qgrid" id="qg" hidden>
+      ${state.list.map((x,k) => `<button data-j="${k}" class="${x.pick === null ? '' : (x.order[x.pick] === 0 ? 'ok' : 'ko')}${k === state.i ? ' cur' : ''}">${lab(x,k)}</button>`).join('')}
+      <p class="leg">Verde: acertada · Rojo: fallada · Gris: sin contestar. Con el teclado: flechas ← → (de una en una) y AvPág / RePág (de 10 en 10).</p>
+      <button class="go fin" id="fin">Terminar y ver resultado</button>
+    </div>
+  </div>
   <div class="card">
     ${q.img ? `<figure><img src="${IMGS[q.img]}" alt="Esquema: ${esc(q.cap)}" id="fig"><figcaption>${esc(q.cap)}</figcaption></figure>` : ''}
     <div class="qtext">${esc(q.q)}</div>
@@ -245,6 +273,14 @@ function show(){
   </div>`;
   const f = document.getElementById('fig'); if (f) f.onclick = () => openZoom(f.src);
   app.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(+b.dataset.k));
+  document.getElementById('prev').onclick = () => go(state.i - 1);
+  document.getElementById('nx').onclick = () => go(state.i + 1);
+  document.getElementById('m10').onclick = () => go(Math.max(0, state.i - 10));
+  document.getElementById('p10').onclick = () => go(Math.min(state.list.length - 1, state.i + 10));
+  document.getElementById('fin').onclick = result;
+  const tg = document.getElementById('tg'), qg = document.getElementById('qg');
+  tg.onclick = () => { qg.hidden = !qg.hidden; tg.setAttribute('aria-expanded', !qg.hidden); };
+  app.querySelectorAll('.qgrid button[data-j]').forEach(b => b.onclick = () => go(+b.dataset.j));
   if (state.answered) paint();
   window.scrollTo({ top: 0 });
 }
@@ -275,6 +311,8 @@ function paint(){
   document.getElementById('next').onclick = next;
   document.querySelector('.score').textContent = `Aciertos: ${state.ok}`;
 }
+function lab(x, k){ return state.mode === 'orden' ? x.q.n : k + 1; }
+function go(k){ if (k < 0 || k >= state.list.length) return; state.i = k; show(); }
 function next(){
   if (state.i < state.list.length - 1) { state.i++; show(); } else result();
 }
@@ -282,14 +320,16 @@ function next(){
 /* ---------- resultado ---------- */
 function result(){
   state.screen = 'end';
-  const n = state.list.length, nota = (state.ok / n * 10);
-  const fails = state.list.filter(it => it.order[it.pick] !== 0);
+  const n = state.list.length, ans = state.list.filter(it => it.pick !== null), blank = state.list.filter(it => it.pick === null);
+  const nota = ans.length ? state.ok / ans.length * 10 : 0;
+  const fails = ans.filter(it => it.order[it.pick] !== 0);
   const msg = nota >= 9 ? '¡Muy bien! Lo dominas.' : nota >= 7 ? 'Bien. Repasa los fallos.' : nota >= 5 ? 'Aprobado justo: repasa los fallos con los apuntes.' : 'Toca repasar. Mira los fallos y vuelve a intentarlo.';
   app.innerHTML = `
   <h1>Resultado</h1>
   <div class="card" style="text-align:center">
-    <p class="big">${state.ok} / ${n}</p>
+    <p class="big">${state.ok} / ${ans.length}</p>
     <p style="margin:4px 0 0">Nota: <b>${nota.toFixed(1).replace('.',',')}</b> · ${msg}</p>
+    ${blank.length ? `<p class="cnt" style="margin:6px 0 0">Has contestado ${ans.length} de ${n}. Las ${blank.length} sin contestar no cuentan en la nota.</p>` : ''}
   </div>
   ${fails.length ? `<div class="card"><h2 style="margin:0 0 4px;font-size:20px">Tus fallos (${fails.length})</h2>
     ${fails.map(it => { const a = opts(it.q); return `<div class="review">
@@ -300,11 +340,14 @@ function result(){
   </div>` : ''}
   <div class="nav" style="justify-content:center">
     ${fails.length ? '<button class="go ghost" id="redo">Repetir solo los fallos</button>' : ''}
+    ${blank.length ? '<button class="go ghost" id="blank">Hacer las que faltan</button>' : ''}
     <button class="go" id="again">Nuevo test</button>
   </div>`;
   document.getElementById('again').onclick = start;
   const r = document.getElementById('redo');
   if (r) r.onclick = () => { state = { screen: 'q', mode: state.mode, list: (state.mode === 'orden' ? fails : shuffle(fails)).map(it => item(it.q, state.mode === 'orden')), i: 0, ok: 0, answered: false }; show(); };
+  const bl = document.getElementById('blank');
+  if (bl) bl.onclick = () => { const m = state.mode; state = { screen: 'q', mode: m, list: blank.map(it => item(it.q, m === 'orden')), i: 0, ok: 0, answered: false }; show(); };
   window.scrollTo({ top: 0 });
 }
 start();
