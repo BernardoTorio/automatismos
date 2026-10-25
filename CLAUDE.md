@@ -10,7 +10,8 @@ Los alumnos entran desde **códigos QR impresos en los apuntes**, que apuntan a 
 ## Estructura del repositorio
 ```
 index.html                 portada con cinco "carpetas": Temas, Prácticas, Animaciones, Tests, Medidas
-test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modo en orden y al azar)
+test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modos en orden, al azar y por temas; saltos de 1 en 1 y de 10 en 10)
+test_28oct_II.html         test II examen 28 de octubre (100 preguntas nuevas, con peso en medidas y averías; mismo motor)
 test_diciembre.html        test examen de diciembre (Práctica 3)
 test_repaso.html           antiguo test: ahora redirige a index.html#tests
 medidas.html               práctica de medidas: polímetro (V~, Ω) y pinza en 7 circuitos, ligada a las preguntas de medida del test
