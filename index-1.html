@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Automatismos Industriales · I.E.S. Trinidad Arroyo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F4;--ink:#1a1a1a;--muted:#56606b;--card:#fff;--line:#cfd6de;--acc:#1F4E79;--green:#6A9A1F;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--card:#1f252c;--line:#36404b;--acc:#8EC1F0}}
+:root[data-theme="dark"]{--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--card:#1f252c;--line:#36404b;--acc:#8EC1F0}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:820px;margin:0 auto;padding:28px 16px 40px}
+.top{border-bottom:4px solid var(--green);padding-bottom:10px;margin-bottom:22px}
+.top small{color:var(--green);font-weight:700;letter-spacing:.04em}
+h1{margin:4px 0 0;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.15}
+a.card{display:flex;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;color:inherit;text-decoration:none;transition:transform .12s,border-color .12s}
+a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--acc);outline:none}
+.num{flex:none;min-width:62px;padding:0 6px;height:52px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.2rem}
+.sec{font-size:1.05rem;color:var(--muted);margin:0 0 12px;font-weight:700}
+.card h2{margin:0 0 2px;font-size:1.2rem;color:var(--acc)}
+.card p{margin:0;color:var(--muted);font-size:.98rem}
+.foot{color:var(--muted);font-size:.9rem;margin-top:24px}
+.pdf{display:flex;gap:14px;align-items:center;background:var(--card);border:2px solid var(--green);border-radius:12px;padding:12px 16px;margin:0 0 18px;color:inherit;text-decoration:none;font-weight:700}
+.pdf:hover,.pdf:focus-visible{border-color:var(--acc);outline:none}
+.pdf .ico{flex:none;width:44px;height:52px;border-radius:6px;background:#C0392B;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700}
+.pdf small{display:block;font-weight:400;color:var(--muted)}
+
+.folders{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:700px){.folders{grid-template-columns:repeat(2,1fr)}}
+.folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 16px;color:inherit;text-decoration:none;font-weight:700;font-size:1.1rem;cursor:pointer}
+.folder:hover,.folder:focus-visible{border-color:var(--acc);outline:none}
+.folder.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc) inset}
+.folder small{font-weight:400;color:var(--muted);font-size:.9rem}
+.fico{width:46px;height:36px;position:relative}
+.fico:before{content:"";position:absolute;left:0;top:0;width:20px;height:8px;border-radius:4px 4px 0 0;background:#E0A800}
+.fico:after{content:"";position:absolute;left:0;top:5px;width:46px;height:31px;border-radius:0 5px 5px 5px;background:#F2B400}
+section{display:none} section.on{display:block}
+.pdf.missing{opacity:.45;border-style:dashed;pointer-events:none}
+.pdf.missing small:after{content:" · próximamente"}
+
+/* ---- barra superior: volver, dónde estás, tema ---- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs a:hover{color:var(--ink)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1}
+/* ---- cables con tensión ---- */
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.wlive{fill:none;stroke:#FF1F1F;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:0;pointer-events:none;transition:opacity .15s}
+.wlive.live{opacity:1;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.howto{border-left:6px solid #1F4E79}
+.howto h2{font-size:1rem;margin:0 0 6px;color:var(--muted)}
+.howto ul{margin:4px 0 0;padding-left:20px}
+.howto li{margin:3px 0}
+.lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
+.lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
+.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
+/* ---- rúbrica de las prácticas ---- */
+.rub{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:12px;padding:6px 16px 12px;margin:0 0 18px}
+.rub table{border-collapse:collapse;width:100%;font-size:.98rem}
+.rub th,.rub td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;vertical-align:top}
+.rub thead th{color:var(--muted);font-size:.85rem}
+.rub td b{display:block;color:var(--ink)}
+.rub td{color:var(--muted)}
+.rub .p{text-align:right;white-space:nowrap;font-weight:700;color:var(--acc)}
+.rub tr.blq th,.rub tr.blq td{background:var(--bg);color:var(--green);font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-size:.9rem}
+.rubnota{margin:10px 0 0;color:var(--muted);font-size:.92rem}
+
+/* ---- animaciones: partes desplegables a dos columnas ---- */
+details.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px}
+details.grp summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;font-weight:700;font-size:1.1rem;color:var(--acc)}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary::before{content:"▸";display:inline-block;transition:transform .15s;color:var(--muted)}
+details.grp[open] summary::before{transform:rotate(90deg)}
+details.grp summary .gt{flex:1}
+details.grp summary small{font-weight:400;color:var(--muted);font-size:.85em}
+details.grp summary .gn{font-weight:400;font-size:.9rem;color:var(--muted);white-space:nowrap}
+details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg);border-radius:12px;outline:none}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 14px 14px}
+.cards2 a.card{margin-bottom:0}
+@media (max-width:700px){.cards2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><b id="crumbLast">Temas</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <div class="top">
+    <small>AUTOMATISMOS INDUSTRIALES · I.E.S. TRINIDAD ARROYO</small>
+    <h1>Automatismos Industriales</h1>
+  </div>
+  <nav class="folders" aria-label="Carpetas">
+    <a class="folder" href="#temas" data-f="temas"><span class="fico"></span>Temas<small>Apuntes en PDF</small></a>
+    <a class="folder" href="#practicas" data-f="practicas"><span class="fico"></span>Prácticas<small>Fichas en PDF</small></a>
+    <a class="folder" href="#animaciones" data-f="animaciones"><span class="fico"></span>Animaciones<small>Esquemas que se mueven</small></a>
+    <a class="folder" href="#tests" data-f="tests"><span class="fico"></span>Tests<small>Pon a prueba lo que sabes</small></a>
+    <a class="folder" href="#medidas" data-f="medidas"><span class="fico"></span>Medidas<small>Polímetro y pinza</small></a>
+  </nav>
+  <section id="sec-temas">
+    <h2 class="sec">Temas · apuntes para descargar</h2>
+  <a class="pdf" href="temas/T1_Esquemas_basicos_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 1 · Esquemas básicos<small>Símbolos de los aparatos del aula y criterios para dibujar esquemas</small></div>
+  </a>
+  <a class="pdf" href="temas/T2_Dispositivos_basicos_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 2 · Dispositivos básicos<small>Fusible, pulsador, final de carrera, detector, piloto, contactor, relé y térmico</small></div>
+  </a>
+  <a class="pdf" href="temas/T3_Conexionado_basico_II_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 3 · Conexionado básico II<small>Serie y paralelo, realimentación, combinaciones, enclavamiento, relé auxiliar y potencia · con los QR de las animaciones</small></div>
+  </a>
+  <a class="pdf" href="temas/R3_Resumen_conexionados_mando_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>R3 · Resumen del Tema 3: conexionados de mando<small>Funciones «O» e «Y», realimentación, combinaciones, enclavamientos, activación condicionada, relé auxiliar y señalización · 2 caras</small></div>
+  </a>
+  <a class="pdf" href="temas/T4_Conexionado_basico_III_Esquemas_de_fuerza.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 4 · Conexionado básico III: esquemas de fuerza <span style="font-weight:400;color:var(--muted)">(versión provisional)</span><small>Fuerza y mando, aparatos de fuerza y sus tornillos, el relé térmico (95-96 y 97-98) y varios motores · puede cambiar</small></div>
+  </a>
+  </section>
+  <section id="sec-practicas">
+    <h2 class="sec">Prácticas · fichas para descargar</h2>
+  <a class="pdf" href="practicas/P1_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Práctica 1 · Cableados iniciales<small>Pulsadores en serie y en paralelo mandando un contactor, con señalización</small></div>
+  </a>
+  <a class="pdf" href="practicas/P2_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Práctica 2 · Cableados iniciales II<small>Realimentación, prioridad al paro y a la marcha, marchas y paros totales con relé auxiliar y activación condicionada</small></div>
+  </a>
+  <a class="pdf" href="practicas/P3_Automatismos.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Práctica 3 · Esquemas de fuerza<small>Tres motores con sus relés térmicos: cualquier térmico para todo (se monta), cada térmico para su motor y paro solo si saltan dos o más</small></div>
+  </a>
+    <h2 class="sec" style="margin-top:26px">Cómo se valoran las prácticas</h2>
+  <div class="rub">
+  <table>
+  <thead><tr><th scope="col">Qué se mira</th><th scope="col" class="p">Peso</th></tr></thead>
+  <tbody>
+  <tr class="blq"><th scope="rowgroup">Memoria</th><td class="p">50 %</td></tr>
+  <tr><td><b>Presentación</b>Limpieza, orden, esquemas bien dibujados, letra clara.</td><td class="p">20 %</td></tr>
+  <tr><td><b>Contenido</b>Está todo lo que se pide y está bien respondido.</td><td class="p">30 %</td></tr>
+  <tr class="blq"><th scope="rowgroup">Práctica</th><td class="p">50 %</td></tr>
+  <tr><td><b>Acabados</b>Cables de la longitud correcta (ni cortos ni sobrantes), bien metidos en la canaleta y en los bornes (tornillos), sin pisar el aislante y sin cobre a la vista; recorridos ordenados y montaje limpio.</td><td class="p">30 %</td></tr>
+  <tr><td><b>Funcionamiento</b>El circuito hace lo que pide el enunciado la primera vez que se enseña al profesor.</td><td class="p">10 %</td></tr>
+  <tr><td><b>Medidas</b>Comprobaciones y medidas con el polímetro.</td><td class="p">10 %</td></tr>
+  </tbody>
+  </table>
+  <p class="rubnota">Cada apartado se puntúa de 0 a 10. La nota de la práctica es la suma de cada apartado por su peso.</p>
+  </div>
+    <h2 class="sec" style="margin-top:26px">Animaciones de las soluciones · toca una práctica para verlas</h2>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p1_1_serie.html">
+    <div class="num">1.1</div>
+    <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
+  </a>
+  <a class="card" href="p1_2_paralelo.html">
+    <div class="num">1.2</div>
+    <div><h2>Pulsadores en paralelo</h2><p>-S3 o -S4 activan -KM1: con uno basta.</p></div>
+  </a>
+  <a class="card" href="p1_3_excluyentes.html">
+    <div class="num">1.3</div>
+    <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p2_1_prioridades.html">
+    <div class="num">2.1</div>
+    <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
+  </a>
+  <a class="card" href="p2_2_compartidos.html">
+    <div class="num">2.2</div>
+    <div><h2>Marchas y paros compartidos</h2><p>-S2 para los dos; -S4 arranca -KM1 y para -KM2 a la vez.</p></div>
+  </a>
+  <a class="card" href="p2_3_totales.html">
+    <div class="num">2.3</div>
+    <div><h2>Marcha y paro totales</h2><p>Tres contactores, paro total -S4 y marcha total -S5 con un relé auxiliar de 3 contactos.</p></div>
+  </a>
+  <a class="card" href="p2_4_cascada.html">
+    <div class="num">2.4</div>
+    <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones</span><span class="gn">2 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p3_1_termicos_serie.html">
+    <div class="num">3.1</div>
+    <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
+  </a>
+  <a class="card" href="p3_3_dos_o_mas.html">
+    <div class="num">3.3</div>
+    <div><h2>Paro si saltan dos o más</h2><p>Solución por pasos: relés de avería con el 97-98, parejas 1-2, 1-3 y 3-2 que activan -KA5; -KA5 para todo (también el motor sano) y enciende la alarma.</p></div>
+  </a>
+    </div>
+  </details>
+</section>
+  <section id="sec-animaciones">
+    <h2 class="sec">Animaciones · toca una parte para ver sus animaciones</h2>
+  <details class="grp">
+    <summary><span class="gt">Tema 3 · Conexionado básico II · teoría</span><span class="gn">11 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="pulsadores_na.html">
+    <div class="num">3.1</div>
+    <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
+  </a>
+  <a class="card" href="pulsadores_nc.html">
+    <div class="num">3.2</div>
+    <div><h2>Pulsadores NC en serie y en paralelo</h2><p>Tres paros en serie (cualquiera para) y tres en paralelo (hay que pulsar todos), con bobinas de contactor.</p></div>
+  </a>
+  <a class="card" href="realimentacion.html">
+    <div class="num">3.3</div>
+    <div><h2>La realimentación del contactor</h2><p>Marcha y paro con prioridad al paro: por qué el contactor se "sujeta solo" con su 13-14.</p></div>
+  </a>
+  <a class="card" href="realimentacion_marcha.html">
+    <div class="num">3.3</div>
+    <div><h2>Realimentación con prioridad a la marcha</h2><p>El paro solo corta la realimentación: si pulsas marcha y paro a la vez, gana la marcha.</p></div>
+  </a>
+  <a class="card" href="combinaciones.html">
+    <div class="num">3.4</div>
+    <div><h2>Una combinación de paros y marchas</h2><p>Dos paros en paralelo con otro en serie; dos marchas en serie con otra en paralelo y la realimentación.</p></div>
+  </a>
+  <a class="card" href="condicionada.html">
+    <div class="num">3.5</div>
+    <div><h2>Activación condicionada</h2><p>El 53-54 de KM1 en serie con la bobina de KM2: KM2 solo arranca si KM1 ya está en marcha.</p></div>
+  </a>
+  <a class="card" href="enclavamiento.html">
+    <div class="num">3.6</div>
+    <div><h2>Enclavamiento entre dos contactores</h2><p>Inversión de giro: el 61-62 de cada contactor bloquea al otro. Quítalo y mira qué pasa.</p></div>
+  </a>
+  <a class="card" href="rele_auxiliar.html">
+    <div class="num">3.7</div>
+    <div><h2>El relé auxiliar</h2><p>Una bobina y tres contactos conmutados: KA1 se sujeta solo y maneja KM1 y dos pilotos.</p></div>
+  </a>
+  <a class="card" href="rele_base.html">
+    <div class="num">3.8</div>
+    <div><h2>El relé y su base: leer los dibujos del fabricante</h2><p>Base, pegatina y esquema: los mismos tornillos dibujados de tres formas. Con polímetro y retos.</p></div>
+  </a>
+  <a class="card" href="arranque_motor.html">
+    <div class="num">3.9</div>
+    <div><h2>Arranque directo de un motor</h2><p>Fuerza y mando: contactor, relé térmico y motor. Provoca una sobrecarga y mira qué pasa.</p></div>
+  </a>
+  <a class="card" href="inversion_giro.html">
+    <div class="num">3.10</div>
+    <div><h2>Inversión de giro de un motor</h2><p>Fuerza y mando: KM2 cruza L1 y L3. Con enclavamiento, sobrecarga y cortocircuito si lo quitas.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p1_1_serie.html">
+    <div class="num">1.1</div>
+    <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
+  </a>
+  <a class="card" href="p1_2_paralelo.html">
+    <div class="num">1.2</div>
+    <div><h2>Pulsadores en paralelo</h2><p>-S3 o -S4 activan -KM1: con uno basta.</p></div>
+  </a>
+  <a class="card" href="p1_3_excluyentes.html">
+    <div class="num">1.3</div>
+    <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p2_1_prioridades.html">
+    <div class="num">2.1</div>
+    <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
+  </a>
+  <a class="card" href="p2_2_compartidos.html">
+    <div class="num">2.2</div>
+    <div><h2>Marchas y paros compartidos</h2><p>-S2 para los dos; -S4 arranca -KM1 y para -KM2 a la vez.</p></div>
+  </a>
+  <a class="card" href="p2_3_totales.html">
+    <div class="num">2.3</div>
+    <div><h2>Marcha y paro totales</h2><p>Tres contactores, paro total -S4 y marcha total -S5 con un relé auxiliar de 3 contactos.</p></div>
+  </a>
+  <a class="card" href="p2_4_cascada.html">
+    <div class="num">2.4</div>
+    <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Práctica 3 · animaciones de las soluciones</span><span class="gn">2 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="p3_1_termicos_serie.html">
+    <div class="num">3.1</div>
+    <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
+  </a>
+  <a class="card" href="p3_3_dos_o_mas.html">
+    <div class="num">3.3</div>
+    <div><h2>Paro si saltan dos o más</h2><p>Solución por pasos: relés de avería con el 97-98, parejas 1-2, 1-3 y 3-2 que activan -KA5; -KA5 para todo (también el motor sano) y enciende la alarma.</p></div>
+  </a>
+    </div>
+  </details>
+  <details class="grp">
+    <summary><span class="gt">Simulación de examen práctico · soluciones</span><span class="gn">2 animaciones</span></summary>
+    <div class="cards2">
+  <a class="card" href="examen1_ej1_mando.html">
+    <div class="num">Ej. 1</div>
+    <div><h2>Mando con luz de alarma</h2><p>Cada térmico para solo su motor; el 97-98 enciende la luz de alarma y -S5 la apaga con el relé -KA1. Toca cada apartado (a, b, c…) para ver qué parte lo resuelve.</p></div>
+  </a>
+  <a class="card" href="examen1_ej2_fuerza.html">
+    <div class="num">Ej. 2</div>
+    <div><h2>Fuerza y mando: cada térmico para su motor</h2><p>Dos motores con contactor, térmico y bornero; marchas, paro total y pilotos de marcha, de parado y de avería. Solución por apartados.</p></div>
+  </a>
+    </div>
+  </details>
+    <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
+  </section>
+  <section id="sec-tests">
+    <h2 class="sec">Tests · repasa con preguntas tipo test</h2>
+  <a class="card" href="test_28oct.html">
+    <div class="num">28 oct</div>
+    <div><h2>Test examen 28 de octubre</h2><p>96 preguntas de los temas 1 a 4 y las prácticas 1 y 2, con esquemas. Hazlas en orden, al azar o por temas; al responder ves por qué.</p></div>
+  </a>
+  <a class="card" href="test_28oct_II.html">
+    <div class="num">II</div>
+    <div><h2>Test II examen 28 de octubre</h2><p>97 preguntas nuevas de los temas 1 a 4 y las prácticas 1 y 2, con muchas medidas con el polímetro (tensión y continuidad) y búsqueda de averías.</p></div>
+  </a>
+  <a class="card" href="test_diciembre.html">
+    <div class="num">Dic</div>
+    <div><h2>Test examen de diciembre</h2><p>14 preguntas de la Práctica 3: esquemas de fuerza, tres motores con sus térmicos y medidas con la pinza.</p></div>
+  </a>
+    <p class="foot">Las preguntas tienen siempre el mismo número. Al final ves tu nota y puedes repetir solo los fallos.</p>
+  </section>
+  <section id="sec-medidas">
+    <h2 class="sec">Medidas · practica con el polímetro y la pinza</h2>
+  <a class="card" href="medidas.html">
+    <div class="num">V Ω A</div>
+    <div><h2>Medidas con el polímetro y la pinza</h2><p>Siete circuitos de los temas y las prácticas: mide tensión, continuidad e intensidad tocando los tornillos del esquema. Con las preguntas de medida del test.</p></div>
+  </a>
+    <p class="foot">Recuerda: la continuidad se mide siempre sin tensión. Con la pinza se abraza un solo cable.</p>
+  </section>
+</main>
+<script>
+(function(){
+  function show(){
+    var f = (location.hash || '#temas').slice(1);
+    if (!document.getElementById('sec-' + f)) f = 'temas';
+    document.querySelectorAll('section').forEach(function(s){ s.classList.toggle('on', s.id === 'sec-' + f); });
+    document.querySelectorAll('.folder').forEach(function(a){ a.classList.toggle('sel', a.dataset.f === f); });
+  }
+  window.addEventListener('hashchange', function(){ show(); window.scrollTo(0, 0); });
+  document.querySelectorAll('.folder').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); history.replaceState(null, '', '#' + a.dataset.f); show(); }); });
+  show(); setTimeout(function(){ window.scrollTo(0, 0); }, 0);
+  // los PDF que aún no están subidos se marcan como "próximamente"
+  document.querySelectorAll('a.pdf').forEach(function(a){
+    fetch(a.getAttribute('href'), { method:'HEAD' }).then(function(r){ if (!r.ok) a.classList.add('missing'); }).catch(function(){});
+  });
+})();
+</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){
+  var N = {"temas": "Temas", "practicas": "Prácticas", "animaciones": "Animaciones", "tests": "Tests", "medidas": "Medidas"};
+  function upd(){ var f = (location.hash || '#temas').slice(1); if (!N[f]) f = 'temas';
+    document.getElementById('crumbLast').textContent = N[f]; }
+  window.addEventListener('hashchange', upd);
+  document.querySelectorAll('.folder').forEach(function(a){ a.addEventListener('click', function(){ setTimeout(upd, 0); }); });
+  upd();
+})();</script>
+</body>
+</html>
