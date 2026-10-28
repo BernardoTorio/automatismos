@@ -200,7 +200,7 @@ var PAIRS = [ { s:3, a:'F1', b:'F2', txt:'-KA2 (11-14) y -KA3 (11-14)' },
               { s:5, a:'F3', b:'F2', txt:'-KA4 (21-24) y -KA3 (21-24)' } ];
 var STEPS = [
   { c:'El problema', t:'El problema: nos faltan contactos',
-    h:'<p>Partimos de la 3.2: el <span class="k">95-96</span> de cada térmico para <b>solo su motor</b> y el <span class="k">97-98</span> enciende su piloto de avería (-H3, -H4, -H5).</p>' +
+    h:'<p><b>Este paso es también la solución de la 3.2.</b> El <span class="k">95-96</span> de cada térmico va en la rama de su contactor, antes del paralelo de marcha: si salta, para <b>solo su motor</b> y ese motor no arranca ni con su marcha ni con la marcha total. El <span class="k">97-98</span> de cada térmico enciende su piloto de avería (-H3, -H4, -H5).</p>' +
       '<p>Para saber si han saltado <b>dos</b> térmicos hay que mirarlos <b>por parejas</b>: 1-2, 1-3 y 3-2. Cada térmico está en <b>dos parejas</b>, así que necesitamos <b>dos contactos más</b> de cada térmico. Pero el térmico solo tiene uno de cada, y ya están ocupados.</p>' +
       '<p class="prueba">Prueba: arranca los tres motores y dispara dos térmicos. Solo se paran esos dos motores y el tercero se queda trabajando solo. Eso es lo que hay que evitar.</p>' },
   { c:'Relés de avería', t:'Llevamos el 97-98 a un relé auxiliar',
