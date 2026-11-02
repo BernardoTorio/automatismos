@@ -32,7 +32,8 @@ a.card:hover,a.card:focus-visible{transform:translateY(-2px);border-color:var(--
 .pdf .ico{flex:none;width:44px;height:52px;border-radius:6px;background:#C0392B;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700}
 .pdf small{display:block;font-weight:400;color:var(--muted)}
 
-.folders{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+.folders{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:1000px){.folders{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:700px){.folders{grid-template-columns:repeat(2,1fr)}}
 .folder{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 16px;color:inherit;text-decoration:none;font-weight:700;font-size:1.1rem;cursor:pointer}
 .folder:hover,.folder:focus-visible{border-color:var(--acc);outline:none}
@@ -106,6 +107,7 @@ details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg)
   <nav class="folders" aria-label="Carpetas">
     <a class="folder" href="#temas" data-f="temas"><span class="fico"></span>Temas<small>Apuntes en PDF</small></a>
     <a class="folder" href="#practicas" data-f="practicas"><span class="fico"></span>Prácticas<small>Fichas en PDF</small></a>
+    <a class="folder" href="#ejercicios" data-f="ejercicios"><span class="fico"></span>Ejercicios<small>Problemas en PDF</small></a>
     <a class="folder" href="#animaciones" data-f="animaciones"><span class="fico"></span>Animaciones<small>Esquemas que se mueven</small></a>
     <a class="folder" href="#tests" data-f="tests"><span class="fico"></span>Tests<small>Pon a prueba lo que sabes</small></a>
     <a class="folder" href="#medidas" data-f="medidas"><span class="fico"></span>Medidas<small>Polímetro y pinza</small></a>
@@ -131,6 +133,10 @@ details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg)
   <a class="pdf" href="temas/T4_Conexionado_basico_III_Esquemas_de_fuerza.pdf" download>
     <div class="ico">PDF</div>
     <div>Tema 4 · Conexionado básico III: esquemas de fuerza <span style="font-weight:400;color:var(--muted)">(versión provisional)</span><small>Fuerza y mando, aparatos de fuerza y sus tornillos, el relé térmico (95-96 y 97-98), varios motores y la placa de bornes · el cambio de sentido pasa al Tema 5</small></div>
+  </a>
+  <a class="pdf" href="temas/T6_Dimensionamiento_protecciones.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 6 · Dimensionamiento de protecciones<small>Leer la placa del motor (estrella y triángulo), calibre, cable, curvas B, C y D, arranque, relé térmico, fusibles, guardamotor y cuadros con varios motores</small></div>
   </a>
   </section>
   <section id="sec-practicas">
@@ -237,6 +243,13 @@ details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg)
     </div>
   </details>
 </section>
+  <section id="sec-ejercicios">
+    <h2 class="sec">Ejercicios · problemas para descargar</h2>
+  <a class="pdf" href="ejercicios/T6_Ejercicios_Dimensionamiento_protecciones.pdf" download>
+    <div class="ico">PDF</div>
+    <div>Tema 6 · Ejercicios de dimensionamiento de protecciones<small>20 ejercicios con las placas de los motores: de menos a más, leer curvas y tipo examen · tablas y curvas al final</small></div>
+  </a>
+  </section>
   <section id="sec-animaciones">
     <h2 class="sec">Animaciones · toca una parte para ver sus animaciones</h2>
   <details class="grp">
@@ -420,7 +433,7 @@ details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg)
   paint();
 })();</script>
 <script>(function(){
-  var N = {"temas": "Temas", "practicas": "Prácticas", "animaciones": "Animaciones", "tests": "Tests", "medidas": "Medidas"};
+  var N = {"temas": "Temas", "practicas": "Prácticas", "ejercicios": "Ejercicios", "animaciones": "Animaciones", "tests": "Tests", "medidas": "Medidas"};
   function upd(){ var f = (location.hash || '#temas').slice(1); if (!N[f]) f = 'temas';
     document.getElementById('crumbLast').textContent = N[f]; }
   window.addEventListener('hashchange', upd);
