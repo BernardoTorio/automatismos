@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temporizadores: el cronograma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:12px 10px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:not-allowed}
+#bS1{border-color:#2E8B3E;grid-column:1 / -1;padding:16px 10px;font-size:1.1rem}
+#bS1.on{background:#2E8B3E;color:#fff}
+button.tog.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.small{font-size:.86rem;font-weight:400;display:block;opacity:.8}
+.foot{color:var(--muted);font-size:.9rem;margin-top:4px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+/* temporizadores (columna de estado) */
+.tm{display:grid;grid-template-columns:78px 1fr;gap:12px;align-items:center}
+.tm + .tm{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tm svg{width:78px;height:108px}
+.tmname{font-weight:700}
+.tmname .ty{font-weight:400;color:var(--muted)}
+.cd{font-size:2rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;min-height:1.1em}
+.cd.run{color:#B07800}
+:root[data-theme="dark"] .cd.run{color:#FFC94D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cd.run{color:#FFC94D}}
+.stt{font-weight:700;color:var(--muted)}
+.stt.work{color:var(--ok)}
+.led{display:inline-flex;align-items:center;gap:6px;font-weight:700;margin-top:4px}
+.dot{width:22px;height:22px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .15s,box-shadow .15s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.a.on{background:#FFB000;box-shadow:0 0 14px #FFB000}
+.inside{font-size:.9rem;color:var(--muted);margin:10px 0 0}
+/* ruleta */
+.dialrow{display:flex;align-items:center;gap:14px}
+.dialrow svg{width:96px;height:96px;flex:none}
+.dialrow input{width:100%;accent-color:#1F4E79;height:28px}
+.tval{font-size:1.5rem;font-weight:700}
+/* cronograma */
+.chart{margin-top:18px}
+.chartwrap{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px}
+.chartwrap canvas{display:block;width:100%;height:330px}
+.howread{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.95rem;color:var(--muted);margin:0 0 8px}
+.howread b{color:var(--ink)}
+.sw{display:inline-block;width:26px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.uses h2{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
+.uses ul{margin:6px 0 0;padding-left:22px}
+.uses li{margin:4px 0}
+.tag{white-space:nowrap;font-size:.8rem;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff}
+.tag.on{background:#2E8B3E}.tag.off{background:#B07800}
+.big{font-size:1.15rem}
+.box{border-radius:10px;padding:12px 14px;margin-top:10px;border:2px solid}
+.box.ojo{border-color:#C0392B}
+.box.ojo b.t{color:#C0392B}
+.box.pista{border-color:#1F4E79}
+.box.pista b.t{color:#1F4E79}
+:root[data-theme="dark"] .box.pista b.t{color:#8DB8E8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .box.pista b.t{color:#8DB8E8}}
+/* diagrama */
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.cdt{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:16px;fill:#9a6a00}
+.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .14s ease}
+.glow{opacity:0;transition:opacity .15s}
+.glow.on{opacity:.9}
+.coilfill{transition:fill .15s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>5.2 El cronograma de los temporizadores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <h1>A la conexión y a la desconexión: el cronograma</h1>
+  <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> (enciende H1) y <b>-KT2 a la desconexión</b> (enciende H2). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de abajo: se dibuja solo. Después prueba una pulsación corta.</p>
+
+  <div class="grid">
+    <div class="sheet" aria-label="Esquema de mando de los dos temporizadores">
+      <svg viewBox="0 0 640 628" role="img" aria-labelledby="svgt">
+        <title id="svgt">Esquema: magnetotérmico Q1; el pulsador S1 alimenta las bobinas de KT1 (a la conexión) y KT2 (a la desconexión); el 67-68 de KT1 enciende H1 y el 67-68 de KT2 enciende H2</title>
+
+        <!-- raíles -->
+        <path id="wL" class="w wf live" d="M40 40 H120 V58"/>
+        <text class="t name" x="30" y="46" text-anchor="end" style="fill:var(--fase)">L</text>
+        <path class="w wn" d="M40 600 H560"/>
+        <text class="t name" x="30" y="606" text-anchor="end" style="fill:var(--neutro)">N</text>
+
+        <!-- cables de fase (se iluminan con tensión) -->
+        <path id="wQ" class="w wf" d="M120 200 V256"/>
+        <path id="wBus" class="w wf" d="M120 222 H560 V378 M420 222 V378"/>
+        <path id="wS1" class="w wf" d="M120 322 V514 M120 350 H260 V514"/>
+        <path id="wC" class="w wf" d="M420 444 V520"/>
+        <path id="wD" class="w wf" d="M560 444 V520"/>
+        <!-- neutro -->
+        <path class="w wn" d="M120 554 V600 M260 554 V600 M420 556 V600 M560 556 V600"/>
+
+        <!-- corriente -->
+        <path id="fTop" class="flow" d="M40 40 H120 V222"/>
+        <path id="fA" class="flow" d="M120 222 V350 V600 H40"/>
+        <path id="fB" class="flow" d="M120 350 H260 V600 H40"/>
+        <path id="fH1" class="flow" d="M120 222 H420 V600 H40"/>
+        <path id="fH2" class="flow" d="M420 222 H560 V600 H420"/>
+
+        <!-- Q1 magnetotérmico completo -->
+        <g id="gQ1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q1: abrir o cerrar">
+          <rect class="hitbox" x="22" y="50" width="130" height="156" rx="8"/>
+          <line class="sym" x1="120" y1="58" x2="120" y2="76"/>
+          <line class="sym" x1="112" y1="68" x2="128" y2="84" style="stroke-width:2.4"/>
+          <line class="sym" x1="112" y1="84" x2="128" y2="68" style="stroke-width:2.4"/>
+          <line id="kQ1" class="sym blade" x1="120" y1="110" x2="120" y2="78" style="transform-origin:120px 110px"/>
+          <line class="sym" x1="120" y1="110" x2="120" y2="124"/>
+          <rect class="symf" x="106" y="124" width="28" height="30"/>
+          <path class="sym" d="M120 124 V135 H128 V143 H120 V154" style="stroke-width:2.4"/>
+          <line class="sym" x1="120" y1="154" x2="120" y2="162"/>
+          <rect class="symf" x="106" y="162" width="28" height="26"/>
+          <text class="t" x="120" y="180" text-anchor="middle" style="font-size:13px;font-weight:700">I&gt;</text>
+          <line class="sym" x1="120" y1="188" x2="120" y2="200"/>
+          <g id="aQ1" class="blade">
+            <line class="dash" x1="72" y1="94" x2="112" y2="94"/>
+            <line class="sym" x1="72" y1="82" x2="72" y2="106"/>
+          </g>
+          <text class="t" x="128" y="58">1</text><text class="t" x="128" y="212">2</text>
+          <text class="t name" x="64" y="100" text-anchor="end">-Q1</text>
+        </g>
+
+        <!-- S1 pulsador NA 3-4 -->
+        <g id="gS1" class="hit" tabindex="0" role="button" aria-label="Pulsador S1: mantener pulsado">
+          <rect class="hitbox" x="22" y="250" width="130" height="80" rx="8"/>
+          <line class="sym" x1="120" y1="256" x2="120" y2="276"/>
+          <line class="sym" x1="120" y1="306" x2="120" y2="322"/>
+          <line id="kS1" class="sym blade" x1="120" y1="306" x2="100" y2="274" style="transform-origin:120px 306px"/>
+          <g id="aS1" class="blade">
+            <line class="dash" x1="70" y1="290" x2="110" y2="290"/>
+            <path class="sym" d="M78 279 H70 V301 H78"/>
+          </g>
+          <text class="t" x="128" y="254">3</text><text class="t" x="128" y="336">4</text>
+          <text class="t name" x="62" y="296" text-anchor="end">-S1</text>
+        </g>
+
+        <!-- contacto 67-68 de KT1 (a la conexión): paraguas "(" -->
+        <g>
+          <line class="sym" x1="420" y1="378" x2="420" y2="398"/>
+          <line class="sym" x1="420" y1="428" x2="420" y2="444"/>
+          <line id="kC" class="sym blade" x1="420" y1="428" x2="400" y2="396" style="transform-origin:420px 428px"/>
+          <path class="sym" d="M388 399 Q374 412 388 425" style="stroke-width:2.6"/>
+          <line id="stubC" class="sym" x1="381" y1="412" x2="410" y2="412" style="stroke-width:2.2"/>
+          <text class="t" x="428" y="376">67</text><text class="t" x="428" y="460">68</text>
+          <text class="t name" x="366" y="418" text-anchor="end">-KT1</text>
+          <text id="cdC" class="cdt" x="430" y="490"></text>
+        </g>
+        <!-- contacto 67-68 de KT2 (a la desconexión): paraguas ")" -->
+        <g>
+          <line class="sym" x1="560" y1="378" x2="560" y2="398"/>
+          <line class="sym" x1="560" y1="428" x2="560" y2="444"/>
+          <line id="kD" class="sym blade" x1="560" y1="428" x2="540" y2="396" style="transform-origin:560px 428px"/>
+          <path class="sym" d="M514 399 Q528 412 514 425" style="stroke-width:2.6"/>
+          <line id="stubD" class="sym" x1="521" y1="412" x2="550" y2="412" style="stroke-width:2.2"/>
+          <text class="t" x="568" y="376">67</text><text class="t" x="568" y="460">68</text>
+          <text class="t name" x="506" y="418" text-anchor="end">-KT2</text>
+          <text id="cdD" class="cdt" x="570" y="490"></text>
+        </g>
+
+        <!-- líneas auxiliares: cada bobina con su contacto -->
+        <path class="dash" d="M148 534 H158 V484 H386 V427"/>
+        <path class="dash" d="M288 534 H298 V498 H516 V427"/>
+
+        <!-- nudos -->
+        <circle cx="120" cy="222" r="5" fill="var(--fase)"/>
+        <circle cx="420" cy="222" r="5" fill="var(--fase)"/>
+        <circle cx="120" cy="350" r="5" fill="var(--fase)"/>
+        <circle cx="120" cy="600" r="5" fill="var(--neutro)"/>
+        <circle cx="260" cy="600" r="5" fill="var(--neutro)"/>
+        <circle cx="420" cy="600" r="5" fill="var(--neutro)"/>
+
+        <!-- bobina KT1 (a la conexión: cuadro aspado) -->
+        <line class="sym" x1="120" y1="514" x2="120" y2="522"/>
+        <line class="sym" x1="120" y1="546" x2="120" y2="554"/>
+        <rect id="coil1" class="symf coilfill" x="92" y="522" width="56" height="24"/>
+        <rect class="symf" x="76" y="522" width="16" height="24"/>
+        <line class="sym" x1="76" y1="522" x2="92" y2="546" style="stroke-width:2"/>
+        <line class="sym" x1="92" y1="522" x2="76" y2="546" style="stroke-width:2"/>
+        <text class="t" x="128" y="512">A1</text><text class="t" x="128" y="570">A2</text>
+        <text class="t name" x="68" y="540" text-anchor="end">-KT1</text>
+        <!-- bobina KT2 (a la desconexión: cuadro relleno) -->
+        <line class="sym" x1="260" y1="514" x2="260" y2="522"/>
+        <line class="sym" x1="260" y1="546" x2="260" y2="554"/>
+        <rect id="coil2" class="symf coilfill" x="232" y="522" width="56" height="24"/>
+        <rect x="216" y="522" width="16" height="24" fill="#111" stroke="#111" stroke-width="3"/>
+        <text class="t" x="268" y="512">A1</text><text class="t" x="268" y="570">A2</text>
+        <text class="t name" x="208" y="540" text-anchor="end">-KT2</text>
+
+        <!-- pilotos -->
+        <circle id="glow1" class="glow" cx="420" cy="538" r="30" style="fill:#8FE08F"/>
+        <line class="sym" x1="420" y1="512" x2="420" y2="520"/>
+        <line class="sym" x1="420" y1="556" x2="420" y2="564"/>
+        <circle class="sym" cx="420" cy="538" r="18"/>
+        <line class="sym" x1="407" y1="525" x2="433" y2="551"/>
+        <line class="sym" x1="407" y1="551" x2="433" y2="525"/>
+        <text class="t" x="430" y="512">X1</text><text class="t" x="430" y="578">X2</text>
+        <text class="t name" x="390" y="544" text-anchor="end">-H1</text>
+        <circle id="glow2" class="glow" cx="560" cy="538" r="30" style="fill:#FFD27A"/>
+        <line class="sym" x1="560" y1="512" x2="560" y2="520"/>
+        <line class="sym" x1="560" y1="556" x2="560" y2="564"/>
+        <circle class="sym" cx="560" cy="538" r="18"/>
+        <line class="sym" x1="547" y1="525" x2="573" y2="551"/>
+        <line class="sym" x1="547" y1="551" x2="573" y2="525"/>
+        <text class="t" x="570" y="512">X1</text><text class="t" x="570" y="578">X2</text>
+        <text class="t name" x="530" y="544" text-anchor="end">-H2</text>
+      </svg>
+    </div>
+
+    <div class="side">
+      <div class="card" aria-label="Estado de los temporizadores">
+        <div class="tm">
+          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell1"></g></svg>
+          <div>
+            <div class="tmname">-KT1 <span class="ty">· a la conexión</span></div>
+            <div id="cd1" class="cd">—</div>
+            <div id="st1" class="stt">Reposo</div>
+            <span class="led"><span id="dH1" class="dot g"></span>H1</span>
+          </div>
+        </div>
+        <div class="tm">
+          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell2"></g></svg>
+          <div>
+            <div class="tmname">-KT2 <span class="ty">· a la desconexión</span></div>
+            <div id="cd2" class="cd">—</div>
+            <div id="st2" class="stt">Reposo</div>
+            <span class="led"><span id="dH2" class="dot a"></span>H2</span>
+          </div>
+        </div>
+        <p class="inside">El <b>fuelle</b> de cada bloque se llena o se vacía <b>despacio</b> por un agujero muy pequeño: eso es lo que marca el tiempo. En el de conexión el aire tarda al <b>entrar</b>; en el de desconexión tarda al <b>salir</b>.</p>
+      </div>
+
+      <div class="card">
+        <div class="controls">
+          <button id="bS1" aria-pressed="false">Pulsador -S1<span class="small">mantén pulsado · tecla M</span></button>
+          <button id="bAuto" class="tog" aria-pressed="false">Pulsos cortos<span class="small">1 s sí, 1 s no · tecla C</span></button>
+          <button id="bQ1">Abrir -Q1<span class="small">tecla Q</span></button>
+          <button id="bSlow" class="tog" aria-pressed="false">Cámara lenta<span class="small">tecla L</span></button>
+          <button id="bFreeze" class="tog" aria-pressed="false">Congelar<span class="small">tecla F</span></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="dialrow">
+          <svg viewBox="0 0 96 96" aria-hidden="true">
+            <circle cx="48" cy="48" r="40" fill="#E9EAEC" stroke="#444" stroke-width="3"/>
+            <g id="ticks"></g>
+            <g id="needle" style="transform-origin:48px 48px;transition:transform .15s">
+              <line x1="48" y1="48" x2="48" y2="16" stroke="#C0392B" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <circle cx="48" cy="48" r="7" fill="#444"/>
+          </svg>
+          <div style="flex:1">
+            <label for="T"><b>Ruleta de los dos bloques</b></label>
+            <div class="tval">T = <span id="Tv">5</span> s</div>
+            <input id="T" type="range" min="2" max="30" step="1" value="5" aria-label="Tiempo de los temporizadores en segundos">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="card chart" aria-label="Cronograma en directo">
+    <h2>El cronograma, en directo</h2>
+    <div class="howread">
+      <span>El tiempo va de <b>izquierda a derecha</b>; lo de la derecha es <b>ahora</b>.</span>
+      <span><span class="sw" style="background:#D0191C"></span><b>Bobinas</b>: arriba con tensión, abajo sin tensión.</span>
+      <span><span class="sw" style="background:#1F5FBF"></span><b>Contactos</b>: arriba en trabajo, abajo en reposo.</span>
+      <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
+    </div>
+    <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de la bobina y de los contactos de KT1 y KT2"></canvas></div>
+  </section>
+
+  <div class="card explain" id="explain" aria-live="polite" style="margin-top:14px"></div>
+
+  <div class="below">
+    <div class="card uses">
+      <h2><span class="tag on">-KT1</span> A la conexión <span class="ty" style="font-weight:400;color:var(--muted)">(retardo al trabajo)</span></h2>
+      <p class="big">Cambia <b>T segundos después</b> de dar tensión.<br>Vuelve a reposo <b>al momento</b> al quitarla.</p>
+      <div class="box ojo"><b class="t">¡OJO! Pulsaciones cortas:</b> si la bobina tiene tensión <b>menos de T</b>, el contacto <b>no llega a actuar nunca</b>. Al soltar, el tiempo se pierde y la próxima vez empieza de cero.</div>
+      <ul>
+        <li><b>Arrancar algo un rato después</b>: el segundo motor del arranque escalonado; una bomba que espera unos segundos.</li>
+        <li><b>Parar algo pasado un tiempo</b> (con su 55-56): pulsas marcha y se para solo.</li>
+        <li><b>Avisar si algo dura demasiado</b>: una puerta que lleva abierta más de 30 s.</li>
+        <li><b>No hacer caso a señales cortas</b>: un detector que se activa un instante por error.</li>
+      </ul>
+    </div>
+    <div class="card uses">
+      <h2><span class="tag off">-KT2</span> A la desconexión <span class="ty" style="font-weight:400;color:var(--muted)">(retardo al reposo)</span></h2>
+      <p class="big">Cambia <b>al momento</b> de dar tensión.<br>Vuelve a reposo <b>T segundos después</b> de quitarla.</p>
+      <div class="box ojo"><b class="t">¡OJO! El tiempo empieza al SOLTAR</b>, no al pulsar. Si vuelve a tener tensión antes de T, empieza de cero. Con pulsaciones cortas seguidas <b>nunca llega a parar</b>.</div>
+      <ul>
+        <li><b>Luz de escalera</b>: pulsas, se enciende y se apaga sola al rato.</li>
+        <li><b>Extractor del baño</b> que sigue un rato después de apagar la luz.</li>
+        <li><b>Ventilador que enfría un motor</b> después de pararlo.</li>
+        <li><b>Cinta que sigue un poco</b> cuando el detector deja de ver la caja.</li>
+      </ul>
+    </div>
+    <div class="card wide">
+      <div class="box pista" style="margin-top:0"><b class="t">PISTA para el test:</b> mira la bobina y busca <b>qué cambio del contacto va retrasado</b>. Si el contacto tarda en <b>entrar</b> (en ir a trabajo) → <b>a la conexión</b>. Si tarda en <b>salir</b> (en volver a reposo) → <b>a la desconexión</b>. En el símbolo, el paraguas del de conexión tiene forma de <b>C</b>, la C de <b>C</b>onexión: <b style="font-size:1.2em">(</b>. El de desconexión, al revés: <b style="font-size:1.2em">)</b>.</div>
+      <p style="margin:10px 0 0">Cada bloque tiene también un <span class="k">55-56</span> (cerrado en reposo). Cambia <b>a la vez</b> que el <span class="k">67-68</span>, pero al revés: cuando el 67-68 se cierra, el 55-56 se abre. En el cronograma sería la misma línea, pero dada la vuelta.</p>
+    </div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en el pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Fase en rojo, neutro en azul. Teclado: <kbd>M</kbd> pulsador, <kbd>C</kbd> pulsos cortos, <kbd>Q</kbd> magnetotérmico, <kbd>L</kbd> cámara lenta, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
+</main>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var st = { q1:true, s1:false, coil:false, tOn:0, onC:false, offC:false, tOff:0, offTiming:false,
+             T:5, speed:1, frozen:false, auto:false, autoClock:0, simT:0 };
+  var ev = 'inicio';
+  var samples = [], edges = [], ivOn = [], ivOff = [];
+  var curOn = null, curOff = null;
+
+  /* ---------- simulación ---------- */
+  function step(dt){
+    if (st.frozen) return;
+    dt *= st.speed; st.simT += dt;
+    if (st.auto){ st.autoClock += dt; st.s1 = (st.autoClock % 2) < 1; }
+    var c = st.q1 && st.s1;
+    if (c && !st.coil){                       // se da tensión
+      edges.push(st.simT);
+      if (st.offTiming){ ev = 'retrig'; if (curOff){ curOff.end = st.simT; curOff.done = false; curOff = null; } }
+      else ev = 'rise';
+      curOn = { start: st.simT, end: null, done: false }; ivOn.push(curOn);
+      st.offTiming = false; st.tOff = 0;
+    }
+    if (!c && st.coil){                       // se quita tensión
+      edges.push(st.simT);
+      if (!st.onC){ ev = 'short'; if (curOn){ curOn.end = st.simT; curOn.done = false; curOn = null; } }
+      else ev = 'fall';
+      st.onC = false; st.tOn = 0;
+      if (st.offC){ st.offTiming = true; st.tOff = 0; curOff = { start: st.simT, end: null, done: false }; ivOff.push(curOff); }
+    }
+    st.coil = c;
+    if (c){
+      st.offC = true;
+      st.tOn += dt;
+      if (!st.onC && st.tOn >= st.T){ st.onC = true; ev = 'acted'; if (curOn){ curOn.end = st.simT; curOn.done = true; curOn = null; } }
+    } else if (st.offTiming){
+      st.tOff += dt;
+      if (st.tOff >= st.T){ st.offC = false; st.offTiming = false; ev = 'released'; if (curOff){ curOff.end = st.simT; curOff.done = true; curOff = null; } }
+    }
+    samples.push({ t: st.simT, c: st.coil, a: st.onC, b: st.offC });
+    var keep = st.simT - win() - 2;
+    while (samples.length > 2 && samples[1].t < keep) samples.shift();
+    while (edges.length && edges[0] < keep) edges.shift();
+    while (ivOn.length && ivOn[0].end !== null && ivOn[0].end < keep) ivOn.shift();
+    while (ivOff.length && ivOff[0].end !== null && ivOff[0].end < keep) ivOff.shift();
+  }
+  function win(){ return Math.max(16, st.T * 2.6 + 4); }
+
+  /* ---------- dibujo del esquema ---------- */
+  function rot(el, deg){ el.style.transform = 'rotate(' + deg + 'deg)'; }
+  function stub(id, px, deg){
+    var r = deg * Math.PI / 180, vx = -10, vy = -16;
+    var x = vx * Math.cos(r) - vy * Math.sin(r), y = vx * Math.sin(r) + vy * Math.cos(r);
+    var l = $(id); l.setAttribute('x2', (px + x).toFixed(1)); l.setAttribute('y2', (428 + y).toFixed(1));
+  }
+  function fmt(s){ return s.toFixed(1).replace('.', ',') + ' s'; }
+  function bellows(g, p){
+    var h = 28 + 56 * p, top = 12, bot = top + h, n = 5, L = 14, R = 64, d = 7;
+    var pts = '';
+    for (var i = 0; i <= n * 2; i++){ var y = top + 6 + (bot - top - 6) * i / (n * 2); pts += (i ? ' L' : 'M') + ((i % 2) ? L - d : L) + ' ' + y.toFixed(1); }
+    var ptsR = '';
+    for (var j = 0; j <= n * 2; j++){ var y2 = top + 6 + (bot - top - 6) * j / (n * 2); ptsR += (j ? ' L' : 'M') + ((j % 2) ? R + d : R) + ' ' + y2.toFixed(1); }
+    g.innerHTML =
+      '<rect x="8" y="' + top + '" width="62" height="7" rx="2" fill="#555"/>' +
+      '<path d="M' + L + ' ' + (top + 6) + ' H' + R + ' V' + bot + ' H' + L + ' Z" fill="#CFE3F7" stroke="none"/>' +
+      '<path d="' + pts + '" fill="none" stroke="#333" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<path d="' + ptsR + '" fill="none" stroke="#333" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<rect x="8" y="' + bot + '" width="62" height="7" rx="2" fill="#555"/>' +
+      '<circle cx="39" cy="' + (top + 3) + '" r="2.6" fill="#FFE066" stroke="#333" stroke-width="1"/>';
+  }
+  var lastMsg = '';
+  function msg(){
+    var T = st.T, r1 = Math.max(0, Math.ceil(T - st.tOn - 1e-6)), r2 = Math.max(0, Math.ceil(T - st.tOff - 1e-6));
+    if (st.auto) return '<b>Pulsos cortos: 1 s pulsado, 1 s suelto, una y otra vez</b> (T = ' + T + ' s).<br>' +
+      '• <b>-KT1 (conexión) nunca llega a actuar</b>: necesita ' + T + ' s <b>seguidos</b> con tensión y cada pulso dura solo 1 s. Al soltar, vuelve a empezar de cero. H1 no se enciende nunca.<br>' +
+      '• <b>-KT2 (desconexión) nunca llega a parar</b>: cada pulso le pone el tiempo a cero antes de que se acabe. H2 no se apaga nunca.';
+    if (!st.q1) return '<b>-Q1 abierto: el mando se queda sin tensión.</b> Las bobinas se sueltan y los pilotos se apagan.' +
+      (st.offTiming ? ' Fíjate en el fuelle de -KT2: <b>sigue contando sin electricidad</b> (faltan ' + r2 + ' s). El tiempo lo marca el aire, no la corriente.' : ' Ciérralo para seguir.');
+    if (st.coil && !st.onC){
+      var pre = ev === 'retrig' ? '<b>Has vuelto a pulsar antes de que -KT2 acabara.</b> Su cuenta se ha puesto a cero: empezará otra vez cuando sueltes. ' : '<b>Las bobinas tienen tensión.</b> ';
+      return pre + '-KT2 (desconexión) ha cambiado <b>al momento</b>: su <span class="k">67-68</span> se cierra y se enciende H2. -KT1 (conexión) <b>está contando</b>: faltan <b>' + r1 + ' s</b>. Su 67-68 sigue abierto. Si sueltas antes, no llegará a actuar.';
+    }
+    if (st.coil && st.onC) return '<b>Han pasado ' + T + ' s con tensión</b>: el <span class="k">67-68</span> de -KT1 se cierra y se enciende H1. Ahora los dos están en trabajo. <b>Suelta el pulsador</b> y mira cuál vuelve antes a reposo.';
+    if (st.offTiming){
+      var p = ev === 'short' ? '<b>Has soltado antes de ' + T + ' s.</b> -KT1 (conexión) <b>no ha llegado a actuar</b>: H1 ni se ha encendido. ' :
+                               '<b>Has soltado: las bobinas ya no tienen tensión.</b> -KT1 (conexión) vuelve a reposo <b>al momento</b>: H1 se apaga. ';
+      return p + '-KT2 (desconexión) <b>sigue en trabajo y cuenta</b>: faltan <b>' + r2 + ' s</b> para que vuelva a reposo y se apague H2.';
+    }
+    if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste</b>: -KT2 vuelve a reposo y H2 se apaga. Todo en reposo otra vez. Mira el cronograma: el de conexión retrasa la <b>entrada</b>; el de desconexión retrasa la <b>salida</b>.';
+    return '<b>Todo en reposo.</b> Las bobinas no tienen tensión y los dos <span class="k">67-68</span> están abiertos. Mantén pulsado <b>-S1</b> más de ' + T + ' s y suéltalo. Después prueba una pulsación corta (menos de ' + T + ' s).';
+  }
+  function render(){
+    var c = st.coil, h1 = st.q1 && st.onC, h2 = st.q1 && st.offC;
+    rot($('kS1'), st.s1 ? 32 : 0); $('aS1').style.transform = st.s1 ? 'translateX(10px)' : '';
+    rot($('kQ1'), st.q1 ? 0 : -32); $('aQ1').style.transform = st.q1 ? '' : 'translateX(-10px)';
+    var dc = st.onC ? 32 : 0, dd = st.offC ? 32 : 0;
+    rot($('kC'), dc); rot($('kD'), dd); stub('stubC', 420, dc); stub('stubD', 560, dd);
+    $('wQ').classList.toggle('live', st.q1); $('wBus').classList.toggle('live', st.q1);
+    $('wS1').classList.toggle('live', c); $('wC').classList.toggle('live', h1); $('wD').classList.toggle('live', h2);
+    $('fTop').classList.toggle('on', c || h1 || h2);
+    $('fA').classList.toggle('on', c); $('fB').classList.toggle('on', c);
+    $('fH1').classList.toggle('on', h1); $('fH2').classList.toggle('on', h2);
+    $('coil1').style.fill = c ? '#FFE9A8' : '#fff'; $('coil2').style.fill = c ? '#FFE9A8' : '#fff';
+    $('glow1').classList.toggle('on', h1); $('glow2').classList.toggle('on', h2);
+    $('dH1').classList.toggle('on', h1); $('dH2').classList.toggle('on', h2);
+    var timing1 = c && !st.onC, timing2 = st.offTiming;
+    $('cdC').textContent = timing1 ? '⏱ ' + fmt(Math.max(0, st.T - st.tOn)) : '';
+    $('cdD').textContent = timing2 ? '⏱ ' + fmt(Math.max(0, st.T - st.tOff)) : '';
+    var cd1 = $('cd1'), cd2 = $('cd2');
+    cd1.textContent = timing1 ? fmt(Math.max(0, st.T - st.tOn)) : '—'; cd1.className = 'cd' + (timing1 ? ' run' : '');
+    cd2.textContent = timing2 ? fmt(Math.max(0, st.T - st.tOff)) : '—'; cd2.className = 'cd' + (timing2 ? ' run' : '');
+    $('st1').textContent = st.onC ? 'En trabajo' : (timing1 ? 'Contando para entrar…' : 'Reposo'); $('st1').className = 'stt' + (st.onC ? ' work' : '');
+    $('st2').textContent = st.offC ? (timing2 ? 'En trabajo · contando para salir…' : 'En trabajo') : 'Reposo'; $('st2').className = 'stt' + (st.offC ? ' work' : '');
+    var p1 = st.onC ? 1 : (c ? Math.min(1, st.tOn / st.T) : 0);
+    var p2 = st.offC ? (timing2 ? Math.max(0, 1 - st.tOff / st.T) : 1) : 0;
+    bellows($('bell1'), p1); bellows($('bell2'), p2);
+    var b = $('bS1'); b.classList.toggle('on', st.s1); b.setAttribute('aria-pressed', st.s1);
+    $('bQ1').firstChild.nodeValue = st.q1 ? 'Abrir -Q1' : 'Cerrar -Q1';
+    var m = msg(); if (m !== lastMsg){ $('explain').innerHTML = m; lastMsg = m; }
+  }
+
+  /* ---------- cronograma ---------- */
+  var cv = $('cv'), ctx = cv.getContext('2d');
+  function sizeCanvas(){
+    var r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  window.addEventListener('resize', sizeCanvas);
+  var FONT = '"Atkinson Hyperlegible",Verdana,Arial,sans-serif';
+  function arrowLine(x1, x2, y, col){
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.6; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y - 7); ctx.lineTo(x1, y + 7); ctx.moveTo(x2, y - 7); ctx.lineTo(x2, y + 7); ctx.stroke();
+    if (x2 - x1 > 14){
+      ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1 + 7, y - 4); ctx.lineTo(x1 + 7, y + 4); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2 - 7, y - 4); ctx.lineTo(x2 - 7, y + 4); ctx.closePath(); ctx.fill();
+    }
+  }
+  function drawChart(){
+    var W = cv.clientWidth, H = cv.clientHeight;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    var narrow = W < 560;
+    var x0 = narrow ? 112 : 196, x1 = W - 14, span = win(), pps = (x1 - x0) / span, now = st.simT;
+    var X = function(t){ return x1 - (now - t) * pps; };
+    var rows = [
+      { title: 'BOBINAS (-KT1 y -KT2)', hi: 'Con tensión', lo: 'Sin tensión', key: 'c', col: '#D0191C' },
+      { title: '-KT1 a la conexión · 67-68', hi: 'Trabajo', lo: 'Reposo', key: 'a', col: '#1F5FBF', iv: ivOn },
+      { title: '-KT2 a la desconexión · 67-68', hi: 'Trabajo', lo: 'Reposo', key: 'b', col: '#1F5FBF', iv: ivOff }
+    ];
+    var rowH = (H - 6) / 3;
+    rows.forEach(function(rw, i){
+      var top = 4 + i * rowH, hiY = top + 34, loY = top + 64;
+      rw.hiY = hiY; rw.loY = loY;
+      ctx.fillStyle = '#111'; ctx.font = '700 ' + (narrow ? 12 : 14) + 'px ' + FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(rw.title, 8, top + 12);
+      ctx.font = (narrow ? 11 : 13) + 'px ' + FONT; ctx.textAlign = 'right'; ctx.fillStyle = '#333';
+      ctx.fillText(rw.hi, x0 - 8, hiY); ctx.fillText(rw.lo, x0 - 8, loY);
+      ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(x0, hiY); ctx.lineTo(x1, hiY); ctx.moveTo(x0, loY); ctx.lineTo(x1, loY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x0 - 4, hiY - 4); ctx.lineTo(x0 - 4, loY + 4); ctx.stroke();
+    });
+    // líneas discontinuas en cada cambio de la bobina
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, 0, x1 - x0 + 2, H); ctx.clip();
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 1.2; ctx.setLineDash([5, 5]);
+    edges.forEach(function(t){ var x = X(t); if (x < x0 - 2) return; ctx.beginPath(); ctx.moveTo(x, rows[0].hiY - 6); ctx.lineTo(x, H - 4); ctx.stroke(); });
+    ctx.setLineDash([]);
+    // señales
+    rows.forEach(function(rw){
+      ctx.strokeStyle = rw.col; ctx.lineWidth = 4; ctx.lineJoin = 'miter';
+      ctx.beginPath(); var first = true, prev = null;
+      for (var k = 0; k < samples.length; k++){
+        var s = samples[k], y = s[rw.key] ? rw.hiY : rw.loY, x = Math.max(x0, X(s.t));
+        if (first){ ctx.moveTo(x, y); first = false; }
+        else if (prev !== y){ ctx.lineTo(x, prev); ctx.lineTo(x, y); }
+        prev = y;
+      }
+      if (!first) ctx.lineTo(x1, prev);
+      ctx.stroke();
+      // flechas de tiempo
+      if (rw.iv){
+        rw.iv.forEach(function(iv){
+          var a = X(iv.start), e = X(iv.end === null ? now : iv.end);
+          if (e < x0) return; a = Math.max(a, x0);
+          var y = rw.loY + 16, open = iv.end === null;
+          arrowLine(a, e, y, open ? '#B07800' : '#111');
+          var lbl = open ? '…' : (iv.done ? 'T' : '< T');
+          ctx.fillStyle = open ? '#B07800' : '#111'; ctx.font = '700 14px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          if (e - a > 18) ctx.fillText(lbl, (a + e) / 2, y + 3);
+        });
+      }
+    });
+    ctx.restore();
+    // marca de "ahora"
+    ctx.strokeStyle = '#F2B400'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x1, 6); ctx.lineTo(x1, H - 4); ctx.stroke();
+    if (st.frozen){ ctx.fillStyle = 'rgba(31,78,121,.9)'; ctx.font = '700 14px ' + FONT; ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('⏸ congelado', x1 - 6, 6); }
+    else if (st.speed < 1){ ctx.fillStyle = '#1F4E79'; ctx.font = '700 13px ' + FONT; ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('cámara lenta', x1 - 6, 6); }
+  }
+
+  /* ---------- ruleta ---------- */
+  (function(){
+    var g = $('ticks'), html = '';
+    [2, 10, 20, 30].forEach(function(v){
+      var a = (-135 + (v - 2) / 28 * 270) * Math.PI / 180, cx = 48 + Math.sin(a) * 29, cy = 48 - Math.cos(a) * 29;
+      html += '<text x="' + cx.toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" text-anchor="middle" font-family="Atkinson Hyperlegible,Verdana,sans-serif" font-size="11" font-weight="700" fill="#222">' + v + '</text>';
+    });
+    for (var v = 2; v <= 30; v += 2){ var a = (-135 + (v - 2) / 28 * 270) * Math.PI / 180;
+      html += '<line x1="' + (48 + Math.sin(a) * 36).toFixed(1) + '" y1="' + (48 - Math.cos(a) * 36).toFixed(1) + '" x2="' + (48 + Math.sin(a) * 40).toFixed(1) + '" y2="' + (48 - Math.cos(a) * 40).toFixed(1) + '" stroke="#444" stroke-width="2"/>'; }
+    g.innerHTML = html;
+  })();
+  function setT(v){ st.T = v; $('Tv').textContent = v; $('needle').style.transform = 'rotate(' + (-135 + (v - 2) / 28 * 270) + 'deg)'; }
+  $('T').addEventListener('input', function(){ setT(+this.value); });
+  setT(5);
+
+  /* ---------- mandos ---------- */
+  function press(down){ if (st.frozen) return; if (st.auto) setAuto(false); st.s1 = down; }
+  var latched = false, lastDown = 0, skipUp = false;
+  function markLatched(){ $('bS1').classList.toggle('latched', latched); $('gS1').classList.toggle('latched', latched); }
+  function hold(el){
+    el.addEventListener('pointerdown', function(e){
+      e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      var now = Date.now();
+      if (latched){ latched = false; skipUp = true; press(false); markLatched(); return; }
+      if (now - lastDown < 380){ latched = true; skipUp = true; lastDown = 0; press(true); markLatched(); return; }
+      lastDown = now; press(true);
+    });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(function(n){ el.addEventListener(n, function(){
+      if (skipUp){ skipUp = false; return; } if (latched) return; press(false);
+    }); });
+    el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(true); } });
+    el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched) press(false); });
+  }
+  hold($('bS1')); hold($('gS1'));
+  function setAuto(on){
+    st.auto = on; st.autoClock = 0; if (!on) st.s1 = false;
+    if (on){ latched = false; markLatched(); }
+    $('bAuto').classList.toggle('on', on); $('bAuto').setAttribute('aria-pressed', on);
+  }
+  function toggleQ1(){ st.q1 = !st.q1; ev = 'q1'; }
+  function toggleSlow(){ st.speed = st.speed < 1 ? 1 : 0.5; $('bSlow').classList.toggle('on', st.speed < 1); $('bSlow').setAttribute('aria-pressed', st.speed < 1); }
+  function toggleFreeze(){ st.frozen = !st.frozen; $('bFreeze').classList.toggle('on', st.frozen); $('bFreeze').setAttribute('aria-pressed', st.frozen);
+    $('bFreeze').firstChild.nodeValue = st.frozen ? 'Seguir' : 'Congelar'; }
+  $('bAuto').addEventListener('click', function(){ if (!st.frozen) setAuto(!st.auto); });
+  $('bQ1').addEventListener('click', toggleQ1);
+  $('gQ1').addEventListener('click', toggleQ1);
+  $('gQ1').addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggleQ1(); } });
+  $('bSlow').addEventListener('click', toggleSlow);
+  $('bFreeze').addEventListener('click', toggleFreeze);
+  document.addEventListener('keydown', function(e){
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
+    var k = e.key.toLowerCase();
+    if (k === 'm') press(true);
+    if (k === 'c' && !st.frozen) setAuto(!st.auto);
+    if (k === 'q') toggleQ1();
+    if (k === 'l') toggleSlow();
+    if (k === 'f') toggleFreeze();
+  });
+  document.addEventListener('keyup', function(e){ if (e.key.toLowerCase() === 'm' && !latched) press(false); });
+
+  /* ---------- bucle ---------- */
+  var lastTs = null;
+  function loop(ts){
+    if (lastTs === null) lastTs = ts;
+    var dt = Math.min(0.1, (ts - lastTs) / 1000); lastTs = ts;
+    step(dt); render(); drawChart();
+    requestAnimationFrame(loop);
+  }
+  sizeCanvas();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeCanvas);
+  requestAnimationFrame(loop);
+  window.__st = st;
+})();
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#animaciones';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '☀️' : '🌙';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>
