@@ -23,12 +23,13 @@
 *,*::before,*::after{box-sizing:inherit}
 html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
-main{max-width:1180px;margin:0 auto;padding:20px 16px 32px}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
 h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
 h2{font-size:1.1rem;margin:0 0 8px}
 .sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
-.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
 .sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
 .sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
 .side{display:flex;flex-direction:column;gap:12px}
@@ -68,9 +69,9 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .dialrow input{width:100%;accent-color:#1F4E79;height:28px}
 .tval{font-size:1.5rem;font-weight:700}
 /* cronograma */
-.chart{margin-top:18px}
+.chart{margin-top:0}
 .chartwrap{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px}
-.chartwrap canvas{display:block;width:100%;height:330px}
+.chartwrap canvas{display:block;width:100%;height:340px}
 .howread{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.95rem;color:var(--muted);margin:0 0 8px}
 .howread b{color:var(--ink)}
 .sw{display:inline-block;width:26px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
@@ -133,7 +134,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>5.2 El cronograma de los temporizadores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <h1>A la conexión y a la desconexión: el cronograma</h1>
-  <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> (enciende H1) y <b>-KT2 a la desconexión</b> (enciende H2). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de abajo: se dibuja solo. Después prueba una pulsación corta.</p>
+  <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> (enciende H1) y <b>-KT2 a la desconexión</b> (enciende H2). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de la derecha: se dibuja solo. Después prueba una pulsación corta.</p>
 
   <div class="grid">
     <div class="sheet" aria-label="Esquema de mando de los dos temporizadores">
@@ -270,29 +271,18 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       </svg>
     </div>
 
-    <div class="side">
-      <div class="card" aria-label="Estado de los temporizadores">
-        <div class="tm">
-          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell1"></g></svg>
-          <div>
-            <div class="tmname">-KT1 <span class="ty">· a la conexión</span></div>
-            <div id="cd1" class="cd">—</div>
-            <div id="st1" class="stt">Reposo</div>
-            <span class="led"><span id="dH1" class="dot g"></span>H1</span>
-          </div>
-        </div>
-        <div class="tm">
-          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell2"></g></svg>
-          <div>
-            <div class="tmname">-KT2 <span class="ty">· a la desconexión</span></div>
-            <div id="cd2" class="cd">—</div>
-            <div id="st2" class="stt">Reposo</div>
-            <span class="led"><span id="dH2" class="dot a"></span>H2</span>
-          </div>
-        </div>
-        <p class="inside">El <b>fuelle</b> de cada bloque se llena o se vacía <b>despacio</b> por un agujero muy pequeño: eso es lo que marca el tiempo. En el de conexión el aire tarda al <b>entrar</b>; en el de desconexión tarda al <b>salir</b>.</p>
-      </div>
+    <section class="card chart" aria-label="Cronograma en directo">
+    <h2>El cronograma, en directo</h2>
+    <div class="howread">
+      <span>El tiempo va de <b>izquierda a derecha</b>; lo de la derecha es <b>ahora</b>.</span>
+      <span><span class="sw" style="background:#D0191C"></span><b>Bobinas</b>: arriba con tensión, abajo sin tensión.</span>
+      <span><span class="sw" style="background:#1F5FBF"></span><b>Contactos</b>: arriba en trabajo, abajo en reposo.</span>
+      <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
+    </div>
+    <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de la bobina y de los contactos de KT1 y KT2"></canvas></div>
+    </section>
 
+    <div class="side">
       <div class="card">
         <div class="controls">
           <button id="bS1" aria-pressed="false">Pulsador -S1<span class="small">mantén pulsado · tecla M</span></button>
@@ -320,19 +310,31 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
           </div>
         </div>
       </div>
+      <div class="card" aria-label="Estado de los temporizadores">
+        <div class="tm">
+          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell1"></g></svg>
+          <div>
+            <div class="tmname">-KT1 <span class="ty">· a la conexión</span></div>
+            <div id="cd1" class="cd">—</div>
+            <div id="st1" class="stt">Reposo</div>
+            <span class="led"><span id="dH1" class="dot g"></span>H1</span>
+          </div>
+        </div>
+        <div class="tm">
+          <svg viewBox="0 0 78 108" aria-hidden="true"><g id="bell2"></g></svg>
+          <div>
+            <div class="tmname">-KT2 <span class="ty">· a la desconexión</span></div>
+            <div id="cd2" class="cd">—</div>
+            <div id="st2" class="stt">Reposo</div>
+            <span class="led"><span id="dH2" class="dot a"></span>H2</span>
+          </div>
+        </div>
+        <p class="inside">El <b>fuelle</b> de cada bloque se llena o se vacía <b>despacio</b> por un agujero muy pequeño: eso es lo que marca el tiempo. En el de conexión el aire tarda al <b>entrar</b>; en el de desconexión tarda al <b>salir</b>.</p>
+      </div>
+
     </div>
   </div>
 
-  <section class="card chart" aria-label="Cronograma en directo">
-    <h2>El cronograma, en directo</h2>
-    <div class="howread">
-      <span>El tiempo va de <b>izquierda a derecha</b>; lo de la derecha es <b>ahora</b>.</span>
-      <span><span class="sw" style="background:#D0191C"></span><b>Bobinas</b>: arriba con tensión, abajo sin tensión.</span>
-      <span><span class="sw" style="background:#1F5FBF"></span><b>Contactos</b>: arriba en trabajo, abajo en reposo.</span>
-      <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
-    </div>
-    <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de la bobina y de los contactos de KT1 y KT2"></canvas></div>
-  </section>
 
   <div class="card explain" id="explain" aria-live="polite" style="margin-top:14px"></div>
 
