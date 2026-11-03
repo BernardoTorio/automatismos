@@ -72,6 +72,7 @@ Q magnetotérmico/diferencial · F fusible y relé térmico · S pulsadores y de
 - Contactores: principales 1-2, 3-4, 5-6 + auxiliar **13-14 (NA)**, **sin 21-22**; bloque frontal de 4 contactos **53-54 NA, 61-62 NC, 71-72 NC, 83-84 NA**.
 - Relés auxiliares: enchufables en base, conmutados de 3 tornillos por contacto, **común arriba** en el símbolo (11 arriba; 12 NC y 14 NA abajo; 21 / 22-24 el segundo…). De 2, 3 y 4 contactos (8, 11 y 14 tornillos). La base usa además numeración **1-14**: NC = n, NA = n+4, común = n+8, bobina 13 (A1) y 14 (A2). El de 2 contactos usa las posiciones 1.ª y 4.ª; el de 3, las tres primeras (pendiente de confirmar con la pegatina real).
 - Relé térmico: 95-96 NC y 97-98 NA.
+- Finales de carrera: **NC 1-2** y **NA 3-4** (como los pulsadores).
 - Detector fotoeléctrico: alimentación a 230 V (L, N) y salida por relé conmutado COM / NC / NA sin números (cables por colores según la leyenda del aparato).
 - El mando del aula va a **230 V**.
 - "Borne" = **tornillo** del aparato (así lo entienden mejor).
