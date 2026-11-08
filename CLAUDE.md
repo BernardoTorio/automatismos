@@ -9,7 +9,7 @@ Los alumnos entran desde **códigos QR impresos en los apuntes**, que apuntan a 
 
 ## Estructura del repositorio
 ```
-index.html                 portada con cinco "carpetas": Temas, Prácticas, Animaciones, Tests, Medidas
+index.html                 portada con seis "carpetas": Temas, Prácticas, Ejercicios, Animaciones, Tests, Medidas
 test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modos en orden, al azar y por temas; saltos de 1 en 1 y de 10 en 10)
 test_28oct_II.html         test II examen 28 de octubre (100 preguntas nuevas, con peso en medidas y averías; mismo motor)
 test_diciembre.html        test examen de diciembre (Práctica 3)
@@ -20,6 +20,7 @@ temas/                     apuntes en PDF
   T1_Esquemas_basicos_Automatismos.pdf
   T2_Dispositivos_basicos_Automatismos.pdf
   T3_Conexionado_basico_II_Automatismos.pdf
+ejercicios/                problemas en PDF (T6_Ejercicios_Dimensionamiento_protecciones.pdf)
 practicas/                 fichas de prácticas en PDF
   P1_Automatismos.pdf      Cableados iniciales
   P2_Automatismos.pdf      Cableados iniciales II
@@ -30,7 +31,8 @@ subir.bat                  publica todo con doble clic
 - El Tema 3 se llama **"Conexionado básico II"** (no "Conexionado complejo").
 
 ## index.html
-- Arriba, cinco carpetas que funcionan como pestañas: `#temas` (por defecto), `#practicas`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-temas`, `sec-practicas`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`.
+- Arriba, seis carpetas que funcionan como pestañas: `#temas` (por defecto), `#practicas`, `#ejercicios`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-temas`, `sec-practicas`, `sec-ejercicios`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`.
+- Ejercicios: PDF de problemas y, debajo, las animaciones que ayudan a hacerlos (también salen en Animaciones). Esas animaciones vuelven a `index.html#ejercicios`.
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
 - Tests: una tarjeta por test; el test vuelve a `index.html#tests`.
@@ -50,6 +52,13 @@ subir.bat                  publica todo con doble clic
 | 3.8 | `rele_base.html` | Base (1-14), pegatina de dos fabricantes y esquema; modos Explorar / Polímetro / Reto |
 | 3.9 | `arranque_motor.html` | Arranque directo: fuerza + mando, térmico con sobrecarga y RESET |
 | 3.10 | `inversion_giro.html` | Inversión de giro: fuerza (KM2 cruza L1-L3) + mando con enclavamiento y F2 |
+
+## Animaciones del Tema 6 · Dimensionamiento de protecciones (carpeta Ejercicios)
+| Apdo. | Archivo | Qué muestra |
+|---|---|---|
+| 6.4 | `intensidad_calor.html` | Motor de 11 kW: intensidad y calor del cable según tensión (230/400/690 V) y sección; pico de arranque a cámara lenta; sobrecarga |
+| 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motor de placa, subir/bajar calibre y sección; qué falla y qué cambiar; modo reto |
+| 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre; zona, tiempos de la tabla (columna siguiente) y comprobación de arranque |
 
 ## Criterios de dibujo de los esquemas (obligatorios)
 - **Colores**: conductor de fase **rojo**, neutro **azul**; símbolos, nombres y números en **negro**. (Son colores de dibujo, no los de los cables reales.)

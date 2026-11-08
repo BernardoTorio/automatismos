@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La intensidad calienta los cables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:40vh}
+.lay2{grid-template-areas:'svg side' 'chart side'}
+.a-svg{grid-area:svg}.a-chart{grid-area:chart}.a-side{grid-area:side}
+@media (max-width:900px){.lay2{grid-template-areas:'svg' 'side' 'chart'}}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif;fill:#1a1a1a}
+#cv{display:block;width:100%;height:260px}
+.howread{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.92rem;color:#56606b;margin:2px 4px 6px}
+.howread b{color:#1a1a1a}
+.sw{display:inline-block;width:26px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.sw.dash{background-image:linear-gradient(90deg,transparent 50%,#fff 50%)!important;background-size:8px 5px}
+.meter{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mlab{font-size:.85rem;color:var(--muted);font-weight:700}
+.mbig{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+.therm{position:relative;height:18px;border-radius:9px;background:linear-gradient(90deg,#3DBB4E 0%,#F2B400 45%,#E8590C 55%,#C0392B 100%);margin-top:10px;overflow:hidden}
+.tfill{position:absolute;right:0;top:0;bottom:0;background:var(--btn);opacity:.88;transition:width .1s}
+.tmark{position:absolute;top:-2px;bottom:-2px;width:3px;background:#1a1a1a}
+.tlab{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-top:3px}
+.speed{margin-top:8px;font-weight:700;font-size:.95rem}
+
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.4 La intensidad y el calor</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <h1>La intensidad calienta los cables</h1>
+  <p class="sub">Un motor de <b>11 kW</b> conectado con un cable. Arráncalo y mira cuánta corriente pasa, cuánto se calienta el cable y qué pasa al subir la tensión o la sección. Fíjate también en el <b>pico de arranque</b>.</p>
+
+  <div class="layout lay2">
+      <div class="sheet a-svg" aria-label="Red, cable y motor">
+        <svg id="svg" viewBox="0 0 760 250" role="img" aria-label="Un cable lleva la corriente de la red al motor; se calienta según la intensidad"></svg>
+      </div>
+      <div class="sheet a-chart">
+        <div class="howread"><span><i class="sw" style="background:#D0191C"></i><b>Intensidad</b> que pasa por cada fase</span><span><i class="sw dash" style="background:#888"></i>la de la placa</span><span><i class="sw dash" style="background:#1F5FBF"></i>lo que aguanta el cable (I<sub>z</sub>)</span></div>
+        <canvas id="cv" aria-label="Gráfica de la intensidad en el tiempo"></canvas>
+      </div>
+    <div class="side a-side">
+      <div class="card ctl">
+        <h3>Tensión de la red</h3>
+        <div class="seg" id="segV"><button data-v="230">230 V</button><button data-v="400">400 V</button><button data-v="690">690 V</button></div>
+        <p class="foot" style="margin:6px 0 0">Siempre la misma potencia: <b>11 kW</b>.</p>
+      </div>
+      <div class="card ctl">
+        <h3>Sección del cable</h3>
+        <div class="seg" id="segC"></div>
+      </div>
+      <div class="card ctl">
+        <h3>El motor</h3>
+        <div class="seg"><button id="bStart" class="go">Arrancar</button><button id="bStop">Parar</button></div>
+        <div class="seg" style="margin-top:8px"><button id="bBrake">Frenar el eje (sobrecarga)</button></div>
+        <div class="seg" style="margin-top:8px"><button id="bCool">Enfriar el cable</button></div>
+      </div>
+      <div class="card">
+        <div class="meter"><div><div class="mlab">Pinza</div><div class="mbig" id="mI">0 A</div></div><div><div class="mlab">Cable</div><div class="mbig" id="mT">25 °C</div></div></div>
+        <div class="therm"><div class="tfill" id="tFill"></div><div class="tmark" style="left:50%"></div></div>
+        <div class="tlab"><span>20 °C</span><span>70 °C: máximo del aislante</span><span>120 °C</span></div>
+        <div class="speed" id="speed"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto">
+      <h2>Qué es la intensidad</h2>
+      <p style="margin:0">La <b>intensidad</b> es la cantidad de electricidad que pasa por un cable cada segundo. Se mide en <b>amperios (A)</b>, con la <b>pinza amperimétrica</b>.</p>
+      <p style="margin:8px 0 0">Piensa en una tubería de agua: la <b>tensión</b> (voltios) es la presión, y la <b>intensidad</b> es el caudal, el agua que pasa. Un cable más grueso es como una tubería más ancha.</p>
+    </div>
+    <div class="card ojo">
+      <h2>Por qué se calientan los cables</h2>
+      <p style="margin:0">Al pasar, la corriente «roza» con el cobre y lo <b>calienta</b>. Cuanta más intensidad, mucho más calor: con el doble de amperios, el cable se calienta <b>cuatro veces más</b>.</p>
+      <p style="margin:8px 0 0">El aislante de PVC aguanta unos <b>70 °C</b>. La corriente que deja el cable justo a esa temperatura es su <b>I<sub>z</sub></b>: lo que aguanta.</p>
+    </div>
+    <div class="card howto">
+      <h2>Por qué ayuda subir la tensión</h2>
+      <p style="margin:0">Para dar la <b>misma potencia</b>, si la tensión es más alta hace falta <b>menos intensidad</b>: a 230 V el motor de 11 kW pide 37,2 A; a 400 V, 21,5 A; a 690 V, 12,4 A.</p>
+      <p style="margin:8px 0 0">Menos intensidad = menos calor = <b>cables más finos y baratos</b>. Por eso las fábricas usan 400 V y la electricidad viaja por las líneas a miles de voltios.</p>
+    </div>
+    <div class="card ojo">
+      <h2>El pico de arranque</h2>
+      <p style="margin:0">Al arrancar, el motor pide de golpe de <b>5 a 8 veces</b> su corriente (aquí, 7 veces). Dura muy poco, <b>menos de un segundo</b>: el cable casi no se calienta.</p>
+      <p style="margin:8px 0 0">Pero el <b>magnetotérmico sí lo ve</b>: por eso a los motores se les pone curva C o D, que no saltan con ese pico.</p>
+    </div>
+    <div class="card wide">
+      <h2>Cómo funciona esta animación</h2>
+      <ul>
+        <li>Pulsa <b>Arrancar</b> y mira la gráfica: el pico de arranque se ve <b>a cámara lenta</b>; después el tiempo va <b>acelerado</b> para que se vea cómo se calienta el cable.</li>
+        <li>Cambia la <b>tensión</b>: la potencia es siempre la misma, pero la intensidad cambia. Mira cuánto se calienta el cable con cada una.</li>
+        <li>Cambia la <b>sección</b>: un cable más grueso aguanta más (su I<sub>z</sub> sube) y se calienta menos.</li>
+        <li><b>Frenar el eje</b> hace que el motor pida más de lo normal (sobrecarga). Aquí no hay protecciones: verás qué le pasa al cable.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+<script>
+
+(function(){
+var $=function(i){return document.getElementById(i);};
+var NS='http://www.w3.org/2000/svg';
+var INOM={230:37.2,400:21.5,690:12.4};
+var CAB=[[1.5,16.5],[2.5,23],[4,31],[6,40],[10,54]];
+var st={V:400,c:1,mode:'off',te:0,load:1,T:25,I:0,off:0,hist:[],tScreen:0};
+function f(x,d){ d=d===undefined?1:d; return x.toFixed(d).replace('.',','); }
+// botones
+var segC=$('segC'); CAB.forEach(function(c,i){ var b=document.createElement('button'); b.textContent=String(c[0]).replace('.',','); b.dataset.i=i; b.title=c[0]+' mm²'; segC.appendChild(b); });
+function paintBtns(){
+  [].forEach.call(document.querySelectorAll('#segV button'),function(b){ b.classList.toggle('on', +b.dataset.v===st.V); });
+  [].forEach.call(document.querySelectorAll('#segC button'),function(b){ b.classList.toggle('on', +b.dataset.i===st.c); });
+  $('bBrake').classList.toggle('on', st.load>1);
+}
+[].forEach.call(document.querySelectorAll('#segV button'),function(b){ b.onclick=function(){ st.V=+b.dataset.v; paintBtns(); }; });
+[].forEach.call(document.querySelectorAll('#segC button'),function(b){ b.onclick=function(){ st.c=+b.dataset.i; paintBtns(); }; });
+$('bStart').onclick=function(){ if(st.mode==='off'){ st.mode='start'; st.te=0; } };
+$('bStop').onclick=function(){ st.mode='off'; st.load=1; paintBtns(); };
+$('bBrake').onclick=function(){ st.load=st.load>1?1:1.35; paintBtns(); };
+$('bCool').onclick=function(){ st.T=25; };
+// dibujo fijo
+var svg=$('svg');
+function el(tag,a,t){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(t!==undefined) e.textContent=t; svg.appendChild(e); return e; }
+var gRed=el('rect',{x:16,y:70,width:96,height:70,rx:10,fill:'#fff',stroke:'#1a1a1a','stroke-width':2.5});
+var tRed1=el('text',{x:64,y:98,'text-anchor':'middle','font-size':15,'class':'lbl'},'Red');
+var tRed2=el('text',{x:64,y:126,'text-anchor':'middle','font-size':22,'font-weight':700,'class':'lbl'},'400 V');
+var ins=el('line',{x1:112,y1:105,x2:596,y2:105,'stroke-linecap':'round'});
+var core=el('line',{x1:112,y1:105,x2:596,y2:105,stroke:'#C46A2B','stroke-linecap':'round'});
+var dots=[]; for(var i=0;i<22;i++) dots.push(el('circle',{r:4,fill:'#FFE066',stroke:'#7a4a00','stroke-width':1}));
+var heat=[]; for(var i=0;i<6;i++) heat.push(el('path',{fill:'none',stroke:'#E8590C','stroke-width':2.5,'stroke-linecap':'round',opacity:0}));
+el('circle',{cx:648,cy:105,r:46,fill:'#fff',stroke:'#1a1a1a','stroke-width':3});
+el('text',{x:648,y:105,'text-anchor':'middle','font-size':22,'font-weight':700,'class':'lbl'},'M');
+el('text',{x:648,y:127,'text-anchor':'middle','font-size':15,'class':'lbl'},'3~ · 11 kW');
+el('line',{x1:694,y1:105,x2:716,y2:105,stroke:'#1a1a1a','stroke-width':6});
+el('circle',{cx:732,cy:105,r:18,fill:'#fff',stroke:'#1a1a1a','stroke-width':3});
+var rotor=el('line',{x1:732,y1:105,x2:732,y2:90,stroke:'#2E8B3E','stroke-width':4,'stroke-linecap':'round'});
+// pinza
+el('path',{d:'M206 70 a36 36 0 1 0 0.1 0',fill:'none',stroke:'#C55A11','stroke-width':6});
+el('rect',{x:186,y:150,width:40,height:52,rx:6,fill:'#C55A11'});
+var tPinza=el('text',{x:206,y:228,'text-anchor':'middle','font-size':18,'font-weight':700,'class':'lbl'},'0 A');
+el('text',{x:206,y:50,'text-anchor':'middle','font-size':13,'class':'lbl',fill:'#56606b'},'pinza');
+var tCab=el('text',{x:400,y:56,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl'},'');
+var tCab2=el('text',{x:400,y:168,'text-anchor':'middle','font-size':15,'class':'lbl',fill:'#1F5FBF'},'');
+var tWarn=el('text',{x:400,y:196,'text-anchor':'middle','font-size':15,'font-weight':700,'class':'lbl',fill:'#C0392B'},'');
+function mix(a,b,t){ t=Math.max(0,Math.min(1,t)); var pa=[parseInt(a.substr(1,2),16),parseInt(a.substr(3,2),16),parseInt(a.substr(5,2),16)], pb=[parseInt(b.substr(1,2),16),parseInt(b.substr(3,2),16),parseInt(b.substr(5,2),16)];
+  return 'rgb('+pa.map(function(v,i){return Math.round(v+(pb[i]-v)*t);}).join(',')+')'; }
+function tempColor(T){ if(T<45) return mix('#8a949e','#9a8f7a',(T-25)/20); if(T<70) return mix('#9a8f7a','#F08C00',(T-45)/25); return mix('#F08C00','#D00000',(T-70)/30); }
+// canvas
+var cv=$('cv'), ctx=cv.getContext('2d');
+function size(){ var r=cv.getBoundingClientRect(), d=window.devicePixelRatio||1; cv.width=r.width*d; cv.height=r.height*d; ctx.setTransform(d,0,0,d,0,0); }
+window.addEventListener('resize',size);
+var WIN=20;
+function chart(){
+  var w=cv.clientWidth,h=cv.clientHeight; ctx.clearRect(0,0,w,h);
+  var In=INOM[st.V], Iz=CAB[st.c][1];
+  var ymax=Math.max(In*7.6,Iz*1.4,60); ymax=Math.ceil(ymax/20)*20;
+  var L=52,R2=w-12,T0=10,B=h-30;
+  function X(t){ return L+(R2-L)*(t-(st.tScreen-WIN))/WIN; } function Y(v){ return B-(B-T0)*v/ymax; }
+  ctx.font='12px "Atkinson Hyperlegible",Verdana,sans-serif'; ctx.fillStyle='#56606b'; ctx.strokeStyle='#e3e7eb'; ctx.lineWidth=1;
+  var step=ymax>200?50:(ymax>100?20:10);
+  for(var v=0;v<=ymax;v+=step){ ctx.beginPath(); ctx.moveTo(L,Y(v)); ctx.lineTo(R2,Y(v)); ctx.stroke(); ctx.fillText(v+' A',4,Y(v)+4); }
+  ctx.fillText('tiempo (pantalla) →',R2-120,h-8);
+  ctx.setLineDash([7,5]); ctx.lineWidth=2;
+  ctx.strokeStyle='#888'; ctx.beginPath(); ctx.moveTo(L,Y(In)); ctx.lineTo(R2,Y(In)); ctx.stroke();
+  ctx.strokeStyle='#1F5FBF'; ctx.beginPath(); ctx.moveTo(L,Y(Iz)); ctx.lineTo(R2,Y(Iz)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#1F5FBF'; ctx.fillText('Iz = '+f(Iz)+' A',L+4,Y(Iz)-5);
+  ctx.fillStyle='#666'; ctx.fillText('placa '+f(In)+' A',L+110,Y(In)-5);
+  ctx.strokeStyle='#D0191C'; ctx.lineWidth=3; ctx.beginPath();
+  st.hist.forEach(function(p,i){ var x=X(p[0]); if(i) ctx.lineTo(x,Y(p[1])); else ctx.moveTo(x,Y(p[1])); }); ctx.stroke();
+  var pk=null; st.hist.forEach(function(p){ if(p[2]&&(!pk||p[1]>pk[1])) pk=p; });
+  if(pk&&pk[1]>In*2){ ctx.fillStyle='#D0191C'; ctx.font='bold 13px "Atkinson Hyperlegible",Verdana,sans-serif'; ctx.fillText('pico de arranque (cámara lenta)',Math.min(X(pk[0])+8,R2-210),Y(pk[1])+14); }
+}
+function step(dtS){
+  var speed=st.mode==='start'?0.25:12; var dt=dtS*speed;
+  var In=INOM[st.V], Iz=CAB[st.c][1], I=0;
+  if(st.mode==='start'){ st.te+=dt; var u=Math.min(1,st.te/0.6); I=In*(1+6*Math.pow(1-u,1.4)); if(st.te>=0.6){ st.mode='run'; } }
+  else if(st.mode==='run') I=In*st.load;
+  st.I=I;
+  var Tss=25+45*Math.pow(I/Iz,2); st.T+=(Tss-st.T)*Math.min(1,dt/90);
+  st.tScreen+=dtS; st.hist.push([st.tScreen,I,st.mode==='start']); while(st.hist.length&&st.hist[0][0]<st.tScreen-WIN-1) st.hist.shift();
+  st.off=(st.off+dtS*I*2.2)%22;
+  st.rot=(st.rot||0)+dtS*(st.mode==='off'?0:(st.mode==='start'?2:8));
+}
+function render(){
+  var S=CAB[st.c][0], Iz=CAB[st.c][1], In=INOM[st.V];
+  tRed2.textContent=st.V+' V';
+  var w=8+Math.sqrt(S)*6;
+  ins.setAttribute('stroke',tempColor(st.T)); ins.setAttribute('stroke-width',w+12);
+  core.setAttribute('stroke-width',w);
+  dots.forEach(function(d,i){ var x=112+((i*22+st.off)%484); d.setAttribute('cx',x); d.setAttribute('cy',105); d.setAttribute('opacity',st.I>0.01?1:0.25); });
+  var hot=Math.max(0,Math.min(1,(st.T-48)/30));
+  heat.forEach(function(p,i){ var x=150+i*75, y0=105-w/2-12; p.setAttribute('d','M'+x+' '+y0+' q -8 -10 0 -20 q 8 -10 0 -20'); p.setAttribute('opacity',hot); });
+  tPinza.textContent=f(st.I)+' A';
+  tCab.textContent='Cable de '+String(S).replace('.',',')+' mm²';
+  tCab2.textContent='aguanta Iz = '+f(Iz)+' A';
+  tWarn.textContent=st.T>70?(st.T>95?'¡el aislante se quema!':'¡pasa de 70 °C: el aislante se estropea!'):'';
+  var a=st.rot*Math.PI; rotor.setAttribute('x2',732+15*Math.sin(a)); rotor.setAttribute('y2',105-15*Math.cos(a));
+  $('mI').textContent=f(st.I)+' A'; $('mT').textContent=Math.round(st.T)+' °C';
+  $('mT').style.color=st.T>70?'#C0392B':'';
+  $('tFill').style.width=(100-Math.max(0,Math.min(100,(st.T-20)))) + '%';
+  $('speed').textContent=st.mode==='start'?'▶ Arranque a cámara lenta (×¼)':(st.mode==='run'?'⏩ Tiempo acelerado (×12) para ver el calor':'');
+  explain();
+}
+var lastHtml='';
+function explain(){
+  var S=String(CAB[st.c][0]).replace('.',','), Iz=CAB[st.c][1], In=INOM[st.V], h='';
+  var Tss=25+45*Math.pow(In*st.load/Iz,2);
+  if(st.mode==='off') h='<p>El motor está <b>parado</b>: no pasa corriente y el cable no se calienta. Pulsa <b>Arrancar</b>.</p><p>Con la red de <b>'+st.V+' V</b>, este motor de 11 kW pedirá <b>'+f(In)+' A</b> por fase.</p>';
+  else if(st.mode==='start') h='<p><b>¡Arranque!</b> El motor pide de golpe hasta <b>'+f(In*7)+' A</b>, 7 veces su corriente. Dura menos de un segundo (aquí lo ves a cámara lenta).</p><p>El cable casi no se calienta porque dura muy poco, pero el <b>magnetotérmico lo ve</b>: por eso los motores llevan curva C o D.</p>';
+  else {
+    h='<p>El motor gira y pide <b>'+f(In*st.load)+' A</b>'+(st.load>1?' (<b>sobrecarga</b>: el eje frenado le hace pedir un 35 % más)':' (la de la placa a '+st.V+' V)')+'. El cable de '+S+' mm² aguanta <b>'+f(Iz)+' A</b>.</p>';
+    if(In*st.load<=Iz) h+='<p><span class="ok">✔ Pasa menos de lo que aguanta el cable:</span> se queda en unos <b>'+Math.round(Tss)+' °C</b>, por debajo de los 70 °C del aislante.</p>';
+    else h+='<p><span class="bad">✘ Pasa más de lo que aguanta el cable:</span> se calienta hasta unos <b>'+Math.round(Tss)+' °C</b> y el aislante se estropea. '+(st.load>1?'Aquí no hay protecciones; en la realidad saltaría el <b>relé térmico</b>.':'Este cable es <b>demasiado fino</b> para esta corriente: sube la sección o sube la tensión.')+'</p>';
+    if(st.V===230) h+='<p>Prueba a cambiar a <b>400 V</b>: la misma potencia con menos intensidad.</p>';
+  }
+  if(h!==lastHtml){ $('now').innerHTML=h; lastHtml=h; }
+}
+var last=null;
+function loop(ts){ if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000); last=ts; step(dt); render(); chart(); requestAnimationFrame(loop); }
+document.addEventListener('keydown',function(e){ var k=e.key.toLowerCase(); if(k==='a') $('bStart').click(); if(k==='p') $('bStop').click(); if(k==='f') $('bBrake').click(); });
+paintBtns(); size(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(size);
+requestAnimationFrame(loop);
+window.__st=st;
+})();
+
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>
