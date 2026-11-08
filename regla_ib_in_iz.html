@@ -87,6 +87,17 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 #svg{max-height:62vh}
 .lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif;fill:#1a1a1a}
 .badge rect{rx:10}
+.cb{border-width:3px;padding-top:0;overflow:hidden}
+.cb h3{margin:0 -16px 10px;padding:8px 16px;color:#fff}
+.cR{border-color:#D0191C}.cR h3{background:#D0191C}
+.cK{border-color:#1a1a1a}.cK h3{background:#1a1a1a}
+.cB{border-color:#1F5FBF}.cB h3{background:#1F5FBF}
+:root[data-theme="dark"] .cK{border-color:#8a939c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cK{border-color:#8a939c}}
+.cR .val{color:#D0191C}.cB .val{color:#1F5FBF}
+:root[data-theme="dark"] .cR .val{color:#ff6b6b} :root[data-theme="dark"] .cB .val{color:#7fb0ff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cR .val{color:#ff6b6b} :root:not([data-theme="light"]) .cB .val{color:#7fb0ff}}
+.cR .val small,.cB .val small{color:var(--muted)}
 
 </style>
 </head>
@@ -101,16 +112,16 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
       <svg id="svg" viewBox="0 0 760 460" role="img" aria-label="Magnetotérmico, cable y motor, y una regla con IB, In e Iz"></svg>
     </div>
     <div class="side">
-      <div class="card ctl">
+      <div class="card ctl cb cR">
         <h3>1 · El motor (I<sub>B</sub>)</h3>
         <div class="row"><button id="mDown" aria-label="Motor más pequeño">◀</button><div class="val" id="vMot"></div><button id="mUp" aria-label="Motor más grande">▶</button></div>
         <p class="foot" style="margin:6px 0 0">Viene de la placa. <b>No se toca.</b></p>
       </div>
-      <div class="card ctl">
+      <div class="card ctl cb cK">
         <h3>2 · El magnetotérmico (I<sub>n</sub>)</h3>
         <div class="row"><button id="qDown">◀ Bajar</button><div class="val" id="vCal"></div><button id="qUp">Subir ▶</button></div>
       </div>
-      <div class="card ctl">
+      <div class="card ctl cb cB">
         <h3>3 · El cable (I<sub>z</sub>)</h3>
         <div class="row"><button id="cDown">◀ Más fino</button><div class="val" id="vCab"></div><button id="cUp">Más grueso ▶</button></div>
       </div>
