@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Un cuadro con varios motores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:62vh}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
+.mot{border:2px solid var(--line);border-left-width:8px;border-radius:10px;padding:8px 10px;margin-top:8px;cursor:pointer}
+.mot.sel{box-shadow:0 0 0 3px #1F4E79 inset}
+.mot .mh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+.mot select{font:inherit;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--btn);color:var(--ink);width:100%;margin:6px 0}
+.mot .seg button{padding:6px 4px;font-size:.88rem}
+.mot button.x{padding:2px 9px;font-size:.9rem}
+.mot .ib{font-size:.9rem;margin-top:4px}
+button.red{background:#C0392B;color:#fff;border-color:#C0392B}
+.plate{padding:10px}
+.plate svg{max-height:34vh}
+.ptit{font-weight:700;margin:0 4px 6px;color:#1a1a1a}
+.pnote{margin:6px 4px 0;font-size:.95rem;color:#1a1a1a}
+.pnote .bad{color:#C0392B;font-weight:700}.pnote .ok{color:#2E8B3E;font-weight:700}
+
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.11 Cuadro con varios motores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <h1>Un cuadro con varios motores</h1>
+  <p class="sub">Añade motores leyendo su <b>placa</b> (¿estrella o triángulo?). Mira cómo se calcula la <b>línea general</b>, qué marcan las <b>pinzas</b> en las tres fases, qué pasa si a un motor le <b>falta una fase</b> y qué salta con un <b>cortocircuito</b>.</p>
+
+  <div class="layout">
+    <div>
+      <div class="sheet" aria-label="Cuadro con la línea general y las líneas de los motores">
+        <svg id="svg" viewBox="0 0 780 470" role="img" aria-label="Línea general y líneas de los motores con sus protecciones"></svg>
+      </div>
+      <div class="sheet plate" style="margin-top:12px">
+        <div class="ptit" id="pTit"></div>
+        <svg id="plate" viewBox="0 0 400 230" role="img" aria-label="Placa del motor"></svg>
+        <p class="pnote" id="pNote"></p>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card ctl">
+        <h3>Línea general (-Q0)</h3>
+        <div class="row"><button id="gDown" aria-label="Calibre general más pequeño">◀</button><div class="val" id="vG"></div><button id="gUp" aria-label="Calibre general más grande">▶</button></div>
+        <div class="seg" style="margin-top:8px"><button id="gAuto">Calcularla bien</button><button id="gReset">Rearmar -Q0</button></div>
+      </div>
+      <div class="card ctl">
+        <h3>Motores (red de 400 V)</h3>
+        <div id="mots"></div>
+        <div class="seg" style="margin-top:8px"><button id="bAdd" class="go">+ Añadir motor</button></div>
+        <div class="seg" style="margin-top:8px"><button id="bAll">Todos en marcha</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto">
+      <h2>Leer la placa: ¿estrella o triángulo?</h2>
+      <p style="margin:0">La placa trae dos cajas: <b>Y</b> (estrella) y <b>Δ</b> (triángulo). Cada una dice la tensión y la corriente del motor conectado así. <b>Lee la caja de la conexión que te digan.</b></p>
+      <p style="margin:8px 0 0">Con la red de <b>400 V</b>, la caja que vale es la que pone <b>400 V</b>: los motores pequeños (230/400 V) van en <b>estrella</b> y los grandes (400/690 V), en <b>triángulo</b>.</p>
+    </div>
+    <div class="card howto">
+      <h2>La línea general</h2>
+      <ul style="margin-top:0">
+        <li>Su corriente es la <b>suma</b> de las de todos los motores que pueden funcionar a la vez.</li>
+        <li>Su calibre: el primero <b>igual o mayor</b> que esa suma… y <b>mayor que el más grande</b> de las líneas de abajo.</li>
+        <li>Así, con una avería en un motor salta <b>solo su protección</b> y los demás siguen: es la <b>selectividad</b>.</li>
+        <li>Y el cable de la general, como siempre: I<sub>n</sub> ≤ I<sub>z</sub>.</li>
+      </ul>
+    </div>
+    <div class="card ojo">
+      <h2>Las tres fases llevan la misma corriente</h2>
+      <p style="margin:0">En un motor trifásico sano, las tres fases (L1, L2, L3) llevan <b>la misma corriente</b>: el consumo es <b>simétrico</b>. Con la pinza tienes que leer lo mismo en las tres.</p>
+      <p style="margin:8px 0 0">Si <b>una fase marca 0 A</b> y las otras suben: <b>falta una fase</b> (fusible fundido, tornillo suelto, contacto quemado). El motor zumba, se calienta y acaba saltando el térmico.</p>
+    </div>
+    <div class="card">
+      <h2>Cómo funciona esta animación</h2>
+      <ul style="margin-top:0">
+        <li>Añade motores (hasta 4). Para cada uno elige la <b>placa</b> y si va en <b>estrella o triángulo</b>: abajo ves su placa y la caja que estás leyendo.</li>
+        <li>Cada línea se dimensiona sola con las reglas del tema. La <b>general</b> también, pero puedes cambiar su calibre para ver qué pasa.</li>
+        <li>Pon motores en <b>marcha</b> y mira las pinzas. Prueba <b>Quitar una fase</b> y <b>Cortocircuito</b>.</li>
+        <li>El tiempo va acelerado.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+<script>
+
+(function(){
+var $=function(i){return document.getElementById(i);};
+var NS='http://www.w3.org/2000/svg';
+// placa: kW, rpm, cos, [V,I] en Δ, [V,I] en Y
+var P=[['0,75',1395,'0,75',[230,3.2],[400,1.85]],['1,5',1415,'0,79',[230,6.0],[400,3.5]],['2,2',1420,'0,81',[230,8.4],[400,4.85]],['3',1435,'0,82',[230,11.0],[400,6.4]],['4',1440,'0,83',[230,14.3],[400,8.3]],
+       ['5,5',1450,'0,84',[400,11],[690,6.4]],['7,5',1455,'0,85',[400,14.8],[690,8.6]],['11',1460,'0,85',[400,21.5],[690,12.4]],['15',1465,'0,86',[400,28.5],[690,16.5]]];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100];
+var CAB=[[1.5,16.5],[2.5,23],[4,31],[6,40],[10,54],[16,73],[25,95],[35,119]];
+var TERM=[[1.6,2.5],[2.5,4],[4,6],[6,9],[9,13],[13,18],[18,25],[25,32],[32,40]];
+var MCOL=['#7b2cbf','#d6336c','#0b7285','#5c4033'];
+var st={mots:[{p:3,c:'Y'},{p:6,c:'D'},{p:7,c:'D'}].map(mk),sel:0,gOff:0,gTrip:false,gh:0,msg:''};
+function mk(o){ return {p:o.p,c:o.c,on:false,fase:false,trip:null,h:0}; }
+function f(x,d){ if(d===undefined) d=(Math.abs(x-Math.round(x))<1e-9?0:(x>=100?0:(x>=10?1:2))); var s=x.toFixed(d); if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
+function box(mo){ var pl=P[mo.p]; return mo.c==='D'?pl[3]:pl[4]; }
+function IB(mo){ return box(mo)[1]; }
+function okCon(mo){ return box(mo)[0]===400; }
+function line(mo){
+  var ib=IB(mo), ci=CAL.findIndex(function(c){return c>=ib;}), cur;
+  while(true){ var x=6*ib/CAL[ci]; if(x<5){cur='C';break;} if(x<10){cur='D';break;} ci++; }
+  var cal=CAL[ci], cab=CAB.find(function(c){return c[1]>=cal;}), th=TERM.find(function(t){return t[0]<=ib&&ib<=t[1];})||TERM[TERM.length-1];
+  return {cal:cal,ci:ci,cur:cur,cab:cab,th:th,ib:ib};
+}
+function gen(){
+  var sum=st.mots.reduce(function(a,m){return a+IB(m);},0);
+  var mx=Math.max.apply(null,st.mots.map(function(m){return line(m).cal;}).concat([0]));
+  var ai=CAL.findIndex(function(c){return c>=sum&&c>mx;}); if(ai<0) ai=CAL.length-1;
+  var gi=Math.max(0,Math.min(CAL.length-1,ai+st.gOff));
+  var cal=CAL[gi], cab=CAB.find(function(c){return c[1]>=cal;})||CAB[CAB.length-1];
+  return {sum:sum,mx:mx,auto:CAL[ai],cal:cal,gi:gi,cab:cab};
+}
+function phases(mo){ if(!mo.on||mo.trip||st.gTrip) return [0,0,0]; var i=IB(mo); return mo.fase?[0,i*1.73,i*1.73]:[i,i,i]; }
+// ------------ dibujo
+var svg=$('svg');
+function el(tag,a,t,par){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(t!==undefined) e.textContent=t; (par||svg).appendChild(e); return e; }
+function boxd(x,y,w,h,t1,t2,tripped,par){
+  el('rect',{x:x-w/2,y:y,width:w,height:h,rx:8,fill:tripped?'#ffe9e6':'#fff',stroke:tripped?'#C0392B':'#1a1a1a','stroke-width':tripped?3.5:2},undefined,par);
+  el('text',{x:x,y:y+(t2?20:h/2+5),'text-anchor':'middle','font-size':14,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},t1,par);
+  if(t2) el('text',{x:x,y:y+38,'text-anchor':'middle','font-size':12.5,'class':'lbl',fill:'#56606b'},t2,par);
+  if(tripped) el('text',{x:x,y:y-6,'text-anchor':'middle','font-size':13,'font-weight':700,'class':'lbl',fill:'#C0392B'},'¡SALTA!',par);
+}
+function pinza(x,y,ph,col,par){
+  var sym=ph[0]>0&&Math.abs(ph[0]-ph[1])<0.01;
+  var tx='L1 '+f(ph[0],1)+' · L2 '+f(ph[1],1)+' · L3 '+f(ph[2],1)+' A';
+  el('rect',{x:x-tx.length*3.5-4,y:y-13,width:tx.length*7+8,height:18,rx:4,fill:'#fff'},undefined,par);
+  el('text',{x:x,y:y,'text-anchor':'middle','font-size':12.5,'font-weight':700,'class':'lbl',fill:col||'#C55A11'},tx,par);
+}
+function draw(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var g=gen(), n=st.mots.length, W=780;
+  var tot=[0,0,0]; st.mots.forEach(function(m){ var p=phases(m); for(var k=0;k<3;k++) tot[k]+=p[k]; });
+  var live=tot[1]>0;
+  el('text',{x:W/2,y:20,'text-anchor':'middle','font-size':14,'class':'lbl',fill:'#1a1a1a'},'Llegada de la red: L1, L2, L3 (400 V)');
+  el('line',{x1:W/2,y1:28,x2:W/2,y2:48,stroke:'#D0191C','stroke-width':4});
+  boxd(W/2,48,220,50,'-Q0  '+g.cal+' A','cable '+f(g.cab[0])+' mm² · aguanta '+f(g.cab[1])+' A',st.gTrip);
+  el('line',{x1:W/2,y1:98,x2:W/2,y2:140,stroke:'#D0191C','stroke-width':live?6:4});
+  pinza(W/2+150,124,tot,'#C55A11');
+  el('text',{x:W/2+150,y:110,'text-anchor':'middle','font-size':12,'class':'lbl',fill:'#56606b'},'pinza en la general');
+  var xs=[]; for(var i=0;i<n;i++) xs.push(n===1?W/2:110+i*(W-220)/(n-1));
+  if(n>1) el('line',{x1:xs[0],y1:140,x2:xs[n-1],y2:140,stroke:'#D0191C','stroke-width':4});
+  el('circle',{cx:W/2,cy:140,r:4,fill:'#1a1a1a'});
+  st.mots.forEach(function(mo,i){
+    var x=xs[i], L=line(mo), ph=phases(mo), on=ph[1]>0, c=MCOL[i];
+    el('line',{x1:x,y1:140,x2:x,y2:350,stroke:'#D0191C','stroke-width':on?5:3});
+    boxd(x,160,150,48,'-Q'+(i+1)+'  '+L.cal+' A '+L.cur,'cable '+f(L.cab[0])+' mm²',mo.trip==='Q');
+    boxd(x,232,150,48,'-F'+(i+1)+' térmico','ruleta '+f(L.ib)+' A',mo.trip==='F');
+    pinza(x,312,ph,c);
+    el('circle',{cx:x,cy:388,r:36,fill:'#fff',stroke:c,'stroke-width':4});
+    el('text',{x:x,y:386,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:c},'M'+(i+1));
+    el('text',{x:x,y:404,'text-anchor':'middle','font-size':12,'class':'lbl',fill:'#1a1a1a'},P[mo.p][0]+' kW · '+(mo.c==='D'?'Δ':'Y'));
+    el('text',{x:x,y:446,'text-anchor':'middle','font-size':13,'font-weight':700,'class':'lbl',fill:on?(mo.fase?'#C0392B':'#2E8B3E'):'#56606b'},mo.trip?'parado (ha saltado)':(on?(mo.fase?'¡le falta una fase!':'en marcha'):'parado'));
+    if(!okCon(mo)) el('text',{x:x,y:464,'text-anchor':'middle','font-size':12,'font-weight':700,'class':'lbl',fill:'#C0392B'},'¡caja equivocada!');
+  });
+  // panel
+  $('vG').innerHTML=g.cal+' A<small>suma '+f(g.sum,1)+' A · bien: '+g.auto+' A</small>';
+  $('gDown').disabled=g.gi===0; $('gUp').disabled=g.gi===CAL.length-1;
+  $('bAdd').disabled=n>=4;
+  plate(); explain(g,tot);
+}
+// ------------ placa
+function plate(){
+  var p=$('plate'); while(p.firstChild) p.removeChild(p.firstChild);
+  var mo=st.mots[st.sel]; if(!mo) return; var pl=P[mo.p], i=st.sel;
+  $('pTit').innerHTML='Placa de <span style="color:'+MCOL[i]+'">-M'+(i+1)+'</span> · se conecta en <b>'+(mo.c==='D'?'triángulo (Δ)':'estrella (Y)')+'</b>';
+  function E(t,a,x){ return el(t,a,x,p); }
+  E('rect',{x:4,y:4,width:392,height:222,rx:12,fill:'#d9dde1',stroke:'#5f6b73','stroke-width':2});
+  E('text',{x:20,y:32,'font-size':15,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'MOTOR   3~   50 Hz');
+  E('text',{x:20,y:62,'font-size':20,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},pl[0]+' kW');
+  E('text',{x:200,y:62,'font-size':14,'class':'lbl',fill:'#1a1a1a'},pl[1]+' r/min   cos φ = '+pl[2]);
+  function bor(x,y,t){ for(var r=0;r<2;r++) for(var k=0;k<3;k++) E('circle',{cx:x+k*13,cy:y+r*13,r:4,fill:'none',stroke:'#222'}); if(t==='Y') E('line',{x1:x,y1:y,x2:x+26,y2:y,stroke:'#222','stroke-width':2}); else for(var k2=0;k2<3;k2++) E('line',{x1:x+k2*13,y1:y,x2:x+k2*13,y2:y+13,stroke:'#222','stroke-width':2}); }
+  [['Y',pl[4],20],['D',pl[3],210]].forEach(function(b){
+    var x=b[2], y=90, chosen=mo.c===b[0], good=b[1][0]===400;
+    E('text',{x:x,y:y+36,'font-size':26,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},b[0]==='D'?'Δ':'Y');
+    bor(x+30,y+18,b[0]);
+    E('rect',{x:x+80,y:y,width:90,height:70,fill:chosen?(good?'#d3f0d8':'#ffd7d2'):'#fff',stroke:chosen?(good?'#2E8B3E':'#C0392B'):'#222','stroke-width':chosen?5:1.5});
+    E('line',{x1:x+80,y1:y+35,x2:x+170,y2:y+35,stroke:'#222'});
+    E('text',{x:x+125,y:y+25,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},b[1][0]+' V');
+    E('text',{x:x+125,y:y+60,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},f(b[1][1])+' A');
+  });
+  E('text',{x:20,y:200,'font-size':13,'class':'lbl',fill:'#1a1a1a'},'IP 55          Cl. F');
+  var b=box(mo);
+  $('pNote').innerHTML=okCon(mo)?'<span class="ok">✔</span> Lees la caja <b>'+(mo.c==='D'?'Δ':'Y')+'</b>: <b>'+b[0]+' V – '+f(b[1])+' A</b>. Es la de la red (400 V): este motor pide <b>'+f(b[1])+' A</b>.':
+    '<span class="bad">✘ Caja equivocada:</span> la caja '+(mo.c==='D'?'Δ':'Y')+' es para <b>'+b[0]+' V</b>, y la red es de 400 V. Con 400 V este motor va en <b>'+(mo.c==='D'?'estrella (Y)':'triángulo (Δ)')+'</b>.';
+}
+// ------------ textos
+var lastH='';
+function explain(g,tot){
+  var h='';
+  if(st.msg) h+='<p>'+st.msg+'</p>';
+  var bad=st.mots.map(function(m,i){return okCon(m)?null:'M'+(i+1);}).filter(Boolean);
+  if(bad.length) h+='<p><span class="bad">✘ '+bad.join(', ')+': caja equivocada de la placa.</span> La línea se ha dimensionado con una corriente que no es la buena. Mira la placa de abajo.</p>';
+  h+='<p><b>Línea general:</b> suma de corrientes = '+st.mots.map(function(m){return f(IB(m));}).join(' + ')+' = <b>'+f(g.sum,2)+' A</b>. El calibre bueno es <b>'+g.auto+' A</b> (igual o mayor que la suma y mayor que '+g.mx+' A, la línea más grande).';
+  if(g.cal<g.auto){ h+=' <span class="bad">Ahora está en '+g.cal+' A: '+(g.cal<g.sum?'es menor que la suma: con todos en marcha saltará.':'')+(g.cal<=g.mx?' No es mayor que '+g.mx+' A: no hay selectividad.':'')+'</span>'; }
+  else if(g.cal>g.auto) h+=' Ahora está en '+g.cal+' A: funciona, pero el cable de la general tiene que ser más grueso ('+f(g.cab[0])+' mm²).';
+  h+='</p>';
+  if(tot[1]>0) h+='<p><b>Pinza en la general:</b> L1 '+f(tot[0],1)+' · L2 '+f(tot[1],1)+' · L3 '+f(tot[2],1)+' A'+(Math.abs(tot[0]-tot[1])>0.05?' <span class="bad">— no son iguales: hay un motor con una fase de menos.</span>':' — iguales: todo simétrico.')+'</p>';
+  if(h!==lastH){ $('now').innerHTML=h; lastH=h; }
+}
+// ------------ panel de motores
+function panel(){
+  var bx=$('mots'); bx.innerHTML='';
+  st.mots.forEach(function(mo,i){
+    var d=document.createElement('div'); d.className='mot'+(i===st.sel?' sel':''); d.style.borderLeftColor=MCOL[i];
+    var opts=P.map(function(pl,j){ return '<option value="'+j+'"'+(j===mo.p?' selected':'')+'>'+pl[0]+' kW · '+pl[3][0]+'/'+pl[4][0]+' V</option>'; }).join('');
+    d.innerHTML='<div class="mh"><span style="color:'+MCOL[i]+'">-M'+(i+1)+'</span>'+(st.mots.length>1?'<button class="x" aria-label="Quitar motor">✕</button>':'')+'</div>'+
+      '<select aria-label="Placa">'+opts+'</select>'+
+      '<div class="seg"><button class="cY'+(mo.c==='Y'?' on':'')+'">Estrella Y</button><button class="cD'+(mo.c==='D'?' on':'')+'">Triángulo Δ</button></div>'+
+      '<div class="ib">Corriente de la caja: <b>'+f(IB(mo))+' A</b></div>'+
+      '<div class="seg" style="margin-top:6px"><button class="on1'+(mo.on?' on':'')+'">'+(mo.on?'Paro':'Marcha')+'</button><button class="fa'+(mo.fase?' on':'')+'">Quitar una fase</button></div>'+
+      '<div class="seg" style="margin-top:6px"><button class="cc red">⚡ Cortocircuito</button><button class="rs">Rearmar</button></div>';
+    d.onclick=function(e){ if(st.sel!==i){ st.sel=i; panel(); } };
+    d.querySelector('select').onchange=function(){ mo.p=+this.value; mo.c=P[mo.p][4][0]===400?'Y':'D'; st.sel=i; reset(mo); panel(); };
+    d.querySelector('.cY').onclick=function(e){ mo.c='Y'; st.sel=i; reset(mo); panel(); };
+    d.querySelector('.cD').onclick=function(e){ mo.c='D'; st.sel=i; reset(mo); panel(); };
+    d.querySelector('.on1').onclick=function(e){ if(mo.trip) return; mo.on=!mo.on; if(!mo.on) mo.fase=false; st.msg=''; panel(); };
+    d.querySelector('.fa').onclick=function(e){ if(!mo.on||mo.trip) { st.msg='Pon antes el motor M'+(i+1)+' en marcha.'; return; } mo.fase=!mo.fase; st.msg=mo.fase?'<b>-M'+(i+1)+' ha perdido una fase</b> (por ejemplo, un tornillo suelto en L1). Mira su pinza: L1 marca 0 A y L2 y L3 suben mucho. El motor zumba y se calienta: su térmico va a saltar.':''; panel(); };
+    d.querySelector('.cc').onclick=function(e){ shortc(i); panel(); };
+    d.querySelector('.rs').onclick=function(e){ reset(mo); st.msg=''; panel(); };
+    var x=d.querySelector('.x'); if(x) x.onclick=function(e){ e.stopPropagation(); st.mots.splice(i,1); st.sel=0; panel(); };
+    bx.appendChild(d);
+  });
+}
+function reset(mo){ mo.trip=null; mo.on=false; mo.fase=false; mo.h=0; }
+function shortc(i){
+  var mo=st.mots[i], g=gen(), L=line(mo);
+  mo.on=false; mo.fase=false;
+  if(g.cal>L.cal){ mo.trip='Q'; st.msg='<b>⚡ Cortocircuito en la línea de -M'+(i+1)+'.</b> Salta solo <b>-Q'+(i+1)+'</b> ('+L.cal+' A). La general ('+g.cal+' A) es más grande y aguanta: <span class="ok">los demás motores siguen funcionando</span>. Esto es la <b>selectividad</b>.'; }
+  else { mo.trip='Q'; st.gTrip=true; st.msg='<b>⚡ Cortocircuito en la línea de -M'+(i+1)+'.</b> <span class="bad">Salta también la general -Q0</span>: su calibre ('+g.cal+' A) no es mayor que el de la línea ('+L.cal+' A). <b>Se para todo el cuadro</b> por la avería de un solo motor: no hay selectividad.'; st.mots.forEach(function(m){ m.on=false; m.fase=false; }); }
+}
+// ------------ tiempo
+function step(dt){
+  var g=gen(), tot=[0,0,0];
+  st.mots.forEach(function(mo,i){
+    var bad=mo.on&&!mo.trip&&!st.gTrip&&(mo.fase||!okCon(mo));
+    if(bad){ mo.h+=dt/(mo.fase?6:4); if(mo.h>=1){ mo.trip='F'; mo.on=false; mo.fase=false; mo.h=0; st.msg=okCon(mo)?'<b>Ha saltado el térmico -F'+(i+1)+'</b>: el motor trabajaba a dos fases y pedía demasiado por L2 y L3. Busca la fase que falta y pulsa <b>Rearmar</b>.':'<b>Ha saltado el térmico -F'+(i+1)+'</b>: con la caja equivocada el motor está mal conectado para 400 V y no funciona bien. Elige la conexión buena.'; panel(); } }
+    else mo.h=Math.max(0,mo.h-dt/10);
+    var p=phases(mo); for(var k=0;k<3;k++) tot[k]+=p[k];
+  });
+  var mx=Math.max(tot[0],tot[1],tot[2]);
+  if(!st.gTrip&&mx>g.cal*1.13){ st.gh+=dt/6; if(st.gh>=1){ st.gTrip=true; st.gh=0; st.mots.forEach(function(m){m.on=false;m.fase=false;}); st.msg='<b>Ha saltado la general -Q0</b> (sobrecarga): los motores en marcha pedían '+f(mx,1)+' A y la general es de '+g.cal+' A. <span class="bad">Se ha parado todo.</span> Pulsa <b>Calcularla bien</b> y <b>Rearmar -Q0</b>.'; panel(); } }
+  else st.gh=Math.max(0,st.gh-dt/10);
+}
+$('gDown').onclick=function(){ st.gOff--; st.msg=''; draw(); };
+$('gUp').onclick=function(){ st.gOff++; st.msg=''; draw(); };
+$('gAuto').onclick=function(){ st.gOff=0; st.msg=''; draw(); };
+$('gReset').onclick=function(){ st.gTrip=false; st.msg=''; panel(); };
+$('bAdd').onclick=function(){ if(st.mots.length<4){ st.mots.push(mk({p:[1,5,8,2][st.mots.length]||1,c:[1,5,8,2][st.mots.length]<5?'Y':'D'})); st.sel=st.mots.length-1; panel(); } };
+$('bAll').onclick=function(){ st.mots.forEach(function(m){ if(!m.trip) m.on=true; }); st.msg=''; panel(); };
+var _panel=panel; panel=function(){ _panel(); draw(); };
+var last=null;
+function loop(ts){ if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000); last=ts; step(dt); draw(); requestAnimationFrame(loop); }
+panel(); requestAnimationFrame(loop);
+window.__st=st;
+})();
+
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>

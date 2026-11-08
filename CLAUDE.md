@@ -60,6 +60,8 @@ subir.bat                  publica todo con doble clic
 | 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motor de placa, subir/bajar calibre y sección; qué falla y qué cambiar; modo reto |
 | 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre; zona, tiempos de la tabla (columna siguiente) y comprobación de arranque; para qué se usa cada curva |
 | 6.7 | `arranque_curvas.html` | Varias curvas (B/C/D) a la vez y hasta 4 motores de placa con pico y duración: escalón de arranque y tabla de si arranca con cada curva |
+| 6.8 | `proteger_motor.html` | Motor 7,5 kW Δ: magnetotérmico D + térmico / fusibles aM o gG + térmico / guardamotor; arranque, eje duro (sobrecarga), cortocircuito; ruleta alta → se quema, baja → salta sin avería |
+| 6.11 | `cuadro_motores.html` | Hasta 4 motores con su placa (Y/Δ, avisa de caja equivocada); líneas y general calculadas; pinzas L1-L2-L3; falta de fase; cortocircuito con y sin selectividad |
 
 ## Criterios de dibujo de los esquemas (obligatorios)
 - **Colores**: conductor de fase **rojo**, neutro **azul**; símbolos, nombres y números en **negro**. (Son colores de dibujo, no los de los cables reales.)
