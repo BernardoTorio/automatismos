@@ -109,6 +109,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
       <div class="card ctl">
         <h3>1 · El magnetotérmico</h3>
         <div class="seg" id="segK"><button data-k="B">Curva B</button><button data-k="C">Curva C</button><button data-k="D">Curva D</button></div>
+        <p class="foot" id="uso" style="margin:8px 0 0"></p>
         <div class="row" style="margin-top:8px"><button id="qDown" aria-label="Calibre más pequeño">◀</button><div class="val" id="vCal"></div><button id="qUp" aria-label="Calibre más grande">▶</button></div>
       </div>
       <div class="card ctl">
@@ -142,6 +143,16 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
         <li><b>Dudosa</b>: la magnética puede saltar al instante… o no. B: de 3 a 5 · C: de 5 a 10 · D: de 10 a 20 veces.</li>
         <li><b>Magnética</b> (cortocircuito): desde el final de la zona dudosa, salta seguro en unos 0,01 s.</li>
       </ul>
+    </div>
+    <div class="card wide">
+      <h2>Para qué se usa cada curva</h2>
+      <div style="overflow-x:auto"><table class="t">
+        <tr><th>Curva</th><th>Parte magnética</th><th>Se usa para…</th><th>Por qué</th></tr>
+        <tr><td><b style="color:#2f6fd0">B</b></td><td>de 3 a 5 veces I<sub>n</sub></td><td><b>Alumbrado</b>, <b>cables muy largos</b> y aparatos electrónicos.</td><td>Salta pronto. En un cable muy largo, un cortocircuito al final da poca corriente, y solo la B lo corta seguro.</td></tr>
+        <tr><td><b style="color:#3b9a2f">C</b></td><td>de 5 a 10 veces I<sub>n</sub></td><td><b>Uso general</b>: enchufes, máquinas y <b>motores pequeños</b> o de arranque suave. Es la más común.</td><td>Aguanta los picos normales de las máquinas sin saltar.</td></tr>
+        <tr><td><b style="color:#e07b00">D</b></td><td>de 10 a 20 veces I<sub>n</sub></td><td><b>Motores con arranque fuerte</b> y <b>transformadores</b>.</td><td>Aguanta picos muy grandes al conectarlos.</td></tr>
+      </table></div>
+      <p class="foot">Para un motor, la B casi nunca vale: su pico de arranque (de 5 a 8 veces) la haría saltar.</p>
     </div>
     <div class="card wide">
       <h2>Tabla de la parte térmica (igual en B, C y D)</h2>
@@ -235,6 +246,7 @@ function draw(){
   $('vI').textContent=f(st.I)+' A';
   $('vT').textContent=f(st.dur,2)+' s';
   [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.classList.toggle('on',b.dataset.k===st.k); });
+  $('uso').innerHTML={B:'<b>B</b>: alumbrado, cables muy largos y electrónica.',C:'<b>C</b>: uso general: enchufes, máquinas y motores pequeños.',D:'<b>D</b>: motores con arranque fuerte y transformadores.'}[st.k];
   $('mI').classList.toggle('on',st.mode==='I'); $('mA').classList.toggle('on',st.mode==='A');
   $('durBox').hidden=st.mode!=='A'; $('lblI').textContent=st.mode==='A'?'Pico de arranque':'Corriente que pasa';
   $('rI').value=Math.round(1000*(Math.log(xv/0.5)/Math.log(120))); $('rT').value=Math.round(1000*Math.log(st.dur/0.05)/Math.log(200));
