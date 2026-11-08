@@ -58,7 +58,8 @@ subir.bat                  publica todo con doble clic
 |---|---|---|
 | 6.4 | `intensidad_calor.html` | Motor de 11 kW: intensidad y calor del cable según tensión (230/400/690 V) y sección; pico de arranque a cámara lenta; sobrecarga |
 | 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motor de placa, subir/bajar calibre y sección; qué falla y qué cambiar; modo reto |
-| 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre; zona, tiempos de la tabla (columna siguiente) y comprobación de arranque |
+| 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre; zona, tiempos de la tabla (columna siguiente) y comprobación de arranque; para qué se usa cada curva |
+| 6.7 | `arranque_curvas.html` | Varias curvas (B/C/D) a la vez y hasta 4 motores de placa con pico y duración: escalón de arranque y tabla de si arranca con cada curva |
 
 ## Criterios de dibujo de los esquemas (obligatorios)
 - **Colores**: conductor de fase **rojo**, neutro **azul**; símbolos, nombres y números en **negro**. (Son colores de dibujo, no los de los cables reales.)
