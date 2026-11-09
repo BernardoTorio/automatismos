@@ -40,6 +40,10 @@ subir.bat                  publica todo con doble clic
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
 - Tests: una tarjeta por test; el test vuelve a `index.html#tests`.
 
+## Tests: mapa y test a medias
+- A la izquierda, el mapa de preguntas con colores (verde, rojo, gris) y, a la derecha, «Cómo vas»; en el móvil, una barra abajo que abre el mapa.
+- El test a medias **se guarda solo en ese navegador** (`localStorage`, clave `testProg:<archivo>`): al volver, la pantalla de inicio ofrece «Seguir donde lo dejé» o «Borrarlo». Se borra al terminarlo entero.
+
 ## Tests: letras en los puntos de medida
 - En cada esquema sobre el que se mide, los tornillos que se usan van marcados con una **letra en una bolita amarilla** (A, B, C…), una serie por figura. No se usan I, L, N ni O (se confunden con 1, la fase, el neutro y el 0).
 - En `DATA` los puntos se escriben con la letra en círculo (`Ⓐ`, `Ⓑ`…): el test (`pts()`) la pinta como la bolita del dibujo, y así no se confunde con las opciones A-B-C-D ni con `-F2`, `-H1`, `-KM1`.

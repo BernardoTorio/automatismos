@@ -75,6 +75,7 @@ figcaption{font-size:14px;color:var(--muted);font-style:italic;margin-top:4px}
 .opt:hover:not(:disabled){border-color:var(--green)}
 .opt .k{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--btn);font-weight:700;font-size:14px}
 .opt:disabled{cursor:default}
+.card.resume{border-left:5px solid var(--yellow);background:var(--yellow-soft)}
 .pt{display:inline-block;min-width:1.5em;height:1.5em;line-height:calc(1.5em - 3px);padding:0 .12em;margin:0 .06em;border-radius:999px;background:#FFDD40;color:#111;border:1.5px solid #111;font-weight:700;font-size:.82em;text-align:center;vertical-align:.1em;font-style:normal}
 .opt.right{border-color:var(--ok);background:var(--ok-soft)}
 .opt.right .k{background:var(--ok);color:#fff}
@@ -261,7 +262,7 @@ function start(){
   </div>
   <div class="box"><span class="lbl">CÓMO FUNCIONA</span>
     Elige una respuesta tocándola (o con las teclas A, B, C, D). Aciertes o no, verás <b>por qué</b> es esa la respuesta.
-    Toca un esquema para verlo en grande.<br>
+    Toca un esquema para verlo en grande. Si sales a medias, el test se queda guardado en este móvil u ordenador y puedes seguirlo otro día.<br>
     <b>En orden</b>: las preguntas salen siempre con el mismo número y las respuestas en el mismo orden, como en el test en papel.
     <b>Al azar</b>: cambian las preguntas y el orden de las respuestas cada vez.
     <b>Por tema</b>: practica solo lo que quieras (por ejemplo, las medidas o un montaje concreto).</div>`;
@@ -283,6 +284,7 @@ function start(){
   document.getElementById('call').onclick = () => { app.querySelectorAll('input[name=cat]').forEach(i => i.checked = true); upd(); };
   document.getElementById('cnone').onclick = () => { app.querySelectorAll('input[name=cat]').forEach(i => i.checked = false); upd(); };
   upd();
+  offerProg();
   document.getElementById('go').onclick = () => {
     const pool = pick(), ord = state.mode === 'orden';
     state = { screen: 'q', mode: ord ? 'orden' : 'azar', list: pool.map(q => item(q, ord)), i: 0, ok: 0, answered: false };
@@ -315,6 +317,46 @@ function filtered(){
   const dif = app.querySelector('input[name=dif]:checked').value;
   const tipos = [...app.querySelectorAll('input[name=tipo]:checked')].map(i => i.value);
   return DATA.filter(q => temas.includes(q.tema) && tipos.includes(q.tipo) && (dif === 'all' || q.dif === dif));
+}
+
+/* ---------- test a medias: se guarda en este navegador para seguirlo otro día ---------- */
+const PKEY = 'testProg:' + (location.pathname.split('/').pop() || 'test');
+function saveProg(){
+  try {
+    if (state.screen !== 'q' || !state.list.some(x => x.pick !== null)) return;
+    localStorage.setItem(PKEY, JSON.stringify({ v: 1, t: Date.now(), mode: state.mode, i: state.i, list: state.list.map(x => [x.q.n, x.order, x.pick]) }));
+  } catch(e) {}
+}
+function clearProg(){ try { localStorage.removeItem(PKEY); } catch(e) {} }
+function loadProg(){
+  try {
+    const p = JSON.parse(localStorage.getItem(PKEY) || 'null');
+    if (!p || p.v !== 1 || !Array.isArray(p.list) || !p.list.length) return null;
+    const byn = {}; DATA.forEach(q => byn[q.n] = q);
+    const list = p.list.map(a => {
+      const q = byn[a[0]], o = a[1], k = a[2];
+      if (!q || !Array.isArray(o) || o.slice().sort().join('') !== '0123') return null;
+      return { q, order: o, pick: (k === 0 || k === 1 || k === 2 || k === 3) ? k : null };
+    });
+    if (list.some(x => !x)) return null;
+    const done = list.filter(x => x.pick !== null).length;
+    if (!done || done === list.length) return null;
+    return { mode: p.mode === 'orden' ? 'orden' : 'azar', list, done, i: Math.max(0, Math.min(list.length - 1, p.i | 0)),
+             ok: list.filter(x => x.pick !== null && x.order[x.pick] === 0).length };
+  } catch(e) { return null; }
+}
+function offerProg(){
+  const p = loadProg(); if (!p) return;
+  const d = document.createElement('div'); d.className = 'card resume'; d.id = 'resume';
+  d.innerHTML = `<b>Tienes un test a medias.</b> Llevas ${p.done} de ${p.list.length} preguntas contestadas y ${p.ok} ${p.ok === 1 ? 'acierto' : 'aciertos'}.
+    <div class="nav" style="justify-content:flex-start;margin-top:10px"><button class="go" id="cont">Seguir donde lo dejé</button><button class="go ghost" id="drop">Borrarlo</button></div>`;
+  app.insertBefore(d, app.querySelector('.card'));
+  document.getElementById('cont').onclick = () => {
+    const first = p.list.findIndex(x => x.pick === null);
+    state = { screen: 'q', mode: p.mode, list: p.list, i: first >= 0 ? first : p.i, ok: p.ok, answered: false };
+    show();
+  };
+  document.getElementById('drop').onclick = () => { clearProg(); d.remove(); };
 }
 
 /* ---------- pregunta ---------- */
@@ -371,7 +413,7 @@ function answer(k){
   const it = state.list[state.i];
   it.pick = k; state.answered = true;
   if (it.order[k] === 0) state.ok++;
-  paint();
+  paint(); saveProg();
   const nb = document.getElementById('next'); if (nb) nb.focus({ preventScroll: true });
 }
 function paint(){
@@ -395,14 +437,15 @@ function paint(){
   drawMap();
 }
 function lab(x, k){ return state.mode === 'orden' ? x.q.n : k + 1; }
-function go(k){ if (k < 0 || k >= state.list.length) return; state.i = k; show(); }
+function go(k){ if (k < 0 || k >= state.list.length) return; state.i = k; show(); saveProg(); }
 function next(){
-  if (state.i < state.list.length - 1) { state.i++; show(); } else result();
+  if (state.i < state.list.length - 1) { state.i++; show(); saveProg(); } else result();
 }
 
 /* ---------- resultado ---------- */
 function result(){
   state.screen = 'end'; drawMap();
+  if (state.list.every(it => it.pick !== null)) clearProg();
   const n = state.list.length, ans = state.list.filter(it => it.pick !== null), blank = state.list.filter(it => it.pick === null);
   const nota = ans.length ? state.ok / ans.length * 10 : 0;
   const fails = ans.filter(it => it.order[it.pick] !== 0);
