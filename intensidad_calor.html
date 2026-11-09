@@ -218,7 +218,7 @@ var NS='http://www.w3.org/2000/svg';
 var RED=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 var INOM={230:37.2,400:21.5,690:12.4};
 var CAB=[[1.5,16.5],[2.5,23],[4,31],[6,40],[10,54]];
-var st={V:400,c:1,mode:'off',te:0,load:1,T:25,I:0,off:0,hist:[],tScreen:0};
+var st={V:400,c:1,mode:'off',te:0,load:1,T:25,I:0,off:0,hist:[],tScreen:0,rot:0};
 function f(x,d){ d=d===undefined?1:d; var s=x.toFixed(d); if(d>0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
 // botones
 var segC=$('segC'); CAB.forEach(function(c,i){ var b=document.createElement('button'); b.textContent=String(c[0]).replace('.',','); b.dataset.i=i; b.title=c[0]+' mm²'; segC.appendChild(b); });
@@ -347,7 +347,7 @@ function loop(ts){ if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000);
   requestAnimationFrame(loop); }
 document.addEventListener('keydown',function(e){ if(e.ctrlKey||e.metaKey||e.altKey) return; var k=(e.key||'').toLowerCase(); if(k==='a') $('bStart').click(); if(k==='p') $('bStop').click(); if(k==='f'||k==='d') $('bBrake').click(); });
 paintBtns(); size(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(size);
-requestAnimationFrame(loop);
+render(); chart(); requestAnimationFrame(loop);
 window.__st=st;
 })();
 

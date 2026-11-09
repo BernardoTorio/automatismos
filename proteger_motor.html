@@ -409,7 +409,7 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey) return; var k=(e.key||'').toLowerCase(); if(k==='a') $('bStart').click(); if(k==='p') $('bStop').click(); if(k==='d') $('bOver').click(); if(k==='c') $('bCC').click(); if(k==='r') $('bReset').click(); });
-requestAnimationFrame(loop);
+draw(); requestAnimationFrame(loop);
 window.__st=st;
 })();
 
