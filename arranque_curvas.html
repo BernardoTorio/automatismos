@@ -86,7 +86,7 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 
 #svg{max-height:70vh}
 .lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
-@media (max-width:620px){#svg text{font-size:19px}#svg text.rt{display:none}.sheet svg{min-width:0}}
+@media (max-width:620px){#svg text{font-size:15px}#svg text.rt{display:none}.sheet svg{min-width:0}}
 .mobnote{display:none;font-size:.85rem;color:var(--muted);margin:4px 6px 0}
 @media (max-width:620px){.mobnote{display:block}}
 .mot{border:2px solid var(--line);border-left-width:8px;border-radius:10px;padding:8px 10px;margin-top:8px}
@@ -94,24 +94,49 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 .mot select{font:inherit;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--btn);color:var(--ink);width:100%;margin:6px 0 2px}
 .mot .lab{font-size:.9rem;margin-top:4px}
 .mot .lab b{font-variant-numeric:tabular-nums}
-.mot button.x{padding:2px 9px;font-size:.9rem}
+.mot button.x{padding:2px 9px;font-size:.9rem;min-width:44px}
 table.v td.ok{color:var(--ok);font-weight:700}
 table.v td.bad{color:var(--warn);font-weight:700}
 table.v td.mid{color:#B07800;font-weight:700}
 .chip{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
 
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.7 El arranque sobre las curvas</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="curvas_disparo.html" aria-label="Anterior: 6.6 Las curvas de disparo">‹ 6.6</a><span class="where">Tema 6 · 4 de 6</span><a class="arr" href="proteger_motor.html" aria-label="Siguiente: 6.8 Térmico, fusibles y guardamotor">6.8 ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">6.4</a><a href="regla_ib_in_iz.html" title="La regla de oro">6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">6.6</a><a href="arranque_curvas.html" class="cur" aria-current="page" title="El arranque sobre las curvas">6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">6.8</a><a href="cuadro_motores.html" title="Un cuadro con varios motores">6.11</a></div></nav>
   <h1>El arranque de los motores sobre las curvas</h1>
   <p class="sub">Pon una o varias curvas del magnetotérmico y añade motores con su pico de arranque. Cada motor es un <b>escalón</b>: si queda a la izquierda y por debajo de la franja, <b>arranca</b>.</p>
+  <p class="serve">Te sirve para los ejercicios <b>5, 9, 10 y 11</b>.</p>
 
   <div class="layout">
-    <div class="sheet" aria-label="Curvas de disparo con las curvas de arranque de los motores">
+    <div class="sheet stick" aria-label="Curvas de disparo con las curvas de arranque de los motores">
       <svg id="svg" viewBox="0 0 760 520" role="img" aria-label="Curvas del magnetotérmico y escalones de arranque de los motores"></svg>
-      <p class="mobnote">Abajo: fila gris = <b>veces</b>; fila azul = <b>amperios</b> con tu calibre.</p>
+      <p class="verd" id="verd" aria-hidden="true"></p>
+      <p class="mobnote">Abajo: fila gris = <b>veces</b>; fila negra = <b>amperios</b> con tu calibre.</p>
     </div>
     <div class="side">
       <div class="card ctl">
@@ -129,7 +154,7 @@ table.v td.mid{color:#B07800;font-weight:700}
   </div>
 
   <div class="below">
-    <div class="card now wide" aria-live="polite"><h2>¿Arranca cada motor?</h2><div id="now"></div></div>
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando: ¿arranca cada motor?</h2><div id="now"></div></div>
     <div class="card howto">
       <h2>Cómo se lee el escalón del motor</h2>
       <ul style="margin-top:0">
@@ -152,10 +177,13 @@ table.v td.mid{color:#B07800;font-weight:700}
       <ul>
         <li>Elige una o varias <b>curvas</b> (B, C, D) y el <b>calibre</b> del magnetotérmico.</li>
         <li>Añade hasta <b>cuatro motores</b>. A cada uno le eliges la placa, cuántas veces su corriente pide al arrancar (el pico) y cuánto dura el arranque.</li>
-        <li>Cada motor sale como un <b>escalón</b> de su color. En la tabla de arriba ves con qué curva arranca cada uno.</li>
+        <li>Cada motor sale como un <b>escalón</b> de su color. En la tabla ves con qué curva arranca cada uno, y debajo, por qué.</li>
+        <li>Teclas: <kbd>←</kbd> <kbd>→</kbd> cambian el calibre.</li>
       </ul>
     </div>
   </div>
+
+  <a class="nextbig" href="proteger_motor.html">Siguiente: 6.8 Térmico, fusibles y guardamotor →</a>
 
 </main>
 <script>
@@ -175,7 +203,10 @@ function logi(x,xs,ys){ for(var i=0;i<xs.length-1;i++){ if(xs[i]<=x&&x<=xs[i+1])
 function tmin(x){ return logi(x,[1.13].concat(TX),[3600].concat(TMIN)); }
 function tmax(x){ return logi(x,[1.45].concat(TX),[3600].concat(TMAX)); }
 function nextCol(x){ for(var i=0;i<TX.length;i++) if(TX[i]>=x-1e-9) return i; return TX.length-1; }
-var L=78,R=740,T=18,B=410;
+var L=78,R=740,T=18,B=410,NAR=false,TK;
+function geo(){ NAR=svg.parentNode.clientWidth<620;
+  if(NAR){ L=58; R=456; B=330; svg.setAttribute('viewBox','0 0 470 404'); TK=[0.3,1,3,5,10,20,50,100]; }
+  else { L=78; R=740; B=410; svg.setAttribute('viewBox','0 0 760 520'); TK=[0.3,0.5,1,1.5,2,3,5,7,10,15,20,30,50,100]; } }
 function X(v){ v=Math.max(0.3,Math.min(100,v)); return L+(R-L)*Math.log(v/0.3)/Math.log(100/0.3); }
 function Y(t){ var a=Math.log(0.005),b=Math.log(10000); t=Math.max(0.005,Math.min(10000,t)); return B-(B-T)*(Math.log(t)-a)/(b-a); }
 var svg=$('svg');
@@ -190,10 +221,11 @@ function verdict(mo,k){
   return ['ok','✔ arranca','el pico ('+f(x,2)+' veces) no llega a '+m[0]+(x>=1.13?' y dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)':'')];
 }
 function draw(){
+  geo();
   while(svg.firstChild) svg.removeChild(svg.firstChild);
   var In=CAL[st.q];
   el('rect',{x:L,y:T,width:R-L,height:B-T,fill:'#fff',stroke:'#999'});
-  var ticks=[0.3,0.5,1,1.5,2,3,5,7,10,15,20,30,50,100];
+  var ticks=TK;
   ticks.forEach(function(v){ el('line',{x1:X(v),y1:T,x2:X(v),y2:B,stroke:'#e2e6ea'}); });
   [[0.01,'0,01 s'],[0.1,'0,1 s'],[1,'1 s'],[10,'10 s'],[100,'100 s'],[1000,'1000 s'],[3600,'1 h']].forEach(function(p){ el('line',{x1:L,y1:Y(p[0]),x2:R,y2:Y(p[0]),stroke:'#e2e6ea'}); el('text',{x:L-6,y:Y(p[0])+4,'text-anchor':'end','font-size':12,fill:'#56606b','class':'lbl'},p[1]); });
   el('line',{x1:X(1),y1:T,x2:X(1),y2:B,stroke:'#9aa3ab','stroke-dasharray':'4 4'});
@@ -227,12 +259,13 @@ function draw(){
   });
   // ejes x
   el('text',{x:8,y:B+24,'font-size':12,'font-weight':700,fill:'#56606b','class':'lbl rt'},'veces');
-  el('text',{x:8,y:B+50,'font-size':12,'font-weight':700,fill:'#1F5FBF','class':'lbl rt'},'amperios');
-  el('text',{x:8,y:B+64,'font-size':11,fill:'#1F5FBF','class':'lbl rt'},'(× '+In+' A)');
+  el('text',{x:8,y:B+50,'font-size':12,'font-weight':700,fill:'#1a1a1a','class':'lbl rt'},'amperios');
+  el('text',{x:8,y:B+64,'font-size':11,fill:'#1a1a1a','class':'lbl rt'},'(× '+In+' A)');
   ticks.forEach(function(v){
     if(v===0.3) return;
-    el('text',{x:X(v),y:B+24,'text-anchor':'middle','font-size':13,fill:'#56606b','class':'lbl'},f(v));
-    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},f(a,(a%1)?1:0));
+    var lastT=NAR&&v===100, xa=lastT?R+10:X(v), an=lastT?'end':'middle';
+    el('text',{x:xa,y:B+24,'text-anchor':an,'font-size':13,fill:'#56606b','class':'lbl'},f(v));
+    var a=v*In; el('text',{x:xa,y:B+50,'text-anchor':an,'font-size':(a>=1000?11:13),'font-weight':700,fill:'#1a1a1a','class':'lbl'},f(a,(a%1)?1:0));
   });
   $('vCal').innerHTML=In+' A<small>calibre (In)</small>';
   [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.classList.toggle('on',!!st.ks[b.dataset.k]); b.setAttribute('aria-pressed',!!st.ks[b.dataset.k]); });
@@ -260,7 +293,7 @@ function panel(){
 }
 function table(){
   var ks=['B','C','D'].filter(function(k){return st.ks[k];});
-  if(!ks.length){ $('now').innerHTML='<p>Elige al menos una curva (B, C o D).</p>'; return; }
+  if(!ks.length){ $('now').innerHTML='<p>Elige al menos una curva (B, C o D).</p>'; $('verd').textContent='Elige una curva'; return; }
   var In=CAL[st.q];
   var h='<div style="overflow-x:auto"><table class="t v"><tr><th>Motor</th><th>Pico</th>'+ks.map(function(k){return '<th>Curva '+k+' de '+In+' A</th>';}).join('')+'</tr>';
   var notes=[];
@@ -273,17 +306,19 @@ function table(){
   });
   h+='</table></div><ul>'+notes.join('')+'</ul>';
   $('now').innerHTML=h;
+  $('verd').textContent=st.mots.map(function(mo,i){ var okk=ks.filter(function(k){return verdict(mo,k)[0]==='ok';}); return '-M'+(i+1)+': '+(okk.length?'✔ arranca con '+okk.join(' y '):'✘ no arranca'); }).join(' · ');
 }
 [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.onclick=function(){ st.ks[b.dataset.k]=!st.ks[b.dataset.k]; draw(); }; });
 $('qDown').onclick=function(){ if(st.q>0){ st.q--; draw(); } };
 $('qUp').onclick=function(){ if(st.q<CAL.length-1){ st.q++; draw(); } };
 $('bAdd').onclick=function(){ if(st.mots.length<4){ st.mots.push({m:[3,7,3,8][st.mots.length]||3,k:[6,7,7,8][st.mots.length]||6,d:0.5}); $('mots').dataset.n=''; draw(); } };
 document.addEventListener('keydown',function(e){ var t=e.target.tagName; if(t==='INPUT'||t==='SELECT') return; if(e.key==='ArrowLeft'){e.preventDefault();$('qDown').click();} if(e.key==='ArrowRight'){e.preventDefault();$('qUp').click();} });
+window.addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(draw,120);});
 draw();
 })();
 
 </script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
 <script>(function(){
   var b = document.getElementById('themeBtn'), r = document.documentElement;
   function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;

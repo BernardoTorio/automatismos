@@ -19,11 +19,11 @@ medidas.html               práctica de medidas: polímetro (V~, Ω) y pinza en 
 temas/                     apuntes en PDF
   T1_Esquemas_basicos_Automatismos.pdf
   T2_Dispositivos_basicos_Automatismos.pdf
-  T3_Conexionado_basico_II_Automatismos.pdf
+  T3_Conexionado_basico_II_Automatismos.pdf   (+ R3 resumen, T4, T5 y T6)
 ejercicios/                problemas en PDF (T6_Ejercicios_Dimensionamiento_protecciones.pdf)
 practicas/                 fichas de prácticas en PDF
   P1_Automatismos.pdf      Cableados iniciales
-  P2_Automatismos.pdf      Cableados iniciales II
+  P2_Automatismos.pdf      Cableados iniciales II   (+ P3, P4, P5 y el examen práctico)
 subir.bat                  publica todo con doble clic
 .gitignore                 contiene *.zip (los zip no se suben nunca)
 ```
@@ -57,11 +57,21 @@ subir.bat                  publica todo con doble clic
 | Apdo. | Archivo | Qué muestra |
 |---|---|---|
 | 6.4 | `intensidad_calor.html` | Motor de 11 kW: intensidad y calor del cable según tensión (230/400/690 V) y sección; pico de arranque a cámara lenta; sobrecarga |
-| 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motor de placa, subir/bajar calibre y sección; qué falla y qué cambiar; modo reto |
-| 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre; zona, tiempos de la tabla (columna siguiente) y comprobación de arranque; para qué se usa cada curva |
+| 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motores de placa y corrientes del ejercicio 2; subir/bajar calibre y sección; tabla del calibre máximo de cada cable; reto (solo vale la solución más ajustada, motor bloqueado) |
+| 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre (al cambiar el calibre los amperios no cambian); zona, tiempos de la tabla (columna siguiente) y comprobación de arranque; para qué se usa cada curva |
 | 6.7 | `arranque_curvas.html` | Varias curvas (B/C/D) a la vez y hasta 4 motores de placa con pico y duración: escalón de arranque y tabla de si arranca con cada curva |
-| 6.8 | `proteger_motor.html` | Motor 7,5 kW Δ: magnetotérmico D + térmico / fusibles aM o gG + térmico / guardamotor; arranque, eje duro (sobrecarga), cortocircuito; ruleta alta → se quema, baja → salta sin avería |
-| 6.11 | `cuadro_motores.html` | Hasta 4 motores con su placa (Y/Δ, avisa de caja equivocada); líneas y general calculadas; pinzas L1-L2-L3; falta de fase; cortocircuito con y sin selectividad |
+| 6.8 | `proteger_motor.html` | Cuatro motores (3, 7,5, 11 y 22 kW): magnetotérmico + térmico / 3 fusibles aM o gG + térmico / guardamotor, con el rango que contiene la corriente; arranque, eje duro (sobrecarga, pinza en las tres fases), cortocircuito; ruleta alta → salta tarde o se quema, baja → salta en el funcionamiento normal del motor |
+| 6.11 | `cuadro_motores.html` | Hasta 4 motores con su placa (se elige qué caja se lee, Y o Δ); receta de los 6 pasos del motor elegido; líneas y general calculadas; pinzas L1-L2-L3; falta de fase; cortocircuito con y sin selectividad |
+
+### Reglas propias de las animaciones del Tema 6
+- Vuelven a `index.html#ejercicios` (botón, Esc y Retroceso; Retroceso no actúa con el foco en un desplegable).
+- Bajo la barra de arriba, la tira `.t6nav`: «‹ anterior · Tema 6 · n de 6 · siguiente ›» y los seis pasos (6.4 … 6.11). Al final de la página, botón grande «Siguiente». Si se añade o se quita una animación del tema, hay que actualizar la tira en las seis.
+- Bajo el título, «Te sirve para los ejercicios …».
+- Móvil (dibujo de menos de 620 px): cada una tiene un **dibujo estrecho propio** con texto de 10 px reales o más; el dibujo va fijo arriba (`.stick`) y lleva debajo una línea de veredicto (`#verd`).
+- Mismas listas en todas: 13 calibres (6 a 160 A), cables hasta 70 mm², los once motores de placa. Nombres `-M1`, `-Q1`, `-F1`.
+- Redacción: «salta en el funcionamiento normal del motor» (nunca «sin avería»); «Eje duro (sobrecarga)», un 18 % más.
+- Modelo de clase acordado (no «corregir» hacia la norma): en la zona dudosa no se dan tiempos (puede saltar al instante); con menos de 2 veces «tarda mucho: de 20 s a 1 hora»; «caja equivocada» es caja mal leída (el motor pide su corriente real y la línea queda mal dimensionada); la general no salta por debajo de 1,13 veces; el térmico salta si el motor pide más que la ruleta (2 % de margen); arranque de 6 veces y 0,4 s en 6.11.
+- Solo se redibuja cuando cambia algo y se respeta `prefers-reduced-motion`.
 
 ## Criterios de dibujo de los esquemas (obligatorios)
 - **Colores**: conductor de fase **rojo**, neutro **azul**; símbolos, nombres y números en **negro**. (Son colores de dibujo, no los de los cables reales.)

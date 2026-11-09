@@ -100,16 +100,40 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 .cR .val small,.cB .val small{color:var(--muted)}
 table.t tr.hi td{background:#FFF1C2;color:#1a1a1a;font-weight:700}
 
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.5 La regla de oro</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="intensidad_calor.html" aria-label="Anterior: 6.4 La intensidad calienta los cables">‹ 6.4</a><span class="where">Tema 6 · 2 de 6</span><a class="arr" href="curvas_disparo.html" aria-label="Siguiente: 6.6 Las curvas de disparo">6.6 ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">6.4</a><a href="regla_ib_in_iz.html" class="cur" aria-current="page" title="La regla de oro">6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">6.8</a><a href="cuadro_motores.html" title="Un cuadro con varios motores">6.11</a></div></nav>
   <h1>La regla de oro: I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub></h1>
   <p class="sub">Sirve para <b>comprobar</b> si el magnetotérmico y el cable de un motor están bien elegidos. Cambia el calibre y el cable y mira la regla: si no se cumple, la animación te dice qué subir o qué bajar.</p>
+  <p class="serve">Te sirve para los ejercicios <b>1, 2, 3 y 14</b>.</p>
 
   <div class="layout">
-    <div class="sheet" aria-label="Línea del motor y regla de las tres corrientes">
+    <div class="sheet stick" aria-label="Línea del motor y regla de las tres corrientes">
       <svg id="svg" viewBox="0 0 760 460" role="img" aria-label="Magnetotérmico, cable y motor, y una regla con IB, In e Iz"></svg>
     </div>
     <div class="side">
@@ -171,6 +195,8 @@ table.t tr.hi td{background:#FFF1C2;color:#1a1a1a;font-weight:700}
     </div>
   </div>
 
+  <a class="nextbig" href="curvas_disparo.html">Siguiente: 6.6 Las curvas de disparo →</a>
+
 </main>
 <script>
 
@@ -225,7 +251,7 @@ function draw(){
   if(!ok1){ svg.appendChild(el('rect',{x:X(In),y:y-14,width:X(IB)-X(In),height:28,fill:'rgba(192,57,43,.30)'})); }
   if(!ok2){ svg.appendChild(el('rect',{x:X(Iz),y:y-14,width:X(In)-X(Iz),height:28,fill:'rgba(232,89,12,.35)'})); }
   svg.appendChild(el('line',{x1:x0,y1:y,x2:x1,y2:y,stroke:'#444','stroke-width':2.5}));
-  for(var v=v0;v<=maxv+1e-9;v+=step){ svg.appendChild(el('line',{x1:X(v),y1:y-6,x2:X(v),y2:y+6,stroke:'#444','stroke-width':1.5})); if(Math.abs(X(v)-X(In))>16) svg.appendChild(el('text',{x:X(v),y:y+44,'text-anchor':'middle','font-size':12,'class':'lbl',fill:'#56606b'},String(v))); }
+  for(var v=v0;v<=maxv+1e-9;v+=step){ svg.appendChild(el('line',{x1:X(v),y1:y-6,x2:X(v),y2:y+6,stroke:'#444','stroke-width':1.5})); if(Math.abs(X(v)-X(In))>16) svg.appendChild(el('text',{x:X(v),y:y+44,'text-anchor':'middle','font-size':nar?14:12,'class':'lbl',fill:'#56606b'},String(v))); }
   function mark(v,col,lab,up,dy,anc){
     svg.appendChild(el('circle',{cx:X(v),cy:y,r:9,fill:col,stroke:'#fff','stroke-width':2}));
     var ty=up?y-30-dy:y+28+dy;
@@ -305,7 +331,7 @@ draw();
 })();
 
 </script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
 <script>(function(){
   var b = document.getElementById('themeBtn'), r = document.documentElement;
   function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;

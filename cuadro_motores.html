@@ -91,7 +91,7 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 .mot .mh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
 .mot select{font:inherit;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--btn);color:var(--ink);width:100%;margin:6px 0}
 .mot .seg button{padding:6px 4px;font-size:.88rem}
-.mot button.x{padding:2px 9px;font-size:.9rem}
+.mot button.x{padding:2px 9px;font-size:.9rem;min-width:44px}
 .mot .ms{flex:1;text-align:right;font-weight:400;font-size:.88rem;color:var(--muted)}
 .mot .seg button small{display:block;font-weight:400;font-size:.8rem}
 .mlab2{font-size:.85rem;color:var(--muted);font-weight:700;margin:6px 0 4px}
@@ -106,13 +106,37 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
 .pnote{margin:6px 4px 0;font-size:.95rem;color:#1a1a1a}
 .pnote .bad{color:#C0392B;font-weight:700}.pnote .ok{color:#2E8B3E;font-weight:700}
 
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.11 Cuadro con varios motores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="proteger_motor.html" aria-label="Anterior: 6.8 Térmico, fusibles y guardamotor">‹ 6.8</a><span class="where">Tema 6 · 6 de 6</span><a class="arr" href="index.html#ejercicios" aria-label="Volver a los ejercicios">Fin ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">6.4</a><a href="regla_ib_in_iz.html" title="La regla de oro">6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">6.8</a><a href="cuadro_motores.html" class="cur" aria-current="page" title="Un cuadro con varios motores">6.11</a></div></nav>
   <h1>Un cuadro con varios motores</h1>
   <p class="sub">Añade motores leyendo su <b>placa</b> (¿estrella o triángulo?). Mira cómo se calcula la <b>línea general</b>, qué marcan las <b>pinzas</b> en las tres fases, qué pasa si a un motor le <b>falta una fase</b> y qué salta con un <b>cortocircuito</b>.</p>
+  <p class="serve">Te sirve para los ejercicios <b>3, 12, 13, 17, 19 y 20</b>.</p>
 
   <div class="layout">
     <div class="draw">
@@ -179,6 +203,8 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
       </ul>
     </div>
   </div>
+
+  <a class="nextbig" href="index.html#ejercicios">Has llegado al final del Tema 6 · Volver a los ejercicios →</a>
 
 </main>
 <script>
@@ -439,7 +465,7 @@ window.__st=st;
 })();
 
 </script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
 <script>(function(){
   var b = document.getElementById('themeBtn'), r = document.documentElement;
   function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;

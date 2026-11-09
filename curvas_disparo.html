@@ -85,25 +85,50 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 
 
 #svg{max-height:70vh}
-@media (max-width:620px){#svg text{font-size:19px}#svg text.rt{display:none}.sheet svg{min-width:0}}
+@media (max-width:620px){#svg text{font-size:15px}#svg text.rt{display:none}.sheet svg{min-width:0}}
 .mobnote{display:none;font-size:.85rem;color:var(--muted);margin:4px 6px 0}
 @media (max-width:620px){.mobnote{display:block}}
 .lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
 .ex button{flex:1 1 45%;font-size:.88rem;padding:8px 6px;font-weight:700}
 table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
 
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.6 Las curvas de disparo</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="regla_ib_in_iz.html" aria-label="Anterior: 6.5 La regla de oro">‹ 6.5</a><span class="where">Tema 6 · 3 de 6</span><a class="arr" href="arranque_curvas.html" aria-label="Siguiente: 6.7 El arranque sobre las curvas">6.7 ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">6.4</a><a href="regla_ib_in_iz.html" title="La regla de oro">6.5</a><a href="curvas_disparo.html" class="cur" aria-current="page" title="Las curvas de disparo">6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">6.8</a><a href="cuadro_motores.html" title="Un cuadro con varios motores">6.11</a></div></nav>
   <h1>Las curvas de disparo: cómo se leen y cómo se usan</h1>
   <p class="sub">Elige la curva y el calibre, y mueve la corriente. Verás en qué zona cae, cuánto tarda en saltar y los pasos para resolverlo en un problema. Con <b>Un arranque</b> compruebas si el motor arranca.</p>
+  <p class="serve">Te sirve para los ejercicios <b>4, 6, 7, 8 y 9</b>.</p>
 
   <div class="layout">
-    <div class="sheet" aria-label="Curva de disparo del magnetotérmico">
+    <div class="sheet stick" aria-label="Curva de disparo del magnetotérmico">
       <svg id="svg" viewBox="0 0 760 520" role="img" aria-label="Curva de disparo con la corriente elegida"></svg>
-      <p class="mobnote">Abajo: fila gris = <b>veces</b>; fila azul = <b>amperios</b> con tu calibre.</p>
+      <p class="verd" id="verd" aria-hidden="true"></p>
+      <p class="mobnote">Abajo: fila gris = <b>veces</b>; fila negra = <b>amperios</b> con tu calibre.</p>
     </div>
     <div class="side">
       <div class="card ctl">
@@ -117,6 +142,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
         <div class="seg"><button id="mI">Una corriente</button><button id="mA">Un arranque</button></div>
         <div style="margin-top:10px"><b id="lblI">Corriente que pasa</b>: <span class="val" id="vI" style="display:inline;font-size:1.2rem"></span></div>
         <input type="range" id="rI" min="0" max="1000" step="1" aria-label="Corriente">
+        <div class="seg" style="margin:2px 0 6px"><button id="iM" aria-label="Un amperio menos">− 1 A</button><button id="iP" aria-label="Un amperio más">+ 1 A</button></div>
         <div id="durBox" hidden><b>Duración del arranque</b>: <span class="val" id="vT" style="display:inline;font-size:1.2rem"></span>
           <input type="range" id="rT" min="0" max="1000" step="1" aria-label="Duración del arranque"></div>
       </div>
@@ -128,11 +154,11 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
   </div>
 
   <div class="below">
-    <div class="card now wide" aria-live="polite"><h2>Cómo se resuelve, paso a paso</h2><div id="now"></div></div>
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando: cómo se resuelve, paso a paso</h2><div id="now"></div></div>
     <div class="card howto">
       <h2>Transformar la curva según el calibre</h2>
       <p style="margin:0">La curva no viene en amperios, sino en <b>veces el calibre</b> (abajo, la fila gris). Así una sola curva vale para todos los magnetotérmicos de esa letra.</p>
-      <p style="margin:8px 0 0">Para pasarla a amperios, <b>multiplica por el calibre</b>: es la fila azul. Con un magnetotérmico de 16 A, «5 veces» son 5 × 16 = <b>80 A</b>. Cambia el calibre y mira cómo cambia la fila azul: la curva es la misma, pero tu corriente cae en otras «veces».</p>
+      <p style="margin:8px 0 0">Para pasarla a amperios, <b>multiplica por el calibre</b>: es la fila negra. Con un magnetotérmico de 16 A, «5 veces» son 5 × 16 = <b>80 A</b>. Cambia el calibre y mira cómo cambia la fila negra: la curva es la misma, pero tu corriente cae en otras «veces».</p>
       <p style="margin:8px 0 0">En los problemas se hace al revés: <b>divide</b> la corriente entre el calibre y busca esas veces en la curva.</p>
     </div>
     <div class="card ojo">
@@ -166,9 +192,12 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
         <li>Mueve la <b>corriente</b>: la raya vertical marca dónde cae y abajo tienes los pasos para resolverlo, como en los problemas.</li>
         <li>En <b>Un arranque</b> eliges el pico y cuánto dura: si el punto queda <b>debajo y a la izquierda</b> de la franja, el motor arranca.</li>
         <li>Los <b>ejemplos</b> son los del tema y los ejercicios.</li>
+        <li>Para afinar la corriente, los botones <b>− 1 A</b> y <b>+ 1 A</b>. Teclas: <kbd>←</kbd> <kbd>→</kbd> cambian el calibre.</li>
       </ul>
     </div>
   </div>
+
+  <a class="nextbig" href="arranque_curvas.html">Siguiente: 6.7 El arranque sobre las curvas →</a>
 
 </main>
 <script>
@@ -186,7 +215,10 @@ function logi(x,xs,ys){ for(var i=0;i<xs.length-1;i++){ if(xs[i]<=x&&x<=xs[i+1])
 function tmin(x){ return logi(x,[1.13].concat(TX),[3600].concat(TMIN)); }
 function tmax(x){ return logi(x,[1.45].concat(TX),[3600].concat(TMAX)); }
 // ejes
-var L=78,R=740,T=18,B=410;
+var L=78,R=740,T=18,B=410,NAR=false,TK;
+function geo(){ NAR=svg.parentNode.clientWidth<620;
+  if(NAR){ L=58; R=456; B=330; svg.setAttribute('viewBox','0 0 470 404'); TK=[1,2,3,5,10,20,50,100]; }
+  else { L=78; R=740; B=410; svg.setAttribute('viewBox','0 0 760 520'); TK=[1,1.5,2,3,4,5,7,10,15,20,30,50,100]; } }
 function X(v){ return L+(R-L)*Math.log(v)/Math.log(100); }
 function Y(t){ var a=Math.log(0.005),b=Math.log(10000); return B-(B-T)*(Math.log(t)-a)/(b-a); }
 var svg=$('svg');
@@ -194,11 +226,12 @@ function el(tag,a,t,par){ var e=document.createElementNS(NS,tag); for(var k in a
 function nextCol(x){ for(var i=0;i<TX.length;i++) if(TX[i]>=x-1e-9) return i; return TX.length-1; }
 function zone(x){ var m=MAG[st.k]; if(x>=m[1]) return 'mag'; if(x>=m[0]) return 'dud'; if(x<1.13) return 'no'; return 'term'; }
 function draw(){
+  geo();
   while(svg.firstChild) svg.removeChild(svg.firstChild);
   var In=CAL[st.q], m=MAG[st.k], c=COL[st.k];
   el('rect',{x:L,y:T,width:R-L,height:B-T,fill:'#fff',stroke:'#999'});
   // rejilla
-  [1,1.5,2,3,4,5,7,10,15,20,30,50,100].forEach(function(v){ el('line',{x1:X(v),y1:T,x2:X(v),y2:B,stroke:'#e2e6ea'}); });
+  TK.forEach(function(v){ el('line',{x1:X(v),y1:T,x2:X(v),y2:B,stroke:'#e2e6ea'}); });
   [[0.01,'0,01 s'],[0.1,'0,1 s'],[1,'1 s'],[10,'10 s'],[100,'100 s'],[1000,'1000 s'],[3600,'1 h']].forEach(function(p){ el('line',{x1:L,y1:Y(p[0]),x2:R,y2:Y(p[0]),stroke:'#e2e6ea'}); el('text',{x:L-6,y:Y(p[0])+4,'text-anchor':'end','font-size':12,fill:'#56606b','class':'lbl'},p[1]); });
   // franja
   var lo=[],up=[],n=120,i,x;
@@ -216,22 +249,23 @@ function draw(){
   el('rect',{x:X(m[0]),y:T,width:X(m[1])-X(m[0]),height:B-T,fill:'#FFD54F','fill-opacity':0.18});
   el('text',{x:(X(m[0])+X(m[1]))/2,y:T+18,'text-anchor':'middle','font-size':13,'font-weight':700,fill:'#8a6d00','class':'lbl'},'dudosa');
   el('text',{x:X(Math.min(m[1]*2,60)),y:T+18,'text-anchor':'middle','font-size':13,'font-weight':700,fill:'#B03A2E','class':'lbl'},'salta seguro');
-  el('text',{x:X(1.06),y:T+18,'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#666','class':'lbl'},'no');
+  if(!NAR) el('text',{x:L+3,y:B-42,'font-size':12,'font-weight':700,fill:'#666','class':'lbl'},'no');
   el('text',{x:X(2.2),y:Y(0.04),'text-anchor':'middle','font-size':14,'font-weight':700,fill:c,'class':'lbl'},'Curva '+st.k);
   // filas del eje X
   el('text',{x:8,y:B+24,'font-size':12,'font-weight':700,fill:'#56606b','class':'lbl rt'},'veces');
-  el('text',{x:8,y:B+50,'font-size':12,'font-weight':700,fill:'#1F5FBF','class':'lbl rt'},'amperios');
-  el('text',{x:8,y:B+64,'font-size':11,fill:'#1F5FBF','class':'lbl rt'},'(× '+In+' A)');
-  [1,1.5,2,3,4,5,7,10,15,20,30,50,100].forEach(function(v){
-    el('text',{x:X(v),y:B+24,'text-anchor':'middle','font-size':13,fill:'#56606b','class':'lbl'},f(v));
-    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},f(a,(a%1)?1:0));
+  el('text',{x:8,y:B+50,'font-size':12,'font-weight':700,fill:'#1a1a1a','class':'lbl rt'},'amperios');
+  el('text',{x:8,y:B+64,'font-size':11,fill:'#1a1a1a','class':'lbl rt'},'(× '+In+' A)');
+  TK.forEach(function(v){
+    var lastT=NAR&&v===100, xa=lastT?R+10:X(v), an=lastT?'end':'middle';
+    el('text',{x:xa,y:B+24,'text-anchor':an,'font-size':13,fill:'#56606b','class':'lbl'},f(v));
+    var a=v*In; el('text',{x:xa,y:B+50,'text-anchor':an,'font-size':(a>=1000?11:13),'font-weight':700,fill:'#1a1a1a','class':'lbl'},f(a,(a%1)?1:0));
   });
   // marcador
   var xv=st.I/In, z=zone(xv), xc=Math.max(1,Math.min(100,xv));
   var mc={no:'#666',term:'#C55A11',dud:'#B08800',mag:'#C0392B'}[z];
   el('line',{x1:X(xc),y1:T,x2:X(xc),y2:B,stroke:mc,'stroke-width':3});
-  el('rect',{x:Math.min(X(xc)-54,R-110),y:B-34,width:108,height:26,rx:6,fill:mc});
-  el('text',{x:Math.min(X(xc),R-56),y:B-16,'text-anchor':'middle','font-size':14,'font-weight':700,fill:'#fff','class':'lbl'},f(xv,2)+' veces');
+  var mxr=Math.max(L+2,Math.min(X(xc)-54,R-110)); el('rect',{x:mxr,y:B-34,width:108,height:26,rx:6,fill:mc});
+  el('text',{x:mxr+54,y:B-16,'text-anchor':'middle','font-size':14,'font-weight':700,fill:'#fff','class':'lbl'},f(xv,2)+' veces');
   if(z==='term'){
     var a1=tmin(xv), a2=xv>=1.45?tmax(xv):null;
     if(a1){ el('line',{x1:L,y1:Y(a1),x2:X(xc),y2:Y(a1),stroke:mc,'stroke-dasharray':'6 4','stroke-width':2}); el('circle',{cx:X(xc),cy:Y(a1),r:5,fill:mc}); }
@@ -276,6 +310,8 @@ function explain(In,xv,z){
     h+='<li><b>¿Arranca?</b> '+v+'</li>';
   }
   h+='</ol>';
+  var zt={no:'no salta',term:'zona térmica',dud:'zona dudosa',mag:'zona magnética: salta seguro'}[z];
+  $('verd').textContent=f(st.I)+' A con '+In+' A = '+f(xv,2)+' veces → '+zt+(st.mode==='A'?' · '+((z==='no'||(z==='term'&&st.dur<TMIN[ci]))?'✔ arranca':'✘ no arranca'):'');
   $('now').innerHTML=h;
   // tabla con la columna marcada
   var hi=(z==='term'&&!lento)?ci:-1, t='<tr><th>Veces I<sub>n</sub></th>';
@@ -288,6 +324,8 @@ function explain(In,xv,z){
 $('qDown').onclick=function(){ if(st.q>0){ st.q--; draw(); } };
 $('qUp').onclick=function(){ if(st.q<CAL.length-1){ st.q++; draw(); } };
 $('mI').onclick=function(){ st.mode='I'; draw(); };
+$('iM').onclick=function(){ st.I=Math.max(1,Math.ceil(st.I-1)); draw(); };
+$('iP').onclick=function(){ st.I=Math.floor(st.I+1); draw(); };
 $('mA').onclick=function(){ st.mode='A'; draw(); };
 $('rI').oninput=function(){ var x=0.5*Math.pow(120,this.value/1000); var a=x*CAL[st.q]; st.I=a>=20?Math.round(a):Math.round(a*10)/10; draw(); };
 $('rT').oninput=function(){ st.dur=Math.round(0.05*Math.pow(200,this.value/1000)*100)/100; draw(); };
@@ -295,11 +333,12 @@ var EX=[['C 16 A con 32 A',{k:'C',In:16,I:32,mode:'I'}],['C 16 A con 96 A',{k:'C
   ['D 125 A con 875 A',{k:'D',In:125,I:875,mode:'I'}],['Arranque 103,6 A · 0,5 s en C 16 A',{k:'C',In:16,I:103.6,mode:'A',dur:0.5}],['El mismo en D 16 A',{k:'D',In:16,I:103.6,mode:'A',dur:0.5}],['Arranque 385 A · 0,2 s en D 50 A',{k:'D',In:50,I:385,mode:'A',dur:0.2}]];
 EX.forEach(function(e){ var b=document.createElement('button'); b.textContent=e[0]; b.onclick=function(){ var p=e[1]; st.k=p.k; st.q=CAL.indexOf(p.In); st.I=p.I; st.mode=p.mode; if(p.dur) st.dur=p.dur; draw(); }; $('exs').appendChild(b); });
 document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT') return; if(e.key==='ArrowLeft'){e.preventDefault();$('qDown').click();} if(e.key==='ArrowRight'){e.preventDefault();$('qUp').click();} });
+window.addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(draw,120);});
 draw();
 })();
 
 </script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
 <script>(function(){
   var b = document.getElementById('themeBtn'), r = document.documentElement;
   function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;

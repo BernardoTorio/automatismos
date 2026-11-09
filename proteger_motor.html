@@ -106,13 +106,37 @@ button:disabled{opacity:.45;cursor:default}
 .flow{fill:none;stroke:#F2B400;stroke-width:4;stroke-dasharray:10 10}
 @media (prefers-reduced-motion: reduce){.flow{stroke-dasharray:none}}
 
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.8 Térmico, fusibles y guardamotor</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="arranque_curvas.html" aria-label="Anterior: 6.7 El arranque sobre las curvas">‹ 6.7</a><span class="where">Tema 6 · 5 de 6</span><a class="arr" href="cuadro_motores.html" aria-label="Siguiente: 6.11 Un cuadro con varios motores">6.11 ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">6.4</a><a href="regla_ib_in_iz.html" title="La regla de oro">6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">6.7</a><a href="proteger_motor.html" class="cur" aria-current="page" title="Térmico, fusibles y guardamotor">6.8</a><a href="cuadro_motores.html" title="Un cuadro con varios motores">6.11</a></div></nav>
   <h1>Tres formas de proteger un motor</h1>
   <p class="sub">Elige un motor y protégelo con <b>magnetotérmico + térmico</b>, con <b>fusibles + térmico</b> o con un <b>guardamotor</b>. Mira qué aparato actúa con una <b>sobrecarga</b> y con un <b>cortocircuito</b>, y dónde va la <b>ruleta</b>.</p>
+  <p class="serve">Te sirve para los ejercicios <b>15, 16, 18 y 20</b>.</p>
 
   <div class="layout">
     <div class="sheet stick" aria-label="Línea de un motor con sus protecciones">
@@ -190,6 +214,8 @@ button:disabled{opacity:.45;cursor:default}
       </ul>
     </div>
   </div>
+
+  <a class="nextbig" href="cuadro_motores.html">Siguiente: 6.11 Un cuadro con varios motores →</a>
 
 </main>
 <script>
@@ -388,7 +414,7 @@ window.__st=st;
 })();
 
 </script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
 <script>(function(){
   var b = document.getElementById('themeBtn'), r = document.documentElement;
   function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
