@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>El arranque del motor sobre las curvas</title>
+<title>El arranque de los motores sobre las curvas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -144,7 +144,7 @@ table.v td.mid{color:#B07800;font-weight:700}
       <ul style="margin-top:0">
         <li><b>Cambiar de curva</b>: de B a C, o de C a D. La franja se va a la derecha y deja sitio al pico.</li>
         <li><b>Subir el calibre</b>: todo el escalón se mueve a la izquierda (son menos «veces»). Pero entonces <b>hay que comprobar el cable</b>: I<sub>n</sub> ≤ I<sub>z</sub>.</li>
-        <li>Si el pico pasa de la zona dudosa, salta seguro: con esa curva no hay nada que hacer.</li>
+        <li>Si el pico pasa de la zona dudosa, salta seguro: con esa curva y ese calibre no arranca.</li>
       </ul>
     </div>
     <div class="card wide">
@@ -163,13 +163,13 @@ table.v td.mid{color:#B07800;font-weight:700}
 (function(){
 var $=function(i){return document.getElementById(i);};
 var NS='http://www.w3.org/2000/svg';
-var CAL=[6,10,16,20,25,32,40,50,63,80];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
 var MAG={B:[3,5],C:[5,10],D:[10,20]};
 var COL={B:'#2f6fd0',C:'#3b9a2f',D:'#e07b00'};
 var MCOL=['#7b2cbf','#d6336c','#0b7285','#5c4033'];
 var TX=[2,3,4,5,7,10,15,20], TMIN=[20,4,2,1.2,0.6,0.3,0.15,0.1], TMAX=[200,40,18,10,5,2.5,1.2,0.7];
-var MOT=[['0,75 kW · Y',1.85],['2,2 kW · Y',4.85],['3 kW · Y',6.4],['4 kW · Y',8.3],['5,5 kW · Δ',11],['7,5 kW · Δ',14.8],['11 kW · Δ',21.5],['15 kW · Δ',28.5],['18,5 kW · Δ',35],['22 kW · Δ',41]];
-var st={ks:{B:false,C:true,D:true},q:2,mots:[{m:4,k:6,d:0.5},{m:5,k:7,d:0.5}]};
+var MOT=[['0,75 kW · Y',1.85],['1,5 kW · Y',3.5],['2,2 kW · Y',4.85],['3 kW · Y',6.4],['4 kW · Y',8.3],['5,5 kW · Δ',11],['7,5 kW · Δ',14.8],['11 kW · Δ',21.5],['15 kW · Δ',28.5],['18,5 kW · Δ',35],['22 kW · Δ',41]];
+var st={ks:{B:false,C:true,D:true},q:2,mots:[{m:5,k:6,d:0.5},{m:6,k:7,d:0.5}]};
 function f(x,d){ if(d===undefined) d=(x>=100?(Math.abs(x-Math.round(x))<1e-9?0:1):(x>=10?1:2)); var s=x.toFixed(d); if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
 function logi(x,xs,ys){ for(var i=0;i<xs.length-1;i++){ if(xs[i]<=x&&x<=xs[i+1]){ var a=Math.log(x/xs[i])/Math.log(xs[i+1]/xs[i]); return Math.exp(Math.log(ys[i])+a*Math.log(ys[i+1]/ys[i])); } } return null; }
 function tmin(x){ return logi(x,[1.13].concat(TX),[3600].concat(TMIN)); }
@@ -182,12 +182,12 @@ var svg=$('svg');
 function el(tag,a,t){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(t!==undefined) e.textContent=t; svg.appendChild(e); return e; }
 function verdict(mo,k){
   var In=CAL[st.q], IB=MOT[mo.m][1], pk=IB*mo.k, x=pk/In, m=MAG[k];
-  if(IB>In) return ['bad','✘ calibre pequeño','el motor pide '+f(IB)+' A y el calibre es de '+In+' A: saltaría en marcha normal'];
-  if(x>=m[1]) return ['bad','✘ salta seguro','el pico ('+f(x,2)+' veces) pasa de '+m[1]+': zona magnética'];
+  if(IB>In) return ['bad','✘ calibre pequeño','el motor pide '+f(IB)+' A y el calibre es de '+In+' A: saltaría en el funcionamiento normal del motor'];
+  if(x>=m[1]) return ['bad','✘ salta seguro','el pico ('+f(x,2)+' veces) llega a '+m[1]+' o más: zona magnética'];
   if(x>=m[0]) return ['mid','✘ zona dudosa','el pico ('+f(x,2)+' veces) cae entre '+m[0]+' y '+m[1]+': a veces saltará'];
   var ci=nextCol(x);
-  if(x>=1.13 && mo.d>=TMIN[ci]) return ['mid','✘ puede saltar la térmica','el arranque ('+f(mo.d,2)+' s) dura más que el tiempo mínimo ('+f(TMIN[ci])+' s)'];
-  return ['ok','✔ arranca','el pico ('+f(x,2)+' veces) no llega a la magnética'+(x>=1.13?' y dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)':'')];
+  if(x>=1.13 && mo.d>=TMIN[ci]) return ['mid','✘ puede saltar la térmica','el arranque ('+f(mo.d,2)+' s) no dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)'];
+  return ['ok','✔ arranca','el pico ('+f(x,2)+' veces) no llega a '+m[0]+(x>=1.13?' y dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)':'')];
 }
 function draw(){
   while(svg.firstChild) svg.removeChild(svg.firstChild);
@@ -222,8 +222,8 @@ function draw(){
   st.mots.forEach(function(mo,i){
     var IB=MOT[mo.m][1], pk=IB*mo.k, c=MCOL[i], x2=X(pk/In), yd=Y(mo.d);
     var tx=x2+10, ty=yd+18+i*18;
-    el('rect',{x:tx-3,y:ty-14,width:32,height:18,rx:4,fill:'#fff',opacity:0.85});
-    el('text',{x:tx,y:ty,'font-size':14,'font-weight':700,fill:c,'class':'lbl'},'M'+(i+1));
+    el('rect',{x:tx-3,y:ty-14,width:38,height:18,rx:4,fill:'#fff',opacity:0.85});
+    el('text',{x:tx,y:ty,'font-size':14,'font-weight':700,fill:c,'class':'lbl'},'-M'+(i+1));
   });
   // ejes x
   el('text',{x:8,y:B+24,'font-size':12,'font-weight':700,fill:'#56606b','class':'lbl rt'},'veces');
@@ -232,7 +232,7 @@ function draw(){
   ticks.forEach(function(v){
     if(v===0.3) return;
     el('text',{x:X(v),y:B+24,'text-anchor':'middle','font-size':13,fill:'#56606b','class':'lbl'},f(v));
-    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},a>=1000?(f(a/1000,1)+'k'):f(a,a<10?1:0));
+    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},f(a,(a%1)?1:0));
   });
   $('vCal').innerHTML=In+' A<small>calibre (In)</small>';
   [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.classList.toggle('on',!!st.ks[b.dataset.k]); b.setAttribute('aria-pressed',!!st.ks[b.dataset.k]); });
@@ -246,7 +246,7 @@ function panel(){
   st.mots.forEach(function(mo,i){
     var d=document.createElement('div'); d.className='mot'; d.style.borderLeftColor=MCOL[i];
     var opts=MOT.map(function(m,j){ return '<option value="'+j+'"'+(j===mo.m?' selected':'')+'>'+m[0]+' · '+f(m[1])+' A</option>'; }).join('');
-    d.innerHTML='<div class="mh"><span style="color:'+MCOL[i]+'">M'+(i+1)+'</span>'+(st.mots.length>1?'<button class="x" aria-label="Quitar motor">✕</button>':'')+'</div>'+
+    d.innerHTML='<div class="mh"><span style="color:'+MCOL[i]+'">-M'+(i+1)+'</span>'+(st.mots.length>1?'<button class="x" aria-label="Quitar motor">✕</button>':'')+'</div>'+
       '<select aria-label="Placa del motor">'+opts+'</select>'+
       '<div class="lab">Pico: <b class="vk">'+mo.k+' veces</b> = <b class="va">'+f(MOT[mo.m][1]*mo.k)+' A</b></div><input type="range" class="rk" min="4" max="12" step="0.5" value="'+mo.k+'" aria-label="Veces del pico">'+
       '<div class="lab">Dura: <b class="vd">'+f(mo.d,2)+' s</b></div><input type="range" class="rd" min="0" max="1000" value="'+Math.round(1000*Math.log(mo.d/0.1)/Math.log(50))+'" aria-label="Duración del arranque">';
@@ -266,10 +266,10 @@ function table(){
   var notes=[];
   st.mots.forEach(function(mo,i){
     var IB=MOT[mo.m][1];
-    h+='<tr><td><span class="chip" style="background:'+MCOL[i]+'"></span><b>M'+(i+1)+'</b> · '+MOT[mo.m][0]+' · '+f(IB)+' A</td><td>'+f(IB*mo.k)+' A · '+f(mo.d,2)+' s<br><small>'+f(IB*mo.k/In,2)+' veces</small></td>';
+    h+='<tr><td><span class="chip" style="background:'+MCOL[i]+'"></span><b>-M'+(i+1)+'</b> · '+MOT[mo.m][0]+' · '+f(IB)+' A</td><td>'+f(IB*mo.k)+' A · '+f(mo.d,2)+' s<br><small>'+f(IB*mo.k/In,2)+' veces</small></td>';
     ks.forEach(function(k){ var v=verdict(mo,k); h+='<td class="'+v[0]+'">'+v[1]+'</td>'; });
     h+='</tr>';
-    var v0=verdict(mo,ks[ks.length-1]); notes.push('<li><b style="color:'+MCOL[i]+'">M'+(i+1)+'</b> con curva '+ks[ks.length-1]+': '+v0[2]+'.</li>');
+    notes.push('<li><b style="color:'+MCOL[i]+'">-M'+(i+1)+'</b>: '+(IB>In?verdict(mo,ks[0])[2]:ks.map(function(k){ return 'con curva <b>'+k+'</b>, '+verdict(mo,k)[2]; }).join('; '))+'.</li>');
   });
   h+='</table></div><ul>'+notes.join('')+'</ul>';
   $('now').innerHTML=h;
@@ -277,7 +277,7 @@ function table(){
 [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.onclick=function(){ st.ks[b.dataset.k]=!st.ks[b.dataset.k]; draw(); }; });
 $('qDown').onclick=function(){ if(st.q>0){ st.q--; draw(); } };
 $('qUp').onclick=function(){ if(st.q<CAL.length-1){ st.q++; draw(); } };
-$('bAdd').onclick=function(){ if(st.mots.length<4){ st.mots.push({m:[2,6,3,7][st.mots.length]||2,k:[6,7,8,8][st.mots.length]||6,d:0.5}); $('mots').dataset.n=''; draw(); } };
+$('bAdd').onclick=function(){ if(st.mots.length<4){ st.mots.push({m:[3,7,3,8][st.mots.length]||3,k:[6,7,7,8][st.mots.length]||6,d:0.5}); $('mots').dataset.n=''; draw(); } };
 document.addEventListener('keydown',function(e){ var t=e.target.tagName; if(t==='INPUT'||t==='SELECT') return; if(e.key==='ArrowLeft'){e.preventDefault();$('qDown').click();} if(e.key==='ArrowRight'){e.preventDefault();$('qUp').click();} });
 draw();
 })();
