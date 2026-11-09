@@ -36,6 +36,14 @@ subir.bat                  publica todo con doble clic
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
 - Tests: una tarjeta por test; el test vuelve a `index.html#tests`.
+
+## Tests: letras en los puntos de medida
+- En cada esquema sobre el que se mide, los tornillos que se usan van marcados con una **letra en una bolita amarilla** (A, B, C…), una serie por figura. No se usan I, L, N ni O (se confunden con 1, la fase, el neutro y el 0).
+- En `DATA` los puntos se escriben con la letra en círculo (`Ⓐ`, `Ⓑ`…): el test (`pts()`) la pinta como la bolita del dibujo, y así no se confunde con las opciones A-B-C-D ni con `-F2`, `-H1`, `-KM1`.
+- La pregunta lleva solo la letra («negra en N y roja en Ⓓ»); el **«¿Por qué?» empieza diciendo qué tornillo es** («Ⓓ es el 3 de -S1.»). `L` y `N` se siguen llamando así.
+- La letra va a la izquierda del hilo con una guía hasta el tornillo; si no cabe, al lado del número. En la fuerza solo caben en los hilos de fuera (L1 y L3): las medidas entre fases se hacen entre esos dos.
+- Las figuras van dentro de cada test (`IMGS`, en base64) y la misma figura se repite en varios tests: si se cambia una, se cambia en todos. «En orden» coincide con el test en papel (mismo número y mismo orden de respuestas).
+- `medidas.html`: las tareas ligadas a una pregunta dicen el tornillo y, entre paréntesis, la letra del dibujo del test.
 - Animaciones: una tarjeta por animación, **numerada con el apartado de los apuntes** (3.1, 3.2…) y en ese orden. Cada animación nueva se añade aquí con número, título y una línea de descripción.
 
 ## Animaciones actuales (Tema 3 · Conexionado básico II)

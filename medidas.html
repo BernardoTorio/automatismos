@@ -83,6 +83,7 @@ button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .task{border-top:1px solid var(--line);padding:9px 0}
 .task:first-of-type{border-top:none}
 .task .tq{font-weight:700}
+.pt{display:inline-block;min-width:1.5em;height:1.5em;line-height:calc(1.5em - 3px);padding:0 .12em;margin:0 .06em;border-radius:999px;background:#FFDD40;color:#111;border:1.5px solid #111;font-weight:700;font-size:.82em;text-align:center;vertical-align:.1em}
 .task .tn{color:var(--acc);font-size:.85rem;font-weight:700}
 .task button{padding:4px 10px;font-size:.85rem;margin-top:4px}
 .task .ans{display:none;margin-top:4px;background:rgba(46,139,62,.12);border-left:5px solid var(--ok);padding:6px 10px;border-radius:6px}
@@ -664,8 +665,8 @@ function circuitos(){
     texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']],
     clamps:[{x:1.5,y:7.75,w:.5,label:'el cable que llega a A1 de -KM1',f:s=>s.on.KM1?0.04:0,why:(s,I)=>I?'Es la corriente de la bobina: muy pequeña, unas centésimas de amperio.':'-KM1 está en reposo: por su bobina no pasa corriente.'}],
     tasks:[
-      {key:'tornillo 3 de -S1', q:'Todo en reposo. V~: punta negra en N y roja en el tornillo 3 de -S1.', a:'<b>230 V</b>: el 95-96 y el 1-2 de -S0 están cerrados, la fase llega hasta ahí.'},
-      {key:'roja en A1 de -KM1', q:'Todo en reposo. V~: punta negra en N y roja en A1 de -KM1.', a:'<b>0 V</b>: -S1 y el 13-14 están abiertos. (El polímetro dice "0 V" aunque A1 está unido al N a través de la bobina.)'},
+      {key:'tornillo 3 de -S1', q:'Todo en reposo. V~: punta negra en N y roja en el tornillo 3 de -S1 (en el dibujo del test, <b class="pt">D</b>).', a:'<b>230 V</b>: el 95-96 y el 1-2 de -S0 están cerrados, la fase llega hasta ahí.'},
+      {key:'roja en A1 de -KM1', q:'Todo en reposo. V~: punta negra en N y roja en A1 de -KM1 (en el dibujo del test, <b class="pt">H</b>).', a:'<b>0 V</b>: -S1 y el 13-14 están abiertos. (El polímetro dice "0 V" aunque A1 está unido al N a través de la bobina.)'},
       {q:'Pulsa TEST del térmico. V~: negra en N y roja en el 96 de -F2. Después, en el 98.', a:'En el 96, unos <b>20-30 V</b>: tensión fantasma, es decir, <b>0 V a efectos prácticos</b> (el 95-96 se ha abierto). En el 98, <b>230 V</b> (el 97-98 se ha cerrado y -H1 se enciende).'},
       {q:'Con todo en reposo, pulsa y mantén -S0. V~: negra en N y roja en el 2 de -S0.', a:'Unos <b>20-30 V</b>: tensión fantasma. El 2 de -S0 se ha quedado «al aire» (paro abierto, marcha y 13-14 abiertos). A efectos prácticos, <b>0 V</b>.'},
       {q:'Baja -Q1. Ω: puntas en el 13 y el 14 de -KM1. Luego en el 61 y el 62.', a:'13-14: <b>OL</b>, no pita (NA abierto). 61-62: <b>pita</b> (NC cerrado).'},
@@ -677,7 +678,7 @@ function circuitos(){
     wires:[W('L','L',[.6,.6],[10.2,.6]),W('q','L',[1.5,2.6],[1.5,2.85]),W('s','L',[1.5,3.85],[1.5,4.1]),W('s','L',[1.5,4.1],[9.4,4.1]),W('N','N',[.6,9.8],[10.2,9.8])],
     dots:[[1.5,.6],[1.5,4.1]], texts:[[.35,.6,'L'],[.35,9.8,'N']], hots:[[.9,.6,'L','L'],[.9,9.8,'N','N']], clamps:[],
     tasks:[
-      {key:'roja en el 54 de -KM1 (rama de -KM2)', q:'Arranca -KM1 con -S1 y deja -KM2 parado. V~: negra en N y roja en el 54 de -KM1 (rama de -KM2).', a:'<b>0 V</b>: el 53-54 está cerrado, pero antes de él la fase solo llega por -S2 o por el 13-14 de -KM2, y los dos están abiertos.'},
+      {key:'roja en el 54 de -KM1 (rama de -KM2)', q:'Arranca -KM1 con -S1 y deja -KM2 parado. V~: negra en N y roja en el 54 de -KM1 de la rama de -KM2 (en el dibujo del test, <b class="pt">A</b>).', a:'<b>0 V</b>: el 53-54 está cerrado, pero antes de él la fase solo llega por -S2 o por el 13-14 de -KM2, y los dos están abiertos.'},
       {q:'Con -KM1 en marcha, mide en el 53 de -KM1 (rama de -KM2) mientras mantienes pulsado -S2.', a:'<b>230 V</b>: -S2 deja pasar la fase y, como -KM1 está activado, -KM2 entra.'},
     ]};
   [1.5,4.7,7.9].forEach((x,i)=>{ const xk=x+1.5, n=i+1, p='p'+n, c=i?'c'+n:p;
@@ -713,7 +714,7 @@ function circuitos(){
     clamps:[{x:5.34,y:7.75,w:.5,label:'el cable que llega a A1 de -KM1',f:s=>s.on.KM1?0.04:0,why:(s,I)=>I?'Corriente de la bobina de -KM1: centésimas de amperio.':'-KM1 está en reposo.'},
             {x:1.5,y:7.75,w:.5,label:'el cable que llega a A1 de -KA1',f:s=>s.on.KA1?0.01:0,why:(s,I)=>I?'La bobina del relé consume todavía menos que la del contactor.':'-KA1 está en reposo.'}],
     tasks:[
-      {key:'roja en el 24 de -KA1', q:'Todo en reposo. V~: punta negra en N y roja en el 24 de -KA1.', a:'<b>0 V</b>: el 21 sí tiene fase, pero en reposo la lámina toca el 22, no el 24.'},
+      {key:'roja en el 24 de -KA1', q:'Todo en reposo. V~: punta negra en N y roja en el 24 de -KA1 (en el dibujo del test, <b class="pt">C</b>).', a:'<b>0 V</b>: el 21 sí tiene fase, pero en reposo la lámina toca el 22, no el 24.'},
       {q:'Todo en reposo. V~: negra en N y roja en el 22 de -KA1. Después pulsa -S1 y vuelve a medir.', a:'En reposo <b>230 V</b> (-H2 encendido). Tras pulsar -S1, <b>0 V</b>: la lámina pasa al 24.'},
     ]});
   // ---------- 4. Arranque directo ----------
@@ -749,9 +750,9 @@ function circuitos(){
     ],
     tasks:[
       {key:'entre U y V del motor', q:'-Q1 subido y -KM1 en reposo. V~: puntas en U1 y V1 del motor.', a:'<b>0 V</b>: los contactos principales de -KM1 están abiertos. Arranca con -S1 y vuelve a medir: <b>230 V</b> (en el aula, entre fases).'},
-      {key:'solo el cable que va a A1', q:'Arranca el motor. Pinza en el cable que llega a A1 de -KM1.', a:'Unas <b>centésimas de amperio</b> (0,03-0,05 A).'},
+      {key:'solo el cable que va a A1', q:'Arranca el motor. Pinza en el cable que llega a A1 de -KM1 (en el dibujo del test, <b class="pt">K</b>).', a:'Unas <b>centésimas de amperio</b> (0,03-0,05 A).'},
       {key:'los tres cables del motor a la vez', q:'Con el motor en marcha, abraza con la pinza los tres cables del motor a la vez. Luego, uno solo.', a:'Los tres a la vez: <b>0 A</b> (se anulan). Uno solo: <b>amperios</b>.'},
-      {key:'entre 1/L1 y 2/T1 de -KM1 en reposo', q:'Baja -Q1 y -Q2. Ω: puntas en 1/L1 y 2/T1 de -KM1. Luego empuja el testigo de -KM1 y repite.', a:'En reposo <b>OL</b>, no pita (NA abierto). Con el testigo empujado, <b>pita</b>.'},
+      {key:'entre 1/L1 y 2/T1 de -KM1 en reposo', q:'Baja -Q1 y -Q2. Ω: puntas en 1/L1 y 2/T1 de -KM1 (en el dibujo del test, <b class="pt">C</b> y <b class="pt">E</b>). Luego empuja el testigo de -KM1 y repite.', a:'En reposo <b>OL</b>, no pita (NA abierto). Con el testigo empujado, <b>pita</b>.'},
       {q:'Baja -Q1 y -Q2. Ω: puntas en U1 y V1 del motor.', a:'Unos <b>17 Ω</b>: es la resistencia de las bobinas del motor (en el aula van en triángulo).'},
     ]});
   // ---------- 5. P1 1.3 ----------
@@ -837,7 +838,7 @@ function circuitos(){
     wires:[], dots:[], texts:[[.3,.35,'Contactor -KM1 con su bloque auxiliar','cap'],[.3,3.35,'Relé térmico -F2','cap']], hots:[], clamps:[],
     tasks:[
       {key:'mides la bobina de un contactor entre A1 y A2', q:'Ω: puntas en A1 y A2 de -KM1. Cambia la bobina a "en cortocircuito" y a "cortada" y repite.', a:'Bien: unos <b>560 Ω</b>. En cortocircuito: <b>0 Ω</b> (pita). Cortada: <b>OL</b>.'},
-      {key:'después de pulsar TEST, ¿entre qué tornillos', q:'Continuidad en el 95-96 y en el 97-98 de -F2. Pulsa TEST y repite.', a:'En reposo: 95-96 <b>pita</b>, 97-98 <b>OL</b>. Tras TEST: 95-96 <b>OL</b>, 97-98 <b>pita</b>. RESET lo deja como al principio.'},
+      {key:'después de pulsar TEST, ¿entre qué tornillos', q:'Continuidad en el 95-96 y en el 97-98 de -F2 (en el dibujo del test, <b class="pt">F</b>-<b class="pt">G</b> y 97-<b class="pt">H</b>). Pulsa TEST y repite.', a:'En reposo: 95-96 <b>pita</b>, 97-98 <b>OL</b>. Tras TEST: 95-96 <b>OL</b>, 97-98 <b>pita</b>. RESET lo deja como al principio.'},
       {q:'Continuidad en el 61-62 y en el 1/L1-2/T1 de -KM1. Empuja el testigo y repite.', a:'En reposo: 61-62 <b>pita</b>, 1-2 <b>OL</b>. Con el testigo: al revés.'},
     ]});
   return L;
