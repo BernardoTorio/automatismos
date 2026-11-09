@@ -114,6 +114,38 @@ figcaption{font-size:14px;color:var(--muted);font-style:italic;margin-top:4px}
 #zoom{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out;padding:16px}
 #zoom img{max-width:100%;max-height:100%;background:#fff;border-radius:8px;padding:8px}
 @media (max-width:560px){body{font-size:16px}.qtext{font-size:17px}h1{font-size:22px}.crumbs{font-size:12px}}
+
+/* ---------- mapa de preguntas y marcador ---------- */
+.qmap,.qbar,.qsheet{display:none}
+.qmap h2{margin:0 0 8px;font-size:15px}
+.qblk{margin:0 0 8px}.qblk>span{display:block;font-size:11px;color:var(--muted);margin:0 0 3px}
+.qblk .g{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.qblk button{font:inherit;font-size:12px;font-weight:700;border:1.5px solid var(--line);background:var(--btn);color:var(--ink);border-radius:6px;padding:5px 0;cursor:pointer}
+.qblk button.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.qblk button.ko{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.qblk button.cur{outline:3px solid var(--green);outline-offset:1px}
+.qmap .leg{font-size:11px;color:var(--muted);margin:6px 0 0}
+.qmap .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;border:1.5px solid var(--line);margin:0 3px 0 6px;vertical-align:-1px}
+.qmap .leg i:first-child{margin-left:0}
+.qmap .leg i.ok{background:var(--ok-soft);border-color:var(--ok)}.qmap .leg i.ko{background:var(--red-soft);border-color:var(--red)}
+.sc{font-size:15px;margin:0 0 6px}.sc b{font-size:22px;margin-right:4px}.sc.ok b{color:var(--ok)}.sc.ko b{color:var(--red)}
+.sc.nota{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}.sc small{display:block;color:var(--muted);font-size:11px}
+.qmap .fin,.qsheet .fin{width:100%;margin-top:8px;font-size:14px;padding:8px}
+@media (min-width:1240px){
+  body.inq .qmap{display:block;position:fixed;top:76px;max-height:calc(100vh - 92px);overflow:auto;width:min(230px,calc((100vw - 860px)/2 - 30px));background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow)}
+  body.inq .qmap.l{right:calc(50% + 444px)} body.inq .qmap.r{left:calc(50% + 444px)}
+}
+@media (max-width:1239px){
+  body.inq .qbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--card);border-top:1px solid var(--line);padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));cursor:pointer;box-shadow:0 -4px 12px rgba(0,0,0,.15)}
+  .qbar .segs{display:flex;gap:1px;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+  .qbar .segs i{flex:1;background:var(--btn)}.qbar .segs i.ok{background:var(--ok)}.qbar .segs i.ko{background:var(--red)}.qbar .segs i.cur{box-shadow:inset 0 0 0 2px var(--ink)}
+  .qbar .tx{font-size:14px;font-weight:700;margin-top:4px;display:flex;gap:6px;align-items:center}.qbar .tx .ok{color:var(--ok)}.qbar .tx .ko{color:var(--red)}.qbar .more{margin-left:auto;color:var(--muted);font-weight:400}
+  body.inq .qsheet{display:block;position:fixed;left:0;right:0;bottom:46px;max-height:62vh;overflow:auto;z-index:14;background:var(--card);border-top:1px solid var(--line);padding:10px 12px 14px;box-shadow:0 -6px 16px rgba(0,0,0,.25)}
+  body.inq .qsheet[hidden]{display:none}
+  .qsheet .qblk .g{grid-template-columns:repeat(10,1fr)}
+  .qsheet .qblk button{padding:8px 0}
+  body.inq main{padding-bottom:110px}
+}
 </style>
 </head>
 <body>
@@ -173,7 +205,7 @@ let state = { screen: 'start' };
 
 /* ---------- inicio ---------- */
 function start(){
-  state = { screen: 'start' };
+  state = { screen: 'start' }; drawMap();
   const cnt = t => DATA.filter(q => q.tema === t).length;
   const N = DATA.length, B = 25, blocks = [];
   for (let a = 1; a <= N; a += B) blocks.push([a, Math.min(a + B - 1, N)]);
@@ -325,6 +357,7 @@ function show(){
   tg.onclick = () => { qg.hidden = !qg.hidden; tg.setAttribute('aria-expanded', !qg.hidden); };
   app.querySelectorAll('.qgrid button[data-j]').forEach(b => b.onclick = () => go(+b.dataset.j));
   if (state.answered) paint();
+  drawMap();
   window.scrollTo({ top: 0 });
 }
 function tabla(t){
@@ -357,6 +390,7 @@ function paint(){
     <div class="nav"><button class="go" id="next">${last ? 'Ver resultado' : 'Siguiente →'}</button></div>`;
   document.getElementById('next').onclick = next;
   document.querySelector('.score').textContent = `Aciertos: ${state.ok}`;
+  drawMap();
 }
 function lab(x, k){ return state.mode === 'orden' ? x.q.n : k + 1; }
 function go(k){ if (k < 0 || k >= state.list.length) return; state.i = k; show(); }
@@ -366,7 +400,7 @@ function next(){
 
 /* ---------- resultado ---------- */
 function result(){
-  state.screen = 'end';
+  state.screen = 'end'; drawMap();
   const n = state.list.length, ans = state.list.filter(it => it.pick !== null), blank = state.list.filter(it => it.pick === null);
   const nota = ans.length ? state.ok / ans.length * 10 : 0;
   const fails = ans.filter(it => it.order[it.pick] !== 0);
@@ -396,6 +430,37 @@ function result(){
   const bl = document.getElementById('blank');
   if (bl) bl.onclick = () => { const m = state.mode; state = { screen: 'q', mode: m, list: blank.map(it => item(it.q, m === 'orden')), i: 0, ok: 0, answered: false }; show(); };
   window.scrollTo({ top: 0 });
+}
+
+/* ---------- mapa de preguntas y marcador (a los lados; en el móvil, barra de abajo) ---------- */
+const mapL = document.createElement('aside'), mapR = document.createElement('aside'), qbar = document.createElement('div'), qsheet = document.createElement('div');
+mapL.className = 'qmap l'; mapR.className = 'qmap r'; qbar.className = 'qbar'; qsheet.className = 'qsheet'; qsheet.hidden = true;
+mapL.setAttribute('aria-label', 'Mapa de preguntas'); mapR.setAttribute('aria-label', 'Cómo vas');
+document.body.append(mapL, mapR, qsheet, qbar);
+qbar.onclick = () => { qsheet.hidden = !qsheet.hidden; };
+function qcls(x, k){ return (x.pick === null ? '' : (x.order[x.pick] === 0 ? 'ok' : 'ko')) + (k === state.i ? ' cur' : ''); }
+function gridHTML(){
+  const L = state.list; let h = '';
+  for (let a = 0; a < L.length; a += 10) {
+    const b = Math.min(a + 9, L.length - 1);
+    h += `<div class="qblk"><span>${lab(L[a], a)} a ${lab(L[b], b)}</span><div class="g">` + L.slice(a, a + 10).map((x, j) => `<button data-j="${a + j}" class="${qcls(x, a + j)}" aria-label="Pregunta ${lab(x, a + j)}">${lab(x, a + j)}</button>`).join('') + '</div></div>';
+  }
+  return h;
+}
+function drawMap(){
+  const on = state.screen === 'q'; document.body.classList.toggle('inq', on);
+  if (!on) { qsheet.hidden = true; return; }
+  const L = state.list, n = L.length, ans = L.filter(x => x.pick !== null), ok = ans.filter(x => x.order[x.pick] === 0).length, ko = ans.length - ok;
+  const nota = ans.length ? (ok / ans.length * 10).toFixed(1).replace('.', ',') : '–';
+  mapL.innerHTML = '<h2>Preguntas</h2>' + gridHTML() + '<p class="leg"><i class="ok"></i>acertada <i class="ko"></i>fallada <i></i>sin contestar</p>';
+  mapR.innerHTML = `<h2>Cómo vas</h2><div class="sc ok"><b>${ok}</b>aciertos</div><div class="sc ko"><b>${ko}</b>fallos</div><div class="sc"><b>${n - ans.length}</b>sin contestar</div><div class="sc nota">Nota: <b>${nota}</b><small>solo cuenta lo contestado</small></div><button class="go fin" id="finR">Terminar y ver resultado</button>`;
+  qbar.innerHTML = `<div class="segs">${L.map((x, k) => `<i class="${qcls(x, k)}"></i>`).join('')}</div><div class="tx">${state.i + 1} de ${n} · <span class="ok">✔ ${ok}</span> · <span class="ko">✘ ${ko}</span><span class="more">▴ mapa de preguntas</span></div>`;
+  qsheet.innerHTML = gridHTML() + '<button class="go fin" id="finS">Terminar y ver resultado</button>';
+  mapL.querySelectorAll('button[data-j]').forEach(b => b.onclick = () => go(+b.dataset.j));
+  qsheet.querySelectorAll('button[data-j]').forEach(b => b.onclick = () => { qsheet.hidden = true; go(+b.dataset.j); });
+  document.getElementById('finR').onclick = result;
+  document.getElementById('finS').onclick = () => { qsheet.hidden = true; result(); };
+  const c = mapL.querySelector('.cur'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'nearest' });
 }
 start();
 </script>
