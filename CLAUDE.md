@@ -9,7 +9,7 @@ Los alumnos entran desde **códigos QR impresos en los apuntes**, que apuntan a 
 
 ## Estructura del repositorio
 ```
-index.html                 portada con seis "carpetas": Temas, Prácticas, Ejercicios, Animaciones, Tests, Medidas
+index.html                 portada: «Ahora en clase», el curso tema a tema y las pestañas Apuntes, Prácticas, Ejercicios, Animaciones, Tests, Medidas
 test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modos en orden, al azar y por temas; saltos de 1 en 1 y de 10 en 10)
 test_28oct_II.html         test II examen 28 de octubre (100 preguntas nuevas, con peso en medidas y averías; mismo motor)
 test_diciembre.html        test examen de diciembre (Práctica 3)
@@ -31,7 +31,10 @@ subir.bat                  publica todo con doble clic
 - El Tema 3 se llama **"Conexionado básico II"** (no "Conexionado complejo").
 
 ## index.html
-- Arriba, seis carpetas que funcionan como pestañas: `#temas` (por defecto), `#practicas`, `#ejercicios`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-temas`, `sec-practicas`, `sec-ejercicios`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`.
+- Arriba, el bloque **«Ahora en clase»** (apuntes, ejercicios y animaciones del tema que se está dando). Al pasar de tema solo se cambia un número: `var HOY = 6;`, al final del archivo. Los temas están en la lista `T` que va justo debajo.
+- Después, una fila de pestañas: `#inicio` («Por temas», por defecto: el curso tema a tema, el último arriba), `#temas` (Apuntes), `#practicas`, `#ejercicios`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-inicio`, `sec-temas`, `sec-practicas`, `sec-ejercicios`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`. **Los nombres de las pestañas (`#…`) no se cambian**: las animaciones y los tests vuelven a ellas.
+- En las demás páginas, la miga «Automatismos» lleva a `index.html` (la portada).
+- **Marca «✓ vista»**: las animaciones que ya se han abierto en ese navegador salen marcadas (clave `visto:<archivo>` en `localStorage`). La pone la portada al tocar una tarjeta y, además, cada animación del Tema 6 al abrirse (también desde un QR). No se marca en tests ni en medidas.
 - Ejercicios: PDF de problemas y, debajo, las animaciones que ayudan a hacerlos (también salen en Animaciones). Esas animaciones vuelven a `index.html#ejercicios`.
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
