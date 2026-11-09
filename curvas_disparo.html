@@ -132,7 +132,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
     <div class="card howto">
       <h2>Transformar la curva según el calibre</h2>
       <p style="margin:0">La curva no viene en amperios, sino en <b>veces el calibre</b> (abajo, la fila gris). Así una sola curva vale para todos los magnetotérmicos de esa letra.</p>
-      <p style="margin:8px 0 0">Para pasarla a amperios, <b>multiplica por el calibre</b>: es la fila azul. Con un magnetotérmico de 16 A, «5 veces» son 5 × 16 = <b>80 A</b>. Cambia el calibre y mira cómo cambia la fila azul: la curva es la misma.</p>
+      <p style="margin:8px 0 0">Para pasarla a amperios, <b>multiplica por el calibre</b>: es la fila azul. Con un magnetotérmico de 16 A, «5 veces» son 5 × 16 = <b>80 A</b>. Cambia el calibre y mira cómo cambia la fila azul: la curva es la misma, pero tu corriente cae en otras «veces».</p>
       <p style="margin:8px 0 0">En los problemas se hace al revés: <b>divide</b> la corriente entre el calibre y busca esas veces en la curva.</p>
     </div>
     <div class="card ojo">
@@ -140,7 +140,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
       <ul style="margin-top:0">
         <li><b>No salta</b>: menos de 1,13 veces.</li>
         <li><b>Térmica</b> (sobrecarga): salta despacio, entre el tiempo mínimo (borde de abajo) y el máximo (borde de arriba).</li>
-        <li><b>Dudosa</b>: la magnética puede saltar al instante… o no. B: de 3 a 5 · C: de 5 a 10 · D: de 10 a 20 veces.</li>
+        <li><b>Dudosa</b>: la magnética puede saltar al instante… o no. Aquí no se usa la tabla. B: de 3 a 5 · C: de 5 a 10 · D: de 10 a 20 veces.</li>
         <li><b>Magnética</b> (cortocircuito): desde el final de la zona dudosa, salta seguro en unos 0,01 s.</li>
       </ul>
     </div>
@@ -157,7 +157,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
     <div class="card wide">
       <h2>Tabla de la parte térmica (igual en B, C y D)</h2>
       <div style="overflow-x:auto"><table class="t" id="tab"></table></div>
-      <p class="foot">Si las veces no están en la tabla, usa la columna <b>siguiente</b> (la de más veces): da un tiempo más corto y te quedas del lado seguro.</p>
+      <p class="foot">Si las veces no están en la tabla, usa la columna <b>siguiente</b> (la de más veces): da un tiempo más corto y te quedas del lado seguro. Con menos de 2 veces tarda mucho: de 20 s a 1 hora.</p>
     </div>
     <div class="card wide">
       <h2>Cómo funciona esta animación</h2>
@@ -176,7 +176,7 @@ table.t td.hi,table.t th.hi{background:#FFF1C2;color:#1a1a1a;font-weight:700}
 (function(){
 var $=function(i){return document.getElementById(i);};
 var NS='http://www.w3.org/2000/svg';
-var CAL=[6,10,16,20,25,32,40,50,63,80,100,125];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
 var MAG={B:[3,5],C:[5,10],D:[10,20]};
 var COL={B:'#2f6fd0',C:'#3b9a2f',D:'#e07b00'};
 var TX=[2,3,4,5,7,10,15,20], TMIN=[20,4,2,1.2,0.6,0.3,0.15,0.1], TMAX=[200,40,18,10,5,2.5,1.2,0.7];
@@ -224,7 +224,7 @@ function draw(){
   el('text',{x:8,y:B+64,'font-size':11,fill:'#1F5FBF','class':'lbl rt'},'(× '+In+' A)');
   [1,1.5,2,3,4,5,7,10,15,20,30,50,100].forEach(function(v){
     el('text',{x:X(v),y:B+24,'text-anchor':'middle','font-size':13,fill:'#56606b','class':'lbl'},f(v));
-    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},a>=1000?(f(a/1000,1)+'k'):f(a,0));
+    var a=v*In; el('text',{x:X(v),y:B+50,'text-anchor':'middle','font-size':(a>=1000?11:13),'font-weight':700,fill:'#1F5FBF','class':'lbl'},f(a,(a%1)?1:0));
   });
   // marcador
   var xv=st.I/In, z=zone(xv), xc=Math.max(1,Math.min(100,xv));
@@ -232,7 +232,7 @@ function draw(){
   el('line',{x1:X(xc),y1:T,x2:X(xc),y2:B,stroke:mc,'stroke-width':3});
   el('rect',{x:Math.min(X(xc)-54,R-110),y:B-34,width:108,height:26,rx:6,fill:mc});
   el('text',{x:Math.min(X(xc),R-56),y:B-16,'text-anchor':'middle','font-size':14,'font-weight':700,fill:'#fff','class':'lbl'},f(xv,2)+' veces');
-  if(z==='term'||z==='dud'){
+  if(z==='term'){
     var a1=tmin(xv), a2=xv>=1.45?tmax(xv):null;
     if(a1){ el('line',{x1:L,y1:Y(a1),x2:X(xc),y2:Y(a1),stroke:mc,'stroke-dasharray':'6 4','stroke-width':2}); el('circle',{cx:X(xc),cy:Y(a1),r:5,fill:mc}); }
     if(a2){ el('line',{x1:L,y1:Y(a2),x2:X(xc),y2:Y(a2),stroke:mc,'stroke-dasharray':'6 4','stroke-width':2}); el('circle',{cx:X(xc),cy:Y(a2),r:5,fill:mc}); }
@@ -262,30 +262,31 @@ function explain(In,xv,z){
   else if(z==='dud') h+=f(xv,2)+' está entre '+m[0]+' y '+m[1]+' → <b>zona dudosa</b>: la magnética puede saltar al instante.</li>';
   else h+=f(xv,2)+' llega a '+m[1]+' o más → <b>zona magnética</b>: salta <b>seguro, en unos 0,01 s</b> (cortocircuito).</li>';
   var ci=nextCol(xv), col=TX[ci], exact=Math.abs(col-xv)<1e-6;
-  if(z==='term'||z==='dud'){
-    h+='<li><b>Tabla</b>: '+(exact?'columna de '+col+' veces':(xv<2?'menos de 2 veces: usa la columna de 2':'no está en la tabla: usa la columna siguiente, la de '+col+' veces'))+' → mínimo <b>'+f(TMIN[ci])+' s</b>, máximo <b>'+f(TMAX[ci])+' s</b>.'+(z==='dud'?' (Esto solo vale si no salta antes la magnética.)':'')+'</li>';
-  }
+  var lento=z==='term'&&xv<2-1e-9;
+  if(z==='dud') h+='<li><b>Tabla</b>: aquí no se usa. En la zona dudosa manda la magnética: <b>puede saltar al instante</b>.</li>';
+  else if(lento) h+='<li><b>Tabla</b>: menos de 2 veces no está en la tabla. Es una sobrecarga pequeña: <b>tarda mucho, de 20 s a 1 hora</b>.</li>';
+  else if(z==='term') h+='<li><b>Tabla</b>: '+(exact?'columna de '+col+' veces':'no está en la tabla: usa la columna siguiente, la de '+col+' veces')+' → mínimo <b>'+f(TMIN[ci])+' s</b>, máximo <b>'+f(TMAX[ci])+' s</b>.</li>';
   if(st.mode==='A'){
     var v;
     if(z==='mag') v='<span class="bad">✘ No arranca:</span> el pico está en la zona magnética y salta seguro al arrancar.';
     else if(z==='dud') v='<span class="bad">✘ No vale:</span> el pico cae en la zona dudosa; algunas veces saltará al arrancar. Prueba otra curva o un calibre mayor.';
     else if(z==='no') v='<span class="ok">✔ Arranca:</span> el pico ni siquiera llega a la zona térmica.';
     else if(st.dur<TMIN[ci]) v='<span class="ok">✔ Arranca:</span> no llega a la magnética y el arranque ('+f(st.dur,2)+' s) dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s).';
-    else v='<span class="bad">✘ Puede saltar la térmica:</span> el arranque ('+f(st.dur,2)+' s) dura más que el tiempo mínimo ('+f(TMIN[ci])+' s).';
+    else v='<span class="bad">✘ Puede saltar la térmica:</span> el arranque ('+f(st.dur,2)+' s) no dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s).';
     h+='<li><b>¿Arranca?</b> '+v+'</li>';
   }
   h+='</ol>';
   $('now').innerHTML=h;
   // tabla con la columna marcada
-  var hi=(z==='term'||z==='dud')?ci:-1, t='<tr><th>Veces I<sub>n</sub></th>';
+  var hi=(z==='term'&&!lento)?ci:-1, t='<tr><th>Veces I<sub>n</sub></th>';
   TX.forEach(function(v,i){ t+='<th'+(i===hi?' class="hi"':'')+'>'+v+'</th>'; }); t+='</tr><tr><td>Tiempo mínimo</td>';
   TMIN.forEach(function(v,i){ t+='<td'+(i===hi?' class="hi"':'')+'>'+f(v)+' s</td>'; }); t+='</tr><tr><td>Tiempo máximo</td>';
   TMAX.forEach(function(v,i){ t+='<td'+(i===hi?' class="hi"':'')+'>'+f(v)+' s</td>'; }); t+='</tr>';
   $('tab').innerHTML=t;
 }
 [].forEach.call(document.querySelectorAll('#segK button'),function(b){ b.onclick=function(){ st.k=b.dataset.k; draw(); }; });
-$('qDown').onclick=function(){ if(st.q>0){ var x=st.I/CAL[st.q]; st.q--; st.I=x*CAL[st.q]; draw(); } };
-$('qUp').onclick=function(){ if(st.q<CAL.length-1){ var x=st.I/CAL[st.q]; st.q++; st.I=x*CAL[st.q]; draw(); } };
+$('qDown').onclick=function(){ if(st.q>0){ st.q--; draw(); } };
+$('qUp').onclick=function(){ if(st.q<CAL.length-1){ st.q++; draw(); } };
 $('mI').onclick=function(){ st.mode='I'; draw(); };
 $('mA').onclick=function(){ st.mode='A'; draw(); };
 $('rI').oninput=function(){ var x=0.5*Math.pow(120,this.value/1000); var a=x*CAL[st.q]; st.I=a>=20?Math.round(a):Math.round(a*10)/10; draw(); };
