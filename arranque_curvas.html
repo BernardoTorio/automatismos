@@ -169,7 +169,7 @@ button:disabled{opacity:.45;cursor:default}
       <ul style="margin-top:0">
         <li><b>Cambiar de curva</b>: de B a C, o de C a D. La franja se va a la derecha y deja sitio al pico.</li>
         <li><b>Subir el calibre</b>: todo el escalón se mueve a la izquierda (son menos «veces»). Pero entonces <b>hay que comprobar el cable</b>: I<sub>n</sub> ≤ I<sub>z</sub>.</li>
-        <li>Si el pico pasa de la zona dudosa, salta seguro: con esa curva y ese calibre no arranca.</li>
+        <li>Si el pico llega a la zona magnética, salta seguro: con esa curva y ese calibre no arranca.</li>
       </ul>
     </div>
     <div class="card wide">
@@ -214,8 +214,8 @@ function el(tag,a,t){ var e=document.createElementNS(NS,tag); for(var k in a) e.
 function verdict(mo,k){
   var In=CAL[st.q], IB=MOT[mo.m][1], pk=IB*mo.k, x=pk/In, m=MAG[k];
   if(IB>In) return ['bad','✘ calibre pequeño','el motor pide '+f(IB)+' A y el calibre es de '+In+' A: saltaría en el funcionamiento normal del motor'];
-  if(x>=m[1]) return ['bad','✘ salta seguro','el pico ('+f(x,2)+' veces) llega a '+m[1]+' o más: zona magnética'];
-  if(x>=m[0]) return ['mid','✘ zona dudosa','el pico ('+f(x,2)+' veces) cae entre '+m[0]+' y '+m[1]+': a veces saltará'];
+  if(x>=m[1]) return ['bad','✘ zona magnética','el pico ('+f(x,2)+' veces) llega a '+m[1]+' o más: zona magnética, salta seguro'];
+  if(x>=m[0]) return ['mid','✘ zona dudosa','el pico ('+f(x,2)+' veces) cae entre '+m[0]+' y '+m[1]+': zona dudosa, a veces saltará'];
   var ci=nextCol(x);
   if(x>=1.13 && mo.d>=TMIN[ci]) return ['mid','✘ puede saltar la térmica','el arranque ('+f(mo.d,2)+' s) no dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)'];
   return ['ok','✔ arranca','el pico ('+f(x,2)+' veces) no llega a '+m[0]+(x>=1.13?' y dura menos que el tiempo mínimo ('+f(TMIN[ci])+' s)':'')];

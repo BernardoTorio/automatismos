@@ -165,9 +165,9 @@ button:disabled{opacity:.45;cursor:default}
       <h2>Las zonas de la curva</h2>
       <ul style="margin-top:0">
         <li><b>No salta</b>: menos de 1,13 veces.</li>
-        <li><b>Térmica</b> (sobrecarga): salta despacio, entre el tiempo mínimo (borde de abajo) y el máximo (borde de arriba).</li>
-        <li><b>Dudosa</b>: la magnética puede saltar al instante… o no. Aquí no se usa la tabla. B: de 3 a 5 · C: de 5 a 10 · D: de 10 a 20 veces.</li>
-        <li><b>Magnética</b> (cortocircuito): desde el final de la zona dudosa, salta seguro en unos 0,01 s.</li>
+        <li><b>Zona térmica</b> (sobrecarga): salta despacio, entre el tiempo mínimo (borde de abajo) y el máximo (borde de arriba).</li>
+        <li><b>Zona dudosa</b>: la magnética puede saltar al instante… o no. Aquí no se usa la tabla. B: de 3 a 5 · C: de 5 a 10 · D: de 10 a 20 veces.</li>
+        <li><b>Zona magnética</b> (cortocircuito): desde el final de la zona dudosa, salta seguro en unos 0,01 s.</li>
       </ul>
     </div>
     <div class="card wide">
@@ -207,7 +207,7 @@ var $=function(i){return document.getElementById(i);};
 var NS='http://www.w3.org/2000/svg';
 var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
 var MAG={B:[3,5],C:[5,10],D:[10,20]};
-var COL={B:'#2f6fd0',C:'#3b9a2f',D:'#e07b00'};
+var COL={B:'#2f6fd0',C:'#3b9a2f',D:'#e07b00'}, COLD={B:'#1f57ab',C:'#2a7a20',D:'#a35600'};
 var TX=[2,3,4,5,7,10,15,20], TMIN=[20,4,2,1.2,0.6,0.3,0.15,0.1], TMAX=[200,40,18,10,5,2.5,1.2,0.7];
 var st={k:'C',q:2,I:32,mode:'I',dur:0.5};
 function f(x,d){ if(d===undefined) d=(x>=100?(Math.abs(x-Math.round(x))<1e-9?0:1):(x>=10?1:2)); var s=x.toFixed(d); if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
@@ -215,7 +215,7 @@ function logi(x,xs,ys){ for(var i=0;i<xs.length-1;i++){ if(xs[i]<=x&&x<=xs[i+1])
 function tmin(x){ return logi(x,[1.13].concat(TX),[3600].concat(TMIN)); }
 function tmax(x){ return logi(x,[1.45].concat(TX),[3600].concat(TMAX)); }
 // ejes
-var L=78,R=740,T=18,B=410,NAR=false,TK;
+var L=78,R=740,T=46,B=410,NAR=false,TK;
 function geo(){ NAR=svg.parentNode.clientWidth<620;
   if(NAR){ L=58; R=456; B=330; svg.setAttribute('viewBox','0 0 470 404'); TK=[1,2,3,5,10,20,50,100]; }
   else { L=78; R=740; B=410; svg.setAttribute('viewBox','0 0 760 520'); TK=[1,1.5,2,3,4,5,7,10,15,20,30,50,100]; } }
@@ -247,8 +247,18 @@ function draw(){
   el('path',{d:dl,fill:'none',stroke:c,'stroke-width':2.5}); el('path',{d:du,fill:'none',stroke:c,'stroke-width':2.5});
   // zona dudosa marcada
   el('rect',{x:X(m[0]),y:T,width:X(m[1])-X(m[0]),height:B-T,fill:'#FFD54F','fill-opacity':0.18});
-  el('text',{x:(X(m[0])+X(m[1]))/2,y:T+18,'text-anchor':'middle','font-size':13,'font-weight':700,fill:'#8a6d00','class':'lbl'},'dudosa');
-  el('text',{x:X(Math.min(m[1]*2,60)),y:T+18,'text-anchor':'middle','font-size':13,'font-weight':700,fill:'#B03A2E','class':'lbl'},'salta seguro');
+  // nombres de las tres zonas, en una tira encima de la gráfica (en dos líneas si no caben en una)
+  var fs=NAR?15:13, zy=NAR?3:6, zh=T-zy-5;
+  function zl(x0,x1,w2,bg,op,col){
+    el('rect',{x:x0+1,y:zy,width:Math.max(4,x1-x0-2),height:zh,rx:5,fill:bg,'fill-opacity':op});
+    var one=(x1-x0)>=('Zona '+w2).length*fs*0.58+8, cy=zy+zh/2;
+    var a={x:(x0+x1)/2,'text-anchor':'middle','font-size':fs,'font-weight':700,fill:col,'class':'lbl zl'};
+    if(one){ a.y=cy+fs*0.36; el('text',a,'Zona '+w2); }
+    else { a.y=cy-fs*0.16; el('text',a,'Zona'); a.y=cy+fs*0.92; el('text',a,w2); }
+  }
+  zl(X(1.13),X(m[0]),'térmica',c,0.16,COLD[st.k]);
+  zl(X(m[0]),X(m[1]),'dudosa','#FFD54F',0.55,'#6f5800');
+  zl(X(m[1]),R,'magnética','#C0392B',0.13,'#A93226');
   if(!NAR) el('text',{x:L+3,y:B-42,'font-size':12,'font-weight':700,fill:'#666','class':'lbl'},'no');
   el('text',{x:X(2.2),y:Y(0.04),'text-anchor':'middle','font-size':14,'font-weight':700,fill:c,'class':'lbl'},'Curva '+st.k);
   // filas del eje X

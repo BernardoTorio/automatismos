@@ -78,6 +78,7 @@ subir.bat                  publica todo con doble clic
 - Móvil (dibujo de menos de 620 px): cada una tiene un **dibujo estrecho propio** con texto de 10 px reales o más; el dibujo va fijo arriba (`.stick`) y lleva debajo una línea de veredicto (`#verd`).
 - Mismas listas en todas: 13 calibres (6 a 160 A), cables hasta 70 mm², los once motores de placa. Nombres `-M1`, `-Q1`, `-F1`.
 - Redacción: «salta en el funcionamiento normal del motor» (nunca «sin avería»); «Eje duro (sobrecarga)», un 18 % más.
+- Las tres zonas de la curva se llaman siempre **«Zona térmica», «Zona dudosa» y «Zona magnética»** (no «salta seguro» ni «dudosa» a secas). En 6.6 van en una tira de colores encima de la gráfica, en dos líneas cuando no caben en una.
 - Modelo de clase acordado (no «corregir» hacia la norma): en la zona dudosa no se dan tiempos (puede saltar al instante); con menos de 2 veces «tarda mucho: de 20 s a 1 hora»; «caja equivocada» es caja mal leída (el motor pide su corriente real y la línea queda mal dimensionada); la general no salta por debajo de 1,13 veces; el térmico salta si el motor pide más que la ruleta (2 % de margen); arranque de 6 veces y 0,4 s en 6.11.
 - Solo se redibuja cuando cambia algo y se respeta `prefers-reduced-motion`.
 
