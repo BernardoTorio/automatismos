@@ -93,7 +93,12 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
 .dial svg{width:90px;height:90px}
 .meter{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mlab{font-size:.85rem;color:var(--muted);font-weight:700}
-.mbig{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.mbig{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+.chipr{display:inline-block;border:2px solid var(--line);border-radius:8px;padding:1px 6px;margin:2px 3px 2px 0;font-weight:700;font-size:.85rem}
+.chipr.on{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.rngp .bad{color:var(--warn);font-weight:700}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+button:disabled{opacity:.45;cursor:default}
 .bar{margin-top:10px;font-size:.88rem;font-weight:700;color:var(--muted)}
 .trk{height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin-top:3px}
 .trk div{height:100%;width:0;background:linear-gradient(90deg,#F2B400,#E8590C,#C0392B)}
@@ -107,15 +112,21 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html#temas">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>6.8 Térmico, fusibles y guardamotor</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <h1>Tres formas de proteger un motor</h1>
-  <p class="sub">Un motor de <b>7,5 kW</b> (placa: 14,8 A en triángulo). Protégelo con <b>magnetotérmico + térmico</b>, con <b>fusibles + térmico</b> o con un <b>guardamotor</b>, y mira qué aparato actúa con una <b>sobrecarga</b> y con un <b>cortocircuito</b>.</p>
+  <p class="sub">Elige un motor y protégelo con <b>magnetotérmico + térmico</b>, con <b>fusibles + térmico</b> o con un <b>guardamotor</b>. Mira qué aparato actúa con una <b>sobrecarga</b> y con un <b>cortocircuito</b>, y dónde va la <b>ruleta</b>.</p>
 
   <div class="layout">
-    <div class="sheet" aria-label="Línea de un motor con sus protecciones">
+    <div class="sheet stick" aria-label="Línea de un motor con sus protecciones">
       <svg id="svg" viewBox="0 0 600 560" role="img" aria-label="Red, protecciones, contactor y motor"></svg>
+      <p class="verd" id="verd" aria-hidden="true"></p>
     </div>
     <div class="side">
       <div class="card ctl">
-        <h3>1 · ¿Cómo lo proteges?</h3>
+        <h3>1 · El motor</h3>
+        <div class="seg" id="segM"><button data-m="0">3 kW</button><button data-m="1">7,5 kW</button><button data-m="2">11 kW</button><button data-m="3">22 kW</button></div>
+        <p class="foot" id="mPl" style="margin:6px 0 0"></p>
+      </div>
+      <div class="card ctl">
+        <h3>2 · ¿Cómo lo proteges?</h3>
         <div class="seg col" id="segS">
           <button data-s="0">Magnetotérmico + térmico</button>
           <button data-s="1">Fusibles + térmico</button>
@@ -124,18 +135,19 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
         <div id="fuseBox" class="seg" style="margin-top:8px"><button id="bAM">Fusibles aM</button><button id="bGG">Fusibles gG</button></div>
       </div>
       <div class="card ctl">
-        <h3 id="rulT">2 · Ruleta del térmico</h3>
+        <h3 id="rulT">3 · Ruleta del térmico</h3>
         <div class="dial"><svg id="dial" viewBox="0 0 90 90" aria-hidden="true"></svg><div><div class="val" id="vR"></div><input type="range" id="rR" min="13" max="18" step="0.1" aria-label="Ruleta"></div></div>
-        <p class="foot" style="margin:4px 0 0">Placa del motor: <b>14,8 A</b> (7,5 kW en triángulo).</p>
+        <p class="foot rngp" id="rng" style="margin:6px 0 0"></p>
       </div>
       <div class="card ctl">
-        <h3>3 · ¿Qué le pasa al motor?</h3>
+        <h3>4 · ¿Qué le pasa al motor?</h3>
         <div class="seg"><button id="bStart" class="go">Arrancar</button><button id="bStop">Parar</button></div>
         <div class="seg" style="margin-top:8px"><button id="bOver">Eje duro (sobrecarga)</button></div>
         <div class="seg" style="margin-top:8px"><button id="bCC" class="red">⚡ Cortocircuito</button><button id="bReset">Rearmar / reponer</button></div>
       </div>
       <div class="card">
-        <div class="meter"><div><div class="mlab">Pinza</div><div class="mbig" id="mI">0 A</div></div><div><div class="mlab">Motor</div><div class="mbig" id="mS">parado</div></div></div>
+        <div class="mlab">Pinza en L1 · L2 · L3</div><div class="mbig" id="mI">0 · 0 · 0 A</div>
+        <div class="mlab" style="margin-top:6px">Motor: <span id="mS" style="font-size:1.15rem;color:var(--ink)">parado</span></div>
         <div class="bar"><span>Calor en el térmico</span><div class="trk"><div id="bH"></div></div></div>
         <div class="bar"><span>Calor en el bobinado del motor</span><div class="trk"><div id="bM"></div></div></div>
         <div class="speed" id="speed"></div>
@@ -149,167 +161,228 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
       <h2>Qué hace cada aparato</h2>
       <div style="overflow-x:auto"><table class="t">
         <tr><th></th><th>Sobrecarga (eje duro)</th><th>Cortocircuito</th><th>Arranque</th></tr>
-        <tr><td><b>Magnetotérmico</b> (curva D)</td><td>No se entera: su calibre es mayor que lo que pide el motor.</td><td><b>Salta</b> al instante (parte magnética).</td><td>Lo aguanta si la curva es la buena.</td></tr>
+        <tr><td><b>Magnetotérmico</b></td><td>No se entera: su calibre es mayor que lo que pide el motor.</td><td><b>Salta</b> al instante (parte magnética).</td><td>Lo aguanta si la curva es la buena.</td></tr>
         <tr><td><b>Relé térmico</b></td><td><b>Salta</b> si la ruleta está en la corriente de la placa.</td><td>No: es demasiado lento.</td><td>Lo aguanta: el pico dura poco.</td></tr>
         <tr><td><b>Fusibles aM</b></td><td>No: <b>solo cortan cortocircuitos</b>. Por eso van siempre con térmico.</td><td><b>Se funden</b>. Hay que cambiarlos por otros iguales.</td><td>Lo aguantan: están hechos para motores.</td></tr>
         <tr><td><b>Fusibles gG</b></td><td>Sí, pero no están pensados para motores.</td><td>Se funden.</td><td><b>Se pueden fundir al arrancar.</b></td></tr>
         <tr><td><b>Guardamotor</b></td><td><b>Salta</b> (tiene ruleta, como el térmico).</td><td><b>Salta</b> (magnética fija: unas 13 veces el máximo del rango).</td><td>Lo aguanta siempre.</td></tr>
       </table></div>
+      <p class="foot">Los fusibles van de tres en tres: <b>uno por fase</b>. El guardamotor tiene una <b>ventaja</b>: un solo aparato hace de magnetotérmico y de térmico. Y un <b>inconveniente</b>: es caro; por eso en el aula usamos magnetotérmico + térmico.</p>
     </div>
     <div class="card ojo">
       <h2>La ruleta: ni más ni menos</h2>
       <ul style="margin-top:0">
-        <li>La ruleta se pone en la <b>corriente de la placa</b>: aquí, 14,8 A.</li>
+        <li>Primero se elige el <b>rango</b> que contiene la corriente de la placa.</li>
+        <li>Después se gira la ruleta hasta la <b>corriente de la placa</b>.</li>
         <li><b>Por encima</b>: con el eje duro el motor pide más de su placa, pero no tanto como la ruleta. El térmico no salta y <b>el motor se quema</b>.</li>
-        <li><b>Por debajo</b>: el térmico salta con el motor trabajando normal.</li>
+        <li><b>Por debajo</b>: el térmico salta en el funcionamiento normal del motor.</li>
       </ul>
     </div>
     <div class="card">
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
-        <li>Elige cómo se protege el motor y pulsa <b>Arrancar</b>.</li>
+        <li>Elige el <b>motor</b> y cómo se protege, y pulsa <b>Arrancar</b>. Con el de 22 kW, prueba el guardamotor.</li>
         <li>Prueba <b>Eje duro</b> con la ruleta bien puesta y con la ruleta al máximo.</li>
         <li>Prueba el <b>Cortocircuito</b>: mira qué aparato actúa. Después, <b>Rearmar / reponer</b>.</li>
         <li>Con fusibles, cambia de <b>aM</b> a <b>gG</b> y arranca.</li>
         <li>El tiempo va <b>acelerado</b>: unos segundos aquí son muchos minutos de verdad.</li>
+        <li>Teclas: <kbd>A</kbd> arrancar · <kbd>P</kbd> parar · <kbd>D</kbd> eje duro · <kbd>C</kbd> cortocircuito · <kbd>R</kbd> rearmar.</li>
       </ul>
     </div>
   </div>
 
 </main>
 <script>
-
 (function(){
 var $=function(i){return document.getElementById(i);};
 var NS='http://www.w3.org/2000/svg';
-var IB=14.8, PK=7*IB, ICC=2000;
-var st={s:0,fuse:'aM',R:14.8,mode:'off',te:0,load:1,I:0,h:0,b:0,trip:null,burn:false,flash:0,dash:0,tWin:0};
-function f(x,d){ d=d===undefined?1:d; return x.toFixed(d).replace('.',','); }
+var MOT=[['3 kW','Y',6.4],['7,5 kW','Δ',14.8],['11 kW','Δ',21.5],['22 kW','Δ',41]];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
+var TERM=[[0.63,1],[1,1.6],[1.6,2.5],[2.5,4],[4,6],[6,9],[9,13],[13,18],[18,25],[25,32],[32,40],[40,50],[50,65],[65,80]];
+var GM=[[1,1.6],[1.6,2.5],[2.5,4],[4,6.3],[6.3,10],[10,14],[14,18],[18,25],[25,32]];
+var ICC=2000, RED=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+var st={m:1,s:0,fuse:'aM',R:14.8,mode:'off',te:0,load:1,I:0,h:0,b:0,trip:null,burn:false,flash:0,dash:0};
+function f(x,d){ d=d===undefined?1:d; var s=x.toFixed(d); if(d>0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
+// datos del motor elegido: corriente de la placa, calibre, curva, rango del térmico y del guardamotor
+function D(){
+  var ib=MOT[st.m][2], cal=CAL.filter(function(c){return c>=ib;})[0], x=7*ib/cal;
+  var th=TERM.filter(function(t){return t[0]<=ib&&ib<=t[1];})[0], gm=GM.filter(function(t){return t[0]<=ib&&ib<=t[1];})[0]||null;
+  return {ib:ib,pk:7*ib,cal:cal,x:x,cur:x<5?'C':'D',th:th,gm:gm,name:MOT[st.m][0],con:MOT[st.m][1]};
+}
+function rng(){ var d=D(); return st.s===2?d.gm:d.th; }
+function noGM(){ return st.s===2&&!D().gm; }
+function rg(r){ return f(r[0])+'-'+f(r[1])+' A'; }
 var svg=$('svg');
 function el(tag,a,t,par){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(t!==undefined) e.textContent=t; (par||svg).appendChild(e); return e; }
 // ---------------- lógica
 function devices(){
-  if(st.s===0) return [{id:'Q1',kind:'mt',lab:'Magnetotérmico',val:'16 A · curva D'},{id:'KM1',kind:'km',lab:'Contactor',val:''},{id:'F1',kind:'th',lab:'Relé térmico',val:'13-18 A'}];
-  if(st.s===1) return [{id:'F2',kind:'fu',lab:'Fusibles '+st.fuse,val:'16 A'},{id:'KM1',kind:'km',lab:'Contactor',val:''},{id:'F1',kind:'th',lab:'Relé térmico',val:'13-18 A'}];
-  return [{id:'Q1',kind:'gm',lab:'Guardamotor',val:'14-18 A'},{id:'KM1',kind:'km',lab:'Contactor',val:''}];
+  var d=D();
+  if(st.s===0) return [{id:'Q1',kind:'mt',lab:'Magnetotérmico',val:d.cal+' A · curva '+d.cur},{id:'KM1',kind:'km',lab:'Contactor',val:''},{id:'F1',kind:'th',lab:'Relé térmico',val:rg(d.th)}];
+  if(st.s===1) return [{id:'F2',kind:'fu',lab:'3 fusibles '+st.fuse,val:d.cal+' A · uno por fase'},{id:'KM1',kind:'km',lab:'Contactor',val:''},{id:'F1',kind:'th',lab:'Relé térmico',val:rg(d.th)}];
+  return [{id:'Q1',kind:'gm',lab:'Guardamotor',val:d.gm?rg(d.gm):'no hay rango'},{id:'KM1',kind:'km',lab:'Contactor',val:''}];
 }
-function tTrip(m){ return m<=1.0001?Infinity:200/(m*m-1); } // segundos reales (térmico clase 10)
-function doTrip(id,why){ st.trip={id:id,why:why}; st.mode='off'; st.load=1; st.I=0; st.flash=1.2; }
-function cc(){
-  if(st.trip||st.mode==='off'){ st.msg='cc_off'; }
-  if(st.s===0) doTrip('Q1','cc'); else if(st.s===1) doTrip('F2','cc'); else doTrip('Q1','cc');
-}
+// el térmico salta si el motor pide más que la ruleta (con un 2 % de margen); más tarde cuanto más cerca
+function salta(I,R){ return I>R*1.02; }
+function tTrip(m){ return Math.min(600,200/(m*m-1)); } // segundos reales
+function doTrip(id,why){ st.trip={id:id,why:why,load:st.load>1,R:st.R}; st.mode='off'; st.load=1; st.I=0; st.flash=RED?0:1.2; }
 function step(dtS){
-  var speed=st.mode==='start'?0.25:60, dt=dtS*speed;
+  var d=D(), speed=st.mode==='start'?0.25:60, dt=dtS*speed;
   if(st.flash>0) st.flash-=dtS;
   var I=0;
   if(st.mode==='start'){
-    st.te+=dt; I=IB*(1+6*Math.pow(Math.max(0,1-st.te/0.6),1.3));
+    st.te+=dt; I=d.ib*(1+6*Math.pow(Math.max(0,1-st.te/0.6),1.3));
     if(st.s===1&&st.fuse==='gG'&&st.te>0.05){ doTrip('F2','gg'); I=0; }
-    if(st.te>=0.6&&st.mode==='start') st.mode='run';
-  } else if(st.mode==='run'){ I=IB*st.load; }
+    else if(st.te>=0.6) st.mode='run';
+  } else if(st.mode==='run'){ I=d.ib*st.load; }
   st.I=I;
-  // calor del térmico / guardamotor
-  var hasTh=st.s!==1||true;
-  var R=st.R, m=I/R;
-  if(I>0 && st.mode==='run' && m>1){ st.h+=dt/tTrip(m); } else { st.h=Math.max(0,st.h-dt/300); }
-  if(st.h>=1 && st.mode==='run'){ st.h=1; doTrip(st.s===2?'Q1':'F1','th'); }
-  // calor del motor
-  if(st.mode==='run' && I>IB*1.08){ st.b+=dt/750; } else { st.b=Math.max(0,st.b-dt/900); }
-  if(st.b>=1 && !st.burn){ st.burn=true; st.mode='off'; st.load=1; st.I=0; }
-  st.dash=(st.dash+dtS*(I>0?40:0))%20;
-  st.speedLab=st.mode==='start'?'▶ Arranque a cámara lenta':(st.mode==='run'?'⏩ Tiempo acelerado (×60): 1 s aquí = 1 minuto':'');
+  var sal=st.mode==='run'&&salta(I,st.R);
+  if(sal) st.h+=dt/tTrip(I/st.R); else st.h=Math.max(0,st.h-dt/300);
+  if(st.h>=1&&st.mode==='run'){ st.h=1; doTrip(st.s===2?'Q1':'F1','th'); }
+  if(st.mode==='run'&&st.load>1&&!sal) st.b+=dt/750; else st.b=Math.max(0,st.b-dt/900);
+  if(st.b>=1&&!st.burn){ st.burn=true; st.mode='off'; st.load=1; st.I=0; }
+  if(!RED) st.dash=(st.dash+dtS*(I>0?40:0))%20;
 }
-// ---------------- dibujo
+// ---------------- dibujo (ancho, y estrecho para el móvil)
 function draw(){
   while(svg.firstChild) svg.removeChild(svg.firstChild);
-  var dv=devices(), x=260, y=60, gap=100;
-  el('text',{x:x,y:30,'text-anchor':'middle','font-size':16,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'Red trifásica 400 V (L1, L2, L3)');
-  var yEnd=y+gap*dv.length+40;
-  var live=st.I>0;
-  el('line',{x1:x,y1:40,x2:x,y2:yEnd,stroke:'#D0191C','stroke-width':live?6:4});
-  if(live) el('path',{d:'M'+x+' 40 V'+yEnd,'class':'flow','stroke-dashoffset':-st.dash});
-  dv.forEach(function(d,i){
-    var yy=y+gap*i+20, tripped=st.trip&&st.trip.id===d.id, fl=tripped&&st.flash>0&&Math.floor(st.flash*6)%2===0;
-    var fill=tripped?(fl?'#ffd7d2':'#ffe9e6'):'#fff', stroke=tripped?'#C0392B':'#1a1a1a';
-    el('rect',{x:x-90,y:yy,width:180,height:64,rx:10,fill:fill,stroke:stroke,'stroke-width':tripped?4:2.5});
-    el('text',{x:x-104,y:yy+38,'text-anchor':'end','font-size':17,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'-'+d.id);
-    el('text',{x:x,y:yy+(d.val?26:38),'text-anchor':'middle','font-size':16,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},d.lab);
-    if(d.val) el('text',{x:x,y:yy+48,'text-anchor':'middle','font-size':14,'class':'lbl',fill:'#56606b'},d.val+((d.kind==='th'||d.kind==='gm')?' · ruleta '+f(st.R):''));
+  var d=D(), dv=devices(), nar=svg.parentNode.clientWidth<620;
+  var W=nar?470:600, x=nar?212:260, gap=nar?92:100, y=nar?44:60, bh=nar?58:64, bw=nar?230:180;
+  var yEnd=y+gap*dv.length+(nar?14:40), mr=nar?38:46, my=yEnd+mr+4;
+  svg.setAttribute('viewBox','0 0 '+W+' '+(my+mr+(nar?10:18)));
+  var F1=nar?17:16, F2=nar?15:14, F3=nar?15:13;
+  el('text',{x:x,y:nar?22:30,'text-anchor':'middle','font-size':F1,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'Red trifásica 400 V (L1, L2, L3)');
+  var live=st.I>0, y0=nar?30:40;
+  el('line',{x1:x,y1:y0,x2:x,y2:yEnd,stroke:'#D0191C','stroke-width':live?6:4});
+  if(live) el('path',{d:'M'+x+' '+y0+' V'+yEnd,'class':'flow','stroke-dashoffset':-st.dash});
+  dv.forEach(function(dd,i){
+    var yy=y+gap*i+(nar?0:20), tripped=!!st.trip&&st.trip.id===dd.id, fl=tripped&&st.flash>0&&Math.floor(st.flash*6)%2===0, none=dd.kind==='gm'&&!d.gm;
+    el('rect',{x:x-bw/2,y:yy,width:bw,height:bh,rx:10,fill:tripped?(fl?'#ffd7d2':'#ffe9e6'):(none?'#e9e9e9':'#fff'),stroke:tripped?'#C0392B':'#1a1a1a','stroke-width':tripped?4:2.5});
+    el('text',{x:x-bw/2-10,y:yy+bh/2+6,'text-anchor':'end','font-size':F1,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'-'+dd.id);
+    el('text',{x:x,y:yy+(dd.val?25:bh/2+6),'text-anchor':'middle','font-size':F1,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},dd.lab);
+    if(dd.val) el('text',{x:x,y:yy+47,'text-anchor':'middle','font-size':F2,'class':'lbl',fill:none?'#C0392B':'#56606b','font-weight':none?700:400},dd.val+((dd.kind==='th'||(dd.kind==='gm'&&d.gm))?' · ruleta '+f(st.R):''));
     if(tripped){
-      var t=d.kind==='fu'?'FUNDIDOS':'¡SALTA!';
-      el('rect',{x:x+100,y:yy+16,width:104,height:32,rx:8,fill:'#C0392B'});
-      el('text',{x:x+152,y:yy+38,'text-anchor':'middle','font-size':16,'font-weight':700,fill:'#fff','class':'lbl'},t);
+      var bx=x+bw/2+(nar?8:10), bwd=nar?112:104;
+      el('rect',{x:bx,y:yy+bh/2-16,width:bwd,height:32,rx:8,fill:'#C0392B'});
+      el('text',{x:bx+bwd/2,y:yy+bh/2+6,'text-anchor':'middle','font-size':F1,'font-weight':700,fill:'#fff','class':'lbl'},dd.kind==='fu'?'FUNDIDOS':'¡SALTA!');
     }
-    var prot={mt:'cortocircuito (el cable)',fu:st.fuse==='aM'?'solo cortocircuito':'cortocircuito y sobrecarga',th:'sobrecarga (el motor)',gm:'sobrecarga y cortocircuito',km:'(pone en marcha)'}[d.kind];
-    el('text',{x:x+100,y:yy+(tripped?62:38),'font-size':13,'class':'lbl',fill:'#2E6B1F','font-weight':700},d.kind==='km'?prot:'protege de: '+prot);
+    var prot={mt:'cortocircuito (el cable)',fu:st.fuse==='aM'?'solo cortocircuito':'cortocircuito y sobrecarga',th:'sobrecarga (el motor)',gm:none?'':'sobrecarga y cortocircuito',km:''}[dd.kind];
+    var lab=dd.kind==='km'?'(pone en marcha)':(prot?'protege de: '+prot:'');
+    if(lab){
+      if(nar) el('text',{x:x,y:yy+bh+18,'text-anchor':'middle','font-size':F3,'class':'lbl',fill:'#2E6B1F','font-weight':700,stroke:'#fff','stroke-width':6,'paint-order':'stroke','stroke-linejoin':'round'},lab);
+      else el('text',{x:x+bw/2+10,y:yy+(tripped?bh-2:bh/2+6),'font-size':F3,'class':'lbl',fill:'#2E6B1F','font-weight':700},lab);
+    }
   });
-  // motor
-  var my=yEnd+50, burn=st.burn;
-  el('circle',{cx:x,cy:my,r:46,fill:burn?'#3a3a3a':'#fff',stroke:'#1a1a1a','stroke-width':3});
-  el('text',{x:x,y:my-2,'text-anchor':'middle','font-size':22,'font-weight':700,'class':'lbl',fill:burn?'#ff8a80':'#1a1a1a'},burn?'🔥':'M');
-  el('text',{x:x,y:my+22,'text-anchor':'middle','font-size':14,'class':'lbl',fill:burn?'#fff':'#1a1a1a'},'3~ · 7,5 kW');
-  el('text',{x:x+60,y:my+5,'font-size':14,'class':'lbl',fill:'#56606b'},'placa: 14,8 A');
-  var h=Math.max(st.b,0);
-  if(h>0.05&&!burn){ for(var k=0;k<3;k++) el('path',{d:'M'+(x-30+k*30)+' '+(my-56)+' q -7 -9 0 -18 q 7 -9 0 -18',fill:'none',stroke:'#E8590C','stroke-width':2.5,opacity:Math.min(1,h*1.5)}); }
+  var burn=st.burn;
+  el('circle',{cx:x,cy:my,r:mr,fill:burn?'#3a3a3a':'#fff',stroke:'#1a1a1a','stroke-width':3});
+  el('text',{x:x,y:my-1,'text-anchor':'middle','font-size':22,'font-weight':700,'class':'lbl',fill:burn?'#ff8a80':'#1a1a1a'},burn?'🔥':'M');
+  el('text',{x:x,y:my+20,'text-anchor':'middle','font-size':F2,'class':'lbl',fill:burn?'#fff':'#1a1a1a'},'3~');
+  el('text',{x:x+mr+12,y:my-4,'font-size':F2,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},d.name+' · '+d.con);
+  el('text',{x:x+mr+12,y:my+16,'font-size':F2,'class':'lbl',fill:'#56606b'},'placa: '+f(d.ib)+' A');
+  if(st.b>0.05&&!burn){ for(var k=0;k<3;k++) el('path',{d:'M'+(x-mr-46+k*15)+' '+(my+20)+' q -6 -9 0 -18 q 6 -9 0 -18',fill:'none',stroke:'#E8590C','stroke-width':2.5,opacity:Math.min(1,st.b*1.5)}); }
   // panel
-  $('mI').textContent=f(st.I,st.I>=100?0:1)+' A';
-  $('mS').textContent=st.burn?'¡quemado!':(st.mode==='start'?'arranca':(st.mode==='run'?(st.load>1?'eje duro':'gira'):'parado'));
-  $('mS').style.color=st.burn?'#C0392B':'';
+  var iv=f(st.I,st.I>=100?0:1);
+  $('mI').textContent=iv+' · '+iv+' · '+iv+' A';
+  $('mS').textContent=burn?'¡quemado!':(st.mode==='start'?'arranca':(st.mode==='run'?(st.load>1?'eje duro':'gira'):'parado'));
+  $('mS').style.color=burn?'var(--warn)':'';
   $('bH').style.width=Math.round(st.h*100)+'%'; $('bM').style.width=Math.round(st.b*100)+'%';
-  $('speed').textContent=st.speedLab||'';
-  $('vR').innerHTML=f(st.R)+' A<small>'+(st.s===2?'guardamotor 14-18 A':'térmico 13-18 A')+'</small>';
-  $('rR').min=st.s===2?14:13; $('rulT').textContent=st.s===2?'2 · Ruleta del guardamotor':'2 · Ruleta del térmico';
-  dial();
+  $('speed').textContent=st.mode==='start'?'▶ Arranque a cámara lenta':(st.mode==='run'?'⏩ Tiempo acelerado (×60): 1 s aquí = 1 minuto':'');
+  var r=rng();
+  $('rR').disabled=!r; if(r){ $('rR').min=r[0]; $('rR').max=r[1]; }
+  $('vR').innerHTML=r?f(st.R)+' A<small>'+(st.s===2?'guardamotor ':'térmico ')+rg(r)+'</small>':'—<small>no hay guardamotor</small>';
+  $('rulT').textContent=st.s===2?'3 · Ruleta del guardamotor':'3 · Ruleta del térmico';
+  $('mPl').innerHTML='Placa: <b>'+f(d.ib)+' A</b> en '+(d.con==='Y'?'estrella (caja Y, 400 V)':'triángulo (caja Δ, 400 V)')+'.';
+  rangos(d); dial(d,r);
+  [].forEach.call(document.querySelectorAll('#segM button'),function(b){ b.classList.toggle('on',+b.dataset.m===st.m); });
   [].forEach.call(document.querySelectorAll('#segS button'),function(b){ b.classList.toggle('on',+b.dataset.s===st.s); });
   $('fuseBox').style.display=st.s===1?'':'none';
   $('bAM').classList.toggle('on',st.fuse==='aM'); $('bGG').classList.toggle('on',st.fuse==='gG');
-  $('bOver').classList.toggle('on',st.load>1);
-  $('bStart').disabled=!!st.trip||st.burn||st.mode!=='off';
-  explain();
+  $('bOver').classList.toggle('on',st.load>1); $('bOver').disabled=st.mode!=='run';
+  $('bStart').disabled=!!st.trip||burn||st.mode!=='off'||noGM();
+  $('bCC').disabled=noGM();
+  explain(d);
 }
-function dial(){
-  var d=$('dial'); while(d.firstChild) d.removeChild(d.firstChild);
-  var lo=st.s===2?14:13, hi=18;
-  el('circle',{cx:45,cy:45,r:38,fill:'#fff',stroke:'#1a1a1a','stroke-width':3},undefined,d);
-  for(var v=lo;v<=hi;v++){ var a=(-135+270*(v-lo)/(hi-lo))*Math.PI/180; el('line',{x1:45+30*Math.sin(a),y1:45-30*Math.cos(a),x2:45+36*Math.sin(a),y2:45-36*Math.cos(a),stroke:'#1a1a1a','stroke-width':2},undefined,d); }
-  var ap=(-135+270*(IB-lo)/(hi-lo))*Math.PI/180; el('line',{x1:45+24*Math.sin(ap),y1:45-24*Math.cos(ap),x2:45+37*Math.sin(ap),y2:45-37*Math.cos(ap),stroke:'#2E8B3E','stroke-width':4},undefined,d);
-  var a=(-135+270*(st.R-lo)/(hi-lo))*Math.PI/180; el('line',{x1:45,y1:45,x2:45+28*Math.sin(a),y2:45-28*Math.cos(a),stroke:'#C55A11','stroke-width':5,'stroke-linecap':'round'},undefined,d);
-  el('circle',{cx:45,cy:45,r:5,fill:'#1a1a1a'},undefined,d);
+function rangos(d){
+  var L=st.s===2?GM:TERM, i=L.indexOf(st.s===2?d.gm:d.th), h='';
+  if(i<0){ $('rng').innerHTML='El guardamotor más grande de la tabla es de <b>25-32 A</b> y este motor pide <b>'+f(d.ib)+' A</b>: <span class="bad">no cabe en ninguno.</span>'; return; }
+  for(var k=Math.max(0,i-2);k<=Math.min(L.length-1,i+2);k++) h+='<span class="chipr'+(k===i?' on':'')+'">'+f(L[k][0])+'-'+f(L[k][1])+'</span>';
+  $('rng').innerHTML='Rangos: '+h+'<br>Se elige el que <b>contiene</b> la corriente de la placa ('+f(d.ib)+' A).';
+}
+function dial(d,r){
+  var dl=$('dial'); while(dl.firstChild) dl.removeChild(dl.firstChild);
+  el('circle',{cx:45,cy:45,r:38,fill:'#fff',stroke:'#1a1a1a','stroke-width':3},undefined,dl);
+  if(r){
+    var lo=r[0], hi=r[1], ang=function(v){ return (-135+270*(v-lo)/(hi-lo))*Math.PI/180; };
+    for(var k=0;k<=5;k++){ var a=ang(lo+(hi-lo)*k/5); el('line',{x1:45+30*Math.sin(a),y1:45-30*Math.cos(a),x2:45+36*Math.sin(a),y2:45-36*Math.cos(a),stroke:'#1a1a1a','stroke-width':2},undefined,dl); }
+    var ap=ang(d.ib); el('line',{x1:45+24*Math.sin(ap),y1:45-24*Math.cos(ap),x2:45+37*Math.sin(ap),y2:45-37*Math.cos(ap),stroke:'#2E8B3E','stroke-width':4},undefined,dl);
+    var a2=ang(st.R); el('line',{x1:45,y1:45,x2:45+28*Math.sin(a2),y2:45-28*Math.cos(a2),stroke:'#C55A11','stroke-width':5,'stroke-linecap':'round'},undefined,dl);
+  }
+  el('circle',{cx:45,cy:45,r:5,fill:'#1a1a1a'},undefined,dl);
 }
 var lastH='';
-function explain(){
-  var h='', R=st.R, ok=Math.abs(R-IB)<0.15;
-  if(st.burn) h='<p><span class="bad">✘ ¡El motor se ha quemado!</span> Ha estado mucho rato pidiendo más de su placa y nadie lo ha parado. La ruleta estaba en <b>'+f(R)+' A</b>, por encima de la placa (14,8 A): con el eje duro el motor pedía <b>'+f(IB*1.18)+' A</b>, menos que la ruleta, y el '+(st.s===2?'guardamotor':'térmico')+' no saltó.</p><p>Pon la ruleta en <b>14,8 A</b> y pulsa <b>Rearmar / reponer</b>.</p>';
+function explain(d){
+  var h='', R=st.R, IB=d.ib, IL=IB*1.18, quien=st.s===2?'guardamotor':'térmico', okR=Math.abs(R-IB)<0.05, pl='<b>'+f(IB)+' A</b>', v;
+  if(noGM()){
+    h='<p><span class="bad">✘ No hay guardamotor para este motor.</span> Pide '+pl+' y el rango más grande de la tabla es 25-32 A. Se protege con <b>magnetotérmico + térmico</b> o con <b>fusibles aM + térmico</b>.</p>';
+    v='✘ No hay guardamotor para '+f(IB)+' A';
+  }
+  else if(st.burn){
+    h='<p><span class="bad">✘ ¡El motor se ha quemado!</span> Con el eje duro pedía <b>'+f(IL)+' A</b>, más que su placa ('+f(IB)+' A), '+(R>=IL?'pero menos que la ruleta':'casi lo mismo que la ruleta')+' (<b>'+f(R)+' A</b>): el '+quien+' no saltó y nadie lo paró.</p><p>Pon la ruleta en '+pl+' y pulsa <b>Rearmar / reponer</b>.</p>';
+    v='✘ Motor quemado: la ruleta estaba en '+f(R)+' A';
+  }
   else if(st.trip){
     var t=st.trip;
-    if(t.why==='cc') h='<p><b>⚡ Cortocircuito:</b> la corriente sube de golpe a unos <b>'+ICC+' A</b>. '+(st.s===0?'La parte <b>magnética del magnetotérmico</b> salta al instante. El térmico no se entera: es demasiado lento.':(st.s===1?'Los <b>fusibles</b> se funden al instante. Hay que cambiarlos por <b>otros iguales</b> (mismo calibre y mismo tipo).':'La parte <b>magnética del guardamotor</b> salta al instante.'))+'</p>';
-    else if(t.why==='gg') h='<p><span class="bad">✘ Los fusibles gG se han fundido al arrancar.</span> El pico de arranque ('+f(PK,0)+' A, '+f(PK/16)+' veces su calibre) es demasiado para un gG. Para motores se ponen <b>aM</b>, que aguantan el pico, siempre con relé térmico.</p>';
-    else if(t.why==='th'){
-      if(R<IB-0.1) h='<p><span class="bad">✘ Ha saltado sin avería.</span> La ruleta está en <b>'+f(R)+' A</b>, por debajo de la placa (14,8 A): con el motor trabajando normal ya le parece una sobrecarga. Sube la ruleta a <b>14,8 A</b>.</p>';
-      else h='<p><span class="ok">✔ Ha saltado el '+(st.s===2?'guardamotor (su parte térmica)':'relé térmico')+'.</span> Con el eje duro el motor pedía <b>'+f(IB*1.18)+' A</b>, más que la ruleta ('+f(R)+' A). Ha tardado un rato porque es una sobrecarga, no un cortocircuito. <b>El motor se ha salvado.</b></p>'+(st.s===0?'<p>Fíjate: el magnetotérmico de 16 A ni se ha enterado (17,5 A son solo 1,09 veces su calibre).</p>':'')+(st.s===1&&st.fuse==='aM'?'<p>Los fusibles aM tampoco se han enterado: solo cortan cortocircuitos.</p>':'');
+    if(t.why==='cc'){ h='<p><b>⚡ Cortocircuito:</b> la corriente sube de golpe a unos <b>'+ICC+' A</b>. '+(st.s===0?'La parte <b>magnética del magnetotérmico</b> salta al instante. El térmico no se entera: es demasiado lento.':(st.s===1?'Los <b>fusibles</b> se funden al instante. Hay que cambiar los tres por <b>otros iguales</b> (mismo calibre y mismo tipo).':'La parte <b>magnética del guardamotor</b> salta al instante.'))+'</p>'; v='⚡ Cortocircuito: '+(st.s===1?'se funden los fusibles':'salta al instante'); }
+    else if(t.why==='gg'){ h='<p><span class="bad">✘ Los fusibles gG se han fundido al arrancar.</span> El pico de arranque ('+f(d.pk,0)+' A, '+f(d.x)+' veces su calibre) puede fundir un gG, y aquí lo ha hecho. Para motores se ponen <b>aM</b>, que aguantan el pico, siempre con relé térmico.</p>'; v='✘ Fusibles gG fundidos al arrancar'; }
+    else {
+      var q=st.s===2?'guardamotor (su parte térmica)':'relé térmico';
+      if(!t.load) h='<p><span class="bad">✘ Ha saltado en el funcionamiento normal del motor.</span> La ruleta está en <b>'+f(t.R)+' A</b>, por debajo de la placa ('+f(IB)+' A): con el motor trabajando normal ya le parece una sobrecarga. Sube la ruleta a '+pl+'.</p>';
+      else if(Math.abs(t.R-IB)<0.05) h='<p><span class="ok">✔ Ha saltado el '+q+'.</span> Con el eje duro el motor pedía <b>'+f(IL)+' A</b> por las tres fases, más que la ruleta ('+f(t.R)+' A). Ha tardado un rato porque es una sobrecarga, no un cortocircuito. <b>El motor se ha salvado.</b></p>'+(st.s===0?'<p>Fíjate: el magnetotérmico de '+d.cal+' A ni se ha enterado ('+f(IL)+' A son solo '+f(IL/d.cal,2)+' veces su calibre).</p>':'')+(st.s===1&&st.fuse==='aM'?'<p>Los fusibles aM tampoco se han enterado: solo cortan cortocircuitos.</p>':'');
+      else h='<p><span class="ok">✔ Ha saltado el '+q+'</span>, pero la ruleta estaba en <b>'+f(t.R)+' A</b> y la placa dice '+f(IB)+' A. '+(t.R>IB?'Ha tardado más de la cuenta y el motor ha sufrido.':'Con la ruleta tan baja acabará saltando también en el funcionamiento normal del motor.')+' Ponla en '+pl+'.</p>';
+      v=(t.load?'Ha saltado el ':'✘ Ha saltado sin sobrecarga el ')+quien;
     }
     h+='<p>Pulsa <b>Rearmar / reponer</b> para volver a empezar.</p>';
   }
-  else if(st.mode==='off') h='<p>Motor parado. Elige cómo lo proteges, mira la ruleta y pulsa <b>Arrancar</b>.</p>'+(ok?'':'<p>La ruleta está en <b>'+f(R)+' A</b> y la placa dice <b>14,8 A</b>: '+(R>IB?'está alta: no protegerá bien al motor.':'está baja: saltará sin avería.')+'</p>');
-  else if(st.mode==='start') h='<p><b>Arranque:</b> el motor pide unos <b>'+f(PK,0)+' A</b> durante medio segundo. '+(st.s===0?'El magnetotérmico curva D lo aguanta (6,5 veces, menos de 10).':(st.s===1?(st.fuse==='aM'?'Los fusibles aM lo aguantan: están hechos para eso.':''):'El guardamotor lo aguanta: su magnética salta a unos 13 × 18 = 234 A.'))+' El '+(st.s===2?'guardamotor':'térmico')+' tampoco salta: el pico dura muy poco.</p>';
-  else if(st.load>1) h='<p><b>Eje duro:</b> el motor pide <b>'+f(IB*1.18)+' A</b>, un 18 % más que su placa. El bobinado se va calentando.</p><p>'+(R<IB*1.18?'La ruleta ('+f(R)+' A) es menor: el '+(st.s===2?'guardamotor':'térmico')+' se está calentando y <b>saltará</b>.':'<span class="bad">La ruleta ('+f(R)+' A) es mayor que lo que pide:</span> el '+(st.s===2?'guardamotor':'térmico')+' <b>no saltará</b>… y el motor se va a quemar.')+'</p>';
-  else h='<p>El motor gira y pide <b>14,8 A</b>, la de su placa.'+(R<IB-0.1?' <span class="bad">La ruleta está por debajo: el térmico se va calentando y saltará sin avería.</span>':' Todo bien.')+'</p><p>Ahora prueba <b>Eje duro</b> o <b>Cortocircuito</b>.</p>';
+  else if(st.mode==='off'){
+    h='<p>Motor parado. Elige el motor y cómo lo proteges, mira la ruleta y pulsa <b>Arrancar</b>.</p>'+(okR?'':'<p>La ruleta está en <b>'+f(R)+' A</b> y la placa dice '+pl+': '+(R>IB?'está alta: no protegerá bien al motor.':(salta(IB,R)?'está baja: saltará en el funcionamiento normal del motor.':'está un poco baja.'))+'</p>');
+    v='Motor parado · ruleta en '+f(R)+' A'+(okR?' (la de la placa)':'');
+  }
+  else if(st.mode==='start'){
+    h='<p><b>Arranque:</b> el motor pide unos <b>'+f(d.pk,0)+' A</b> (7 veces su placa) durante medio segundo. '+(st.s===0?'El magnetotérmico de '+d.cal+' A curva '+d.cur+' lo aguanta ('+f(d.x)+' veces, menos de '+(d.cur==='C'?5:10)+').':(st.s===1?(st.fuse==='aM'?'Los fusibles aM lo aguantan: están hechos para eso.':''):'El guardamotor lo aguanta: su magnética salta a unos 13 × '+f(d.gm[1])+' = '+f(13*d.gm[1],0)+' A.'))+' El '+quien+' tampoco salta: el pico dura muy poco.</p>';
+    v='Arranque: pico de unos '+f(d.pk,0)+' A';
+  }
+  else if(st.load>1){
+    var sl=salta(IL,R);
+    h='<p><b>Eje duro:</b> el motor pide <b>'+f(IL)+' A</b>, un 18 % más que su placa. Las tres fases marcan lo mismo: no falta ninguna fase, es una <b>sobrecarga</b>. El bobinado se va calentando.</p><p>'+(sl?'La ruleta ('+f(R)+' A) es menor: el '+quien+' se está calentando y <b>saltará</b>.':'<span class="bad">La ruleta ('+f(R)+' A) '+(R>=IL?'es mayor que lo que pide':'está casi en lo que pide')+':</span> el '+quien+' <b>no saltará</b>… y el motor se va a quemar.')+'</p>';
+    v='Eje duro: pide '+f(IL)+' A · ruleta '+f(R)+' A → '+(sl?'saltará':'no salta');
+  }
+  else {
+    var sn=salta(IB,R);
+    h='<p>El motor gira y pide '+pl+' por cada fase, la de su placa.'+(sn?' <span class="bad">La ruleta está por debajo: el '+quien+' se va calentando y saltará en el funcionamiento normal del motor.</span>':' Todo bien.')+'</p><p>Ahora prueba <b>Eje duro</b> o <b>Cortocircuito</b>.</p>';
+    v='Gira: '+f(IB)+' A por fase'+(sn?' · ruleta baja: saltará':'');
+  }
   if(h!==lastH){ $('now').innerHTML=h; lastH=h; }
+  $('verd').textContent=v;
 }
 // ---------------- controles
-[].forEach.call(document.querySelectorAll('#segS button'),function(b){ b.onclick=function(){ st.s=+b.dataset.s; reset(); if(st.s===2&&st.R<14) st.R=14.8; }; });
+function reset(){ st.trip=null; st.burn=false; st.mode='off'; st.load=1; st.I=0; st.h=0; st.b=0; }
+[].forEach.call(document.querySelectorAll('#segM button'),function(b){ b.onclick=function(){ st.m=+b.dataset.m; st.R=D().ib; reset(); }; });
+[].forEach.call(document.querySelectorAll('#segS button'),function(b){ b.onclick=function(){ st.s=+b.dataset.s; reset(); var r=rng(); if(r&&(st.R<r[0]||st.R>r[1])) st.R=D().ib; }; });
 $('bAM').onclick=function(){ st.fuse='aM'; reset(); }; $('bGG').onclick=function(){ st.fuse='gG'; reset(); };
 $('rR').oninput=function(){ st.R=+this.value; };
-$('bStart').onclick=function(){ if(!st.trip&&!st.burn&&st.mode==='off'){ st.mode='start'; st.te=0; } };
+$('bStart').onclick=function(){ if(!st.trip&&!st.burn&&st.mode==='off'&&!noGM()){ st.mode='start'; st.te=0; } };
 $('bStop').onclick=function(){ st.mode='off'; st.load=1; st.I=0; };
-$('bOver').onclick=function(){ if(st.mode==='run'||st.mode==='start'){ st.load=st.load>1?1:1.18; } };
-$('bCC').onclick=function(){ if(st.mode==='off'&&!st.trip){ st.mode='run'; } cc(); };
+$('bOver').onclick=function(){ if(st.mode==='run'){ st.load=st.load>1?1:1.18; } };
+$('bCC').onclick=function(){ if(!noGM()) doTrip(st.s===1?'F2':'Q1','cc'); };
 $('bReset').onclick=reset;
-function reset(){ st.trip=null; st.burn=false; st.mode='off'; st.load=1; st.I=0; st.h=0; st.b=0; }
-var last=null;
-function loop(ts){ if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000); last=ts; step(dt); draw(); $('rR').value=st.R; requestAnimationFrame(loop); }
-document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT') return; var k=e.key.toLowerCase(); if(k==='a') $('bStart').click(); if(k==='p') $('bStop').click(); if(k==='d') $('bOver').click(); if(k==='c') $('bCC').click(); if(k==='r') $('bReset').click(); });
+var last=null, sig='';
+function loop(ts){
+  if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000); last=ts; step(dt);
+  // solo se redibuja cuando cambia algo
+  var s=[st.m,st.s,st.fuse,st.R,st.mode,st.load,st.burn,st.trip?st.trip.id+st.trip.why:'',Math.round(st.h*200),Math.round(st.b*200),st.I.toFixed(1),st.flash>0?Math.floor(st.flash*6):-1,Math.floor(st.dash),svg.parentNode.clientWidth<620].join('|');
+  if(s!==sig){ sig=s; draw(); $('rR').value=st.R; }
+  requestAnimationFrame(loop);
+}
+document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT'||e.ctrlKey||e.metaKey||e.altKey) return; var k=(e.key||'').toLowerCase(); if(k==='a') $('bStart').click(); if(k==='p') $('bStop').click(); if(k==='d') $('bOver').click(); if(k==='c') $('bCC').click(); if(k==='r') $('bReset').click(); });
 requestAnimationFrame(loop);
 window.__st=st;
 })();
