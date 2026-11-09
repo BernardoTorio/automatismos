@@ -113,6 +113,8 @@ input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
 .t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
 .t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
 .t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
 .serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
 .nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
 .nextbig:hover{background:#163a5c}
@@ -174,6 +176,10 @@ button:disabled{opacity:.45;cursor:default}
 
   <div class="below">
     <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto wide pqs">
+      <h2>Para qué sirve</h2>
+      <p style="margin:0">Para entender <b>por qué hay que proteger los cables</b>. Cuanta más corriente pasa por un cable, más se calienta; si pasa más de la que aguanta (<b>I<sub>z</sub></b>), el aislante se estropea y puede arder. Todo el Tema 6 va de esto: saber cuánta corriente pide el motor y ponerle un <b>cable</b> y una <b>protección</b> a su medida.</p>
+    </div>
     <div class="card howto">
       <h2>Qué es la intensidad</h2>
       <p style="margin:0">La <b>intensidad</b> es la cantidad de electricidad que pasa por un cable cada segundo. Se mide en <b>amperios (A)</b>, con la <b>pinza amperimétrica</b>.</p>
@@ -362,6 +368,14 @@ window.__st=st;
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
 })();</script>
 </body>
 </html>

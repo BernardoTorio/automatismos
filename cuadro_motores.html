@@ -116,6 +116,8 @@ button.red{background:#C0392B;color:#fff;border-color:#C0392B}
 .t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
 .t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
 .t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
 .serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
 .nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
 .nextbig:hover{background:#163a5c}
@@ -171,6 +173,10 @@ button:disabled{opacity:.45;cursor:default}
       <h2 id="recT">La receta, paso a paso</h2>
       <div id="rec"></div>
       <p class="foot">Cada línea se dimensiona con esta receta. En esta animación todos los motores arrancan con <b>6 veces</b> su corriente durante <b>0,4 s</b>, como en los ejercicios 12 y 19.</p>
+    </div>
+    <div class="card howto wide pqs">
+      <h2>Para qué sirve</h2>
+      <p style="margin:0">Para dimensionar un <b>cuadro entero</b>, como en el examen: cada motor con su línea (corriente de la placa, calibre, cable, curva y térmico) y una <b>línea general</b> para todos. Y para ver qué marcan las pinzas cuando falta una fase o hay un cortocircuito.</p>
     </div>
     <div class="card howto">
       <h2>Leer la placa: ¿estrella o triángulo?</h2>
@@ -475,6 +481,14 @@ window.__st=st;
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
 })();</script>
 </body>
 </html>

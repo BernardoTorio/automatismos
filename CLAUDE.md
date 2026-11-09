@@ -82,6 +82,7 @@ subir.bat                  publica todo con doble clic
 - Vuelven a `index.html#ejercicios` (botón, Esc y Retroceso; Retroceso no actúa con el foco en un desplegable).
 - Bajo la barra de arriba, la tira `.t6nav`: «‹ anterior · Tema 6 · n de 6 · siguiente ›» y los seis pasos (6.4 … 6.11). Al final de la página, botón grande «Siguiente». Si se añade o se quita una animación del tema, hay que actualizar la tira en las seis.
 - Bajo el título, «Te sirve para los ejercicios …».
+- Debajo de «Qué está pasando», un cajón fijo **«Para qué sirve»** (dos o tres frases). En la tira del tema, las animaciones ya abiertas llevan un ✓.
 - Móvil (dibujo de menos de 620 px): cada una tiene un **dibujo estrecho propio** con texto de 10 px reales o más; el dibujo va fijo arriba (`.stick`) y lleva debajo una línea de veredicto (`#verd`).
 - Mismas listas en todas: 13 calibres (6 a 160 A), cables hasta 70 mm², los once motores de placa. Nombres `-M1`, `-Q1`, `-F1`.
 - Redacción: «salta en el funcionamiento normal del motor» (nunca «sin avería»); «Eje duro (sobrecarga)», un 18 % más.
