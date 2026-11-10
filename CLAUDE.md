@@ -73,7 +73,7 @@ subir.bat                  publica todo con doble clic
 | Apdo. | Archivo | Qué muestra |
 |---|---|---|
 | 6.4 | `intensidad_calor.html` | Motor de 11 kW: intensidad y calor del cable según tensión (230/400/690 V) y sección; pico de arranque a cámara lenta; sobrecarga |
-| 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motores de placa y corrientes del ejercicio 2; subir/bajar calibre y sección; tabla del calibre máximo de cada cable; reto (solo vale la solución más ajustada, motor bloqueado) |
+| 6.5 | `regla_ib_in_iz.html` | Regla IB ≤ In ≤ Iz: motores de placa y corrientes del ejercicio 2; subir/bajar calibre y sección; tabla del calibre máximo de cada cable; reto (vale cualquier calibre que quede entre IB e Iz, motor bloqueado) |
 | 6.6 | `curvas_disparo.html` | Curvas B/C/D en veces y en amperios según el calibre (al cambiar el calibre los amperios no cambian); zona, tiempos de la tabla (columna siguiente) y comprobación de arranque; para qué se usa cada curva |
 | 6.7 | `arranque_curvas.html` | Varias curvas (B/C/D) a la vez y hasta 4 motores de placa con pico y duración: escalón de arranque y tabla de si arranca con cada curva |
 | 6.8 | `proteger_motor.html` | Cuatro motores (3, 7,5, 11 y 22 kW): magnetotérmico + térmico / 3 fusibles aM o gG + térmico / guardamotor, con el rango que contiene la corriente; arranque, eje duro (sobrecarga, pinza en las tres fases), cortocircuito; ruleta alta → salta tarde o se quema, baja → salta en el funcionamiento normal del motor |
@@ -88,6 +88,7 @@ subir.bat                  publica todo con doble clic
 - Mismas listas en todas: 13 calibres (6 a 160 A), cables hasta 70 mm², los once motores de placa. Nombres `-M1`, `-Q1`, `-F1`.
 - Redacción: «salta en el funcionamiento normal del motor» (nunca «sin avería»); «Eje duro (sobrecarga)», un 18 % más.
 - Las tres zonas de la curva se llaman siempre **«Zona térmica», «Zona dudosa» y «Zona magnética»** (no «salta seguro» ni «dudosa» a secas). En 6.6 van en una tira de colores encima de la gráfica, en dos líneas cuando no caben en una.
+- Orden para dimensionar (apuntes, ejercicios, tests y animaciones): **corriente → cable → protección**. Primero el cable más fino que aguante IB; después vale **cualquier calibre** que quede entre IB e Iz (todos igual de buenos: el magnetotérmico protege el cable, no el motor); si no cabe ninguno, se sube la sección. Nunca «el primer calibre» ni «la solución más ajustada».
 - Modelo de clase acordado (no «corregir» hacia la norma): en la zona dudosa no se dan tiempos (puede saltar al instante); con menos de 2 veces «tarda mucho: de 20 s a 1 hora»; «caja equivocada» es caja mal leída (el motor pide su corriente real y la línea queda mal dimensionada); la general no salta por debajo de 1,13 veces; el térmico salta si el motor pide más que la ruleta (2 % de margen); arranque de 6 veces y 0,4 s en 6.11.
 - Solo se redibuja cuando cambia algo y se respeta `prefers-reduced-motion`.
 

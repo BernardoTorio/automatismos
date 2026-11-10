@@ -191,7 +191,7 @@ button:disabled{opacity:.45;cursor:default}
         <li>Elige un <b>motor</b>: su corriente (I<sub>B</sub>) sale de la placa y no se puede cambiar.</li>
         <li>Sube o baja el <b>magnetotérmico</b> y el <b>cable</b> con los botones o con el teclado: <kbd>←</kbd> <kbd>→</kbd> para el calibre y <kbd>F</kbd> <kbd>G</kbd> para el cable.</li>
         <li>En la regla de abajo verás las tres corrientes. Si están en orden (I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub>), sale en verde. Si no, la parte que falla sale en rojo.</li>
-        <li>Con <b>Reto</b> te sale una línea mal dimensionada. Se da por buena con el <b>primer calibre igual o mayor que I<sub>B</sub></b> y el <b>cable más fino que lo admite</b>.</li>
+        <li>Con <b>Reto</b> te sale una línea mal dimensionada. Se da por buena en cuanto <b>cumple la regla</b>: vale cualquier calibre que quede entre I<sub>B</sub> e I<sub>z</sub>.</li>
         <li>En la lista de motores están también las corrientes del <b>ejercicio 2</b> (12, 19, 30 y 45 A).</li>
       </ul>
     </div>
@@ -213,7 +213,7 @@ var $=function(i){return document.getElementById(i);};
 var NS='http://www.w3.org/2000/svg';
 function f(x){ var s=(Math.round(x*100)/100).toString().replace('.',','); return s; }
 function el(tag,attrs,txt){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(txt!==undefined) e.textContent=txt; return e; }
-function best(){ var IB=MOT[st.m][1]; var qi=CAL.findIndex(function(c){return c>=IB;}); var In=CAL[qi]; var ci=CAB.findIndex(function(c){return c[1]>=In;}); return {q:qi,c:ci}; }
+function best(){ var IB=MOT[st.m][1]; var qi=CAL.findIndex(function(c){return c>=IB;}); var In=CAL[qi]; var ci=CAB.findIndex(function(c){return c[1]>=In;}); return {q:qi,c:ci}; } // el cable más fino en el que cabe algún calibre, y ese calibre
 function draw(){
   var IB=MOT[st.m][1], In=CAL[st.q], S=CAB[st.c][0], Iz=CAB[st.c][1];
   var ok1=IB<=In, ok2=In<=Iz;
@@ -289,7 +289,7 @@ function explain(IB,In,S,Iz,ok1,ok2){
   var h='';
   if(st.reto&&!(ok1&&ok2)) $('retoMsg').innerHTML=RETO;
   if(!ok1){
-    h+='<p><span class="bad">✘ I<sub>B</sub> ≤ I<sub>n</sub> no se cumple.</span> El motor pide <b>'+f(IB)+' A</b> y el magnetotérmico es de <b>'+In+' A</b>. Con el motor trabajando normal ya le parece una sobrecarga: <b>saltaría en el funcionamiento normal del motor</b>.</p><p>→ <b>Sube I<sub>n</sub></b> (el calibre) hasta el primero igual o mayor que '+f(IB)+' A.</p>';
+    h+='<p><span class="bad">✘ I<sub>B</sub> ≤ I<sub>n</sub> no se cumple.</span> El motor pide <b>'+f(IB)+' A</b> y el magnetotérmico es de <b>'+In+' A</b>. Con el motor trabajando normal ya le parece una sobrecarga: <b>saltaría en el funcionamiento normal del motor</b>.</p><p>→ <b>Sube I<sub>n</sub></b> (el calibre) hasta uno igual o mayor que '+f(IB)+' A.</p>';
   }
   if(!ok2){
     var canLower=CAL.some(function(c){return c>=IB&&c<=Iz;});
@@ -297,14 +297,11 @@ function explain(IB,In,S,Iz,ok1,ok2){
     h+='<p>→ <b>Sube la sección</b> del cable: así <b>sube I<sub>z</sub></b>.'+(canLower&&ok1?' O <b>baja I<sub>n</sub></b> a <b>'+CAL.filter(function(c){return c>=IB&&c<=Iz;})[0]+' A</b>: sigue siendo igual o mayor que I<sub>B</sub> y no pasa de I<sub>z</sub>.':(ok1?' Bajar I<sub>n</sub> no sirve: quedaría por debajo de lo que pide el motor.':''))+'</p>';
   }
   if(ok1&&ok2){
-    var b=best(); var extra=[];
-    if(st.q>b.q) extra.push('el magnetotérmico podría ser más pequeño (<b>'+CAL[b.q]+' A</b>): saltaría antes y protegería más ajustado');
-    var cmin=CAB.findIndex(function(c){return c[1]>=In;});
-    if(st.c>cmin) extra.push('el cable podría ser más fino (<b>'+f(CAB[cmin][0])+' mm²</b>, que admite '+In+' A): más barato');
+    var b=best(), vale=CAL.filter(function(c){return c>=IB&&c<=Iz;});
     h+='<p><span class="ok">✔ Se cumple: '+f(IB)+' ≤ '+In+' ≤ '+f(Iz)+'.</span> El magnetotérmico deja pasar lo que pide el motor y salta antes de que el cable sufra.</p>';
-    if(extra.length) h+='<p>Funciona, pero '+extra.join(' y ')+'.</p>';
-    else h+='<p>Además es la solución más ajustada: el calibre más pequeño que vale y el cable más fino que lo admite.</p>';
-    if(st.reto){ if(st.q===b.q&&st.c===b.c){ st.reto=false; $('retoMsg').innerHTML='<b style="color:var(--ok)">¡Conseguido!</b> Es la más ajustada. Pulsa Reto para otro.<br>'+KEYS; $('mDown').disabled=st.m===0; $('mUp').disabled=st.m===MOT.length-1; } else $('retoMsg').innerHTML='<b>Cumple, pero no es la más ajustada:</b> sigue.'; }
+    h+='<p>Con este cable '+(vale.length>1?'valen los calibres de <b>'+vale.slice(0,-1).join(' A</b>, <b>')+' A</b> y <b>'+vale[vale.length-1]+' A</b>: son igual de buenos':'solo cabe el calibre de <b>'+vale[0]+' A</b>')+'. El magnetotérmico protege el <b>cable</b>; al motor lo protege el relé térmico.</p>';
+    if(st.c>b.c) h+='<p>El cable podría ser más fino (<b>'+f(CAB[b.c][0])+' mm²</b>, con un magnetotérmico de '+CAL[b.q]+' A): más barato.</p>';
+    if(st.reto){ st.reto=false; $('retoMsg').innerHTML='<b style="color:var(--ok)">¡Conseguido!</b> Cumple la regla. Pulsa Reto para otro.<br>'+KEYS; $('mDown').disabled=st.m===0; $('mUp').disabled=st.m===MOT.length-1; }
   }
   $('now').innerHTML=h;
 }
@@ -315,7 +312,7 @@ $('qDown').onclick=function(){st.q=clamp(st.q-1,CAL.length);draw();};
 $('qUp').onclick=function(){st.q=clamp(st.q+1,CAL.length);draw();};
 $('cDown').onclick=function(){st.c=clamp(st.c-1,CAB.length);draw();};
 $('cUp').onclick=function(){st.c=clamp(st.c+1,CAB.length);draw();};
-$('bSol').onclick=function(){var b=best();if(st.reto){st.reto=false;$('retoMsg').innerHTML='Esta era la solución. Pulsa Reto para otro.<br>'+KEYS;}st.q=b.q;st.c=b.c;draw();};
+$('bSol').onclick=function(){var b=best();if(st.reto){st.reto=false;$('retoMsg').innerHTML='Esta era una solución (la del cable más fino). Pulsa Reto para otro.<br>'+KEYS;}st.q=b.q;st.c=b.c;draw();};
 $('bReto').onclick=function(){
   for(var n=0;n<200;n++){
     st.m=Math.floor(Math.random()*MOT.length); var bb=best(); st.q=clamp(bb.q+Math.floor(Math.random()*5)-2,CAL.length); st.c=clamp(bb.c+Math.floor(Math.random()*5)-2,CAB.length);

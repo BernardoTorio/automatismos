@@ -188,7 +188,7 @@ button:disabled{opacity:.45;cursor:default}
       <div id="gNow"></div>
       <ul style="margin-top:0">
         <li>Su corriente es la <b>suma</b> de las de todos los motores que pueden funcionar a la vez.</li>
-        <li>Su calibre: el primero <b>igual o mayor</b> que esa suma… y <b>mayor que el más grande</b> de las líneas de abajo.</li>
+        <li>Su calibre: <b>igual o mayor</b> que esa suma, sin pasar de lo que aguanta su cable… y <b>mayor que el más grande</b> de las líneas de abajo.</li>
         <li>Así, con una avería en un motor salta <b>solo su protección</b> y los demás siguen: es la <b>selectividad</b>.</li>
         <li>Y el cable de la general, como siempre: I<sub>n</sub> ≤ I<sub>z</sub>.</li>
       </ul>
@@ -365,9 +365,10 @@ function receta(){
   var h='<ol style="margin-top:0">';
   h+='<li><b>Corriente.</b> Se conecta en '+(mo.c==='D'?'triángulo → caja Δ':'estrella → caja Y')+': '+b[0]+' V – '+f(b[1])+' A. <span class="k">I<sub>B</sub> = '+f(L.ib)+' A</span>'+(okCon(mo)?'':' <span class="bad">✘ Esa caja no es la de 400 V: todo lo que sigue sale mal.</span>')+'</li>';
   h+='<li><b>Relé térmico.</b> El rango que contiene '+f(L.ib)+' A: <b>'+rg(L.th)+'</b>. Ruleta en <b>'+f(L.ib)+' A</b>.</li>';
-  h+='<li><b>Calibre.</b> El primero igual o mayor que '+f(L.ib)+' A: <b>'+L.cal+' A</b>.</li>';
+  var vale=CAL.filter(function(c){return c>=L.ib&&c<=L.cab[1];});
+  h+='<li><b>Cable.</b> El más fino en el que cabe un calibre: <b>'+f(L.cab[0])+' mm²</b> (aguanta '+f(L.cab[1])+' A).</li>';
+  h+='<li><b>Calibre.</b> Entre '+f(L.ib)+' A y '+f(L.cab[1])+' A '+(vale.length>1?'valen '+vale.join(' A y ')+' A; aquí, el de <b>'+L.cal+' A</b>':'solo cabe el de <b>'+L.cal+' A</b>')+'.</li>';
   h+='<li><b>Curva.</b> Pico: '+KARR+' · '+f(L.ib)+' = '+f(pk)+' A. Veces: '+f(pk)+' / '+L.cal+' = <b>'+f(L.x,2)+'</b>. '+(L.cur==='C'?'Es menos de 5: vale la <b>curva C</b>.':'Con curva C no vale (5 o más: zona dudosa). Es menos de 10: <b>curva D</b>.')+' Tiempo: columna de '+L.col+' veces, mínimo '+f(L.tmin)+' s; el arranque dura '+f(TARR)+' s, menos ✔</li>';
-  h+='<li><b>Cable.</b> El más fino que admite '+L.cal+' A: <b>'+f(L.cab[0])+' mm²</b> (aguanta '+f(L.cab[1])+' A).</li>';
   h+='<li><b>Comprobación.</b> I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub>: <b>'+f(L.ib)+' ≤ '+L.cal+' ≤ '+f(L.cab[1])+'</b> ✔</li></ol>';
   setH('recT','La receta de <span style="color:'+MCOL[i]+'">'+nom(i)+'</span> ('+P[mo.p][0]+' kW), paso a paso');
   setH('rec',h);
