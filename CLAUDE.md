@@ -13,6 +13,7 @@ index.html                 portada: «Ahora en clase», el curso tema a tema y l
 test_28oct.html            test examen 28 de octubre (T1-T4, P1 y P2; modos en orden, al azar y por temas; saltos de 1 en 1 y de 10 en 10)
 test_28oct_II.html         test II examen 28 de octubre (100 preguntas nuevas, con peso en medidas y averías; mismo motor)
 test_diciembre.html        test examen de diciembre (Práctica 3)
+test_t5_t6.html            test Temas 5 y 6 (100 preguntas: dimensionar protecciones, temporizadores, cambio de sentido y pinza)
 test_repaso.html           antiguo test: ahora redirige a index.html#tests
 medidas.html               práctica de medidas: polímetro (V~, Ω) y pinza en 7 circuitos, ligada a las preguntas de medida del test
 *.html                     una animación por archivo (en la raíz)
