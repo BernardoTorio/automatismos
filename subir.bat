@@ -75,15 +75,25 @@ git rm -r --cached --quiet --ignore-unmatch *.zip *.docx >nul 2>&1
 rem --- 4. Anadir todo, commit y push ---
 git add -A
 git diff --cached --quiet
-if not errorlevel 1 (
+if errorlevel 1 goto commit
+rem Sin archivos nuevos: puede haber commits ya hechos (por ejemplo, por Claude) que aun no se han subido
+set "PEND=0"
+for /f %%n in ('git rev-list --count origin/main..HEAD 2^>nul') do set "PEND=%%n"
+if "%PEND%"=="0" (
   echo No hay cambios que subir: todo esta ya en GitHub.
   goto listo
 )
+echo Hay %PEND% commit^(s^) hechos y sin subir: los subo ahora.
+goto push
+
+:commit
 echo Archivos que cambian:
 git diff --cached --name-status
 echo.
 for /f "delims=" %%d in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd HH:mm'"') do set "FECHA=%%d"
 git commit -q -m "Actualizacion de la web %FECHA%"
+
+:push
 git push -u origin main
 if errorlevel 1 (
   echo.
