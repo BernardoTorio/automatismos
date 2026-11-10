@@ -135,12 +135,12 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>5.2 El cronograma de los temporizadores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <h1>A la conexión y a la desconexión: el cronograma</h1>
-  <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> y <b>-KT2 a la desconexión</b>. Cada uno enciende un piloto con su <b>67-68</b> (H1 y H2) y otro con su <b>55-56</b> (H3 y H4). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de la derecha: se dibuja solo. Después prueba una pulsación corta.</p>
+  <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> y <b>-KT2 a la desconexión</b>. Cada uno enciende un piloto con su <b>67-68</b> (H1 y H3) y otro con su <b>55-56</b> (H2 y H4). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de la derecha: se dibuja solo. Después prueba una pulsación corta.</p>
 
   <div class="grid">
     <div class="sheet" aria-label="Esquema de mando de los dos temporizadores">
       <svg viewBox="0 0 920 628" role="img" aria-labelledby="svgt">
-        <title id="svgt">Esquema: magnetotérmico Q1; el pulsador S1 alimenta las bobinas de KT1 (a la conexión) y KT2 (a la desconexión); el 67-68 de KT1 enciende H1 y el 67-68 de KT2 enciende H2; el 55-56 de KT1 enciende H3 y el 55-56 de KT2 enciende H4</title>
+        <title id="svgt">Esquema: magnetotérmico Q1; el pulsador S1 alimenta las bobinas de KT1 (a la conexión) y KT2 (a la desconexión); el 67-68 de KT1 enciende H1 y el 55-56 de KT1 enciende H2; el 67-68 de KT2 enciende H3 y el 55-56 de KT2 enciende H4</title>
 
         <!-- raíles -->
         <path id="wL" class="w wf live" d="M40 40 H120 V58"/>
@@ -153,8 +153,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
         <path id="wBus" class="w wf" d="M120 222 H840 V378 M420 222 V378 M560 222 V378 M700 222 V378"/>
         <path id="wS1" class="w wf" d="M120 322 V514 M120 350 H260 V514"/>
         <path id="wC" class="w wf" d="M420 444 V520"/>
-        <path id="wD" class="w wf" d="M560 444 V520"/>
-        <path id="wE" class="w wf" d="M700 444 V520"/>
+        <path id="wD" class="w wf" d="M700 444 V520"/>
+        <path id="wE" class="w wf" d="M560 444 V520"/>
         <path id="wF" class="w wf" d="M840 444 V520"/>
         <!-- neutro -->
         <path class="w wn" d="M120 554 V600 M260 554 V600 M420 556 V600 M560 556 V600 M700 556 V600 M840 556 V600"/>
@@ -164,8 +164,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
         <path id="fA" class="flow" d="M120 222 V350 V600 H40"/>
         <path id="fB" class="flow" d="M120 350 H260 V600 H40"/>
         <path id="fH1" class="flow" d="M120 222 H420 V600 H40"/>
-        <path id="fH2" class="flow" d="M420 222 H560 V600 H420"/>
-        <path id="fH3" class="flow" d="M560 222 H700 V600 H560"/>
+        <path id="fH2" class="flow" d="M560 222 H700 V600 H560"/>
+        <path id="fH3" class="flow" d="M420 222 H560 V600 H420"/>
         <path id="fH4" class="flow" d="M700 222 H840 V600 H700"/>
 
         <!-- Q1 magnetotérmico completo -->
@@ -213,31 +213,31 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
           <line id="stubC" class="sym" x1="381" y1="412" x2="410" y2="412" style="stroke-width:2.2"/>
           <text class="t" x="428" y="376">67</text><text class="t" x="428" y="460">68</text>
           <text class="t name" x="366" y="418" text-anchor="end">-KT1</text>
-          <text id="cdC" class="cdt" x="430" y="490"></text>
+          <text id="cdC" class="cdt" x="430" y="478"></text>
+        </g>
+        <!-- contacto 55-56 de KT1 (cerrado en reposo) -->
+        <g>
+          <line class="sym" x1="560" y1="378" x2="560" y2="398"/>
+          <line class="sym" x1="560" y1="398" x2="575" y2="398"/>
+          <line class="sym" x1="560" y1="428" x2="560" y2="444"/>
+          <line id="kE" class="sym blade" x1="560" y1="428" x2="573" y2="394" style="transform-origin:560px 428px"/>
+          <path class="sym" d="M528 399 Q514 412 528 425" style="stroke-width:2.6"/>
+          <line id="stubE" class="sym" x1="521" y1="412" x2="566" y2="412" style="stroke-width:2.2"/>
+          <text class="t" x="568" y="374">55</text><text class="t" x="568" y="460">56</text>
+          <text class="t name" x="506" y="418" text-anchor="end">-KT1</text>
         </g>
         <!-- contacto 67-68 de KT2 (a la desconexión): paraguas ")" -->
         <g>
-          <line class="sym" x1="560" y1="378" x2="560" y2="398"/>
-          <line class="sym" x1="560" y1="428" x2="560" y2="444"/>
-          <line id="kD" class="sym blade" x1="560" y1="428" x2="540" y2="396" style="transform-origin:560px 428px"/>
-          <path class="sym" d="M514 399 Q528 412 514 425" style="stroke-width:2.6"/>
-          <line id="stubD" class="sym" x1="521" y1="412" x2="550" y2="412" style="stroke-width:2.2"/>
-          <text class="t" x="568" y="376">67</text><text class="t" x="568" y="460">68</text>
-          <text class="t name" x="506" y="418" text-anchor="end">-KT2</text>
-          <text id="cdD" class="cdt" x="570" y="490"></text>
+          <line class="sym" x1="700" y1="378" x2="700" y2="398"/>
+          <line class="sym" x1="700" y1="428" x2="700" y2="444"/>
+          <line id="kD" class="sym blade" x1="700" y1="428" x2="680" y2="396" style="transform-origin:700px 428px"/>
+          <path class="sym" d="M654 399 Q668 412 654 425" style="stroke-width:2.6"/>
+          <line id="stubD" class="sym" x1="661" y1="412" x2="690" y2="412" style="stroke-width:2.2"/>
+          <text class="t" x="708" y="376">67</text><text class="t" x="708" y="460">68</text>
+          <text class="t name" x="646" y="418" text-anchor="end">-KT2</text>
+          <text id="cdD" class="cdt" x="710" y="478"></text>
         </g>
 
-        <!-- contacto 55-56 de KT1 (cerrado en reposo) -->
-        <g>
-          <line class="sym" x1="700" y1="378" x2="700" y2="398"/>
-          <line class="sym" x1="700" y1="398" x2="715" y2="398"/>
-          <line class="sym" x1="700" y1="428" x2="700" y2="444"/>
-          <line id="kE" class="sym blade" x1="700" y1="428" x2="713" y2="394" style="transform-origin:700px 428px"/>
-          <path class="sym" d="M668 399 Q654 412 668 425" style="stroke-width:2.6"/>
-          <line id="stubE" class="sym" x1="661" y1="412" x2="706" y2="412" style="stroke-width:2.2"/>
-          <text class="t" x="708" y="374">55</text><text class="t" x="708" y="460">56</text>
-          <text class="t name" x="646" y="418" text-anchor="end">-KT1</text>
-        </g>
         <!-- contacto 55-56 de KT2 (cerrado en reposo) -->
         <g>
           <line class="sym" x1="840" y1="378" x2="840" y2="398"/>
@@ -250,8 +250,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
           <text class="t name" x="786" y="418" text-anchor="end">-KT2</text>
         </g>
         <!-- líneas auxiliares: cada bobina con su contacto -->
-        <path class="dash" d="M148 534 H158 V484 H386 V427"/>
-        <path class="dash" d="M288 534 H298 V498 H516 V427"/>
+        <path class="dash" d="M148 534 H158 V484 H526 V427 M386 484 V427"/>
+        <path class="dash" d="M288 534 H298 V498 H806 V427 M666 498 V427"/>
 
         <!-- nudos -->
         <circle cx="120" cy="222" r="5" fill="var(--fase)"/>
@@ -291,7 +291,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
         <line class="sym" x1="407" y1="551" x2="433" y2="525"/>
         <text class="t" x="430" y="512">X1</text><text class="t" x="430" y="578">X2</text>
         <text class="t name" x="390" y="544" text-anchor="end">-H1</text>
-        <circle id="glow2" class="glow" cx="560" cy="538" r="30" style="fill:#FFD27A"/>
+        <circle id="glow3" class="glow" cx="560" cy="538" r="30" style="fill:#8FE08F"/>
         <line class="sym" x1="560" y1="512" x2="560" y2="520"/>
         <line class="sym" x1="560" y1="556" x2="560" y2="564"/>
         <circle class="sym" cx="560" cy="538" r="18"/>
@@ -299,7 +299,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
         <line class="sym" x1="547" y1="551" x2="573" y2="525"/>
         <text class="t" x="570" y="512">X1</text><text class="t" x="570" y="578">X2</text>
         <text class="t name" x="530" y="544" text-anchor="end">-H2</text>
-        <circle id="glow3" class="glow" cx="700" cy="538" r="30" style="fill:#8FE08F"/>
+        <circle id="glow2" class="glow" cx="700" cy="538" r="30" style="fill:#FFD27A"/>
         <line class="sym" x1="700" y1="512" x2="700" y2="520"/>
         <line class="sym" x1="700" y1="556" x2="700" y2="564"/>
         <circle class="sym" cx="700" cy="538" r="18"/>
@@ -364,7 +364,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
             <div class="tmname">-KT1 <span class="ty">· a la conexión</span></div>
             <div id="cd1" class="cd">—</div>
             <div id="st1" class="stt">Reposo</div>
-            <span class="led"><span id="dH1" class="dot g"></span>H1</span> <span class="led" style="margin-left:10px"><span id="dH3" class="dot g"></span>H3</span>
+            <span class="led"><span id="dH1" class="dot g"></span>H1</span> <span class="led" style="margin-left:10px"><span id="dH3" class="dot g"></span>H2</span>
           </div>
         </div>
         <div class="tm">
@@ -373,7 +373,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
             <div class="tmname">-KT2 <span class="ty">· a la desconexión</span></div>
             <div id="cd2" class="cd">—</div>
             <div id="st2" class="stt">Reposo</div>
-            <span class="led"><span id="dH2" class="dot a"></span>H2</span> <span class="led" style="margin-left:10px"><span id="dH4" class="dot a"></span>H4</span>
+            <span class="led"><span id="dH2" class="dot a"></span>H3</span> <span class="led" style="margin-left:10px"><span id="dH4" class="dot a"></span>H4</span>
           </div>
         </div>
         <p class="inside">El <b>fuelle</b> de cada bloque se llena o se vacía <b>despacio</b> por un agujero muy pequeño: eso es lo que marca el tiempo. En el de conexión el aire tarda al <b>entrar</b>; en el de desconexión tarda al <b>salir</b>.</p>
@@ -494,29 +494,29 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var T = st.T, r1 = Math.max(0, Math.ceil(T - st.tOn - 1e-6)), r2 = Math.max(0, Math.ceil(T - st.tOff - 1e-6));
     if (st.auto) return '<b>Pulsos cortos: 1 s pulsado, 1 s suelto, una y otra vez</b> (T = ' + T + ' s).<br>' +
       '• <b>-KT1 (conexión) nunca llega a actuar</b>: necesita ' + T + ' s <b>seguidos</b> con tensión y cada pulso dura solo 1 s. Al soltar, vuelve a empezar de cero. H1 no se enciende nunca.<br>' +
-      '• <b>-KT2 (desconexión) nunca llega a parar</b>: cada pulso le pone el tiempo a cero antes de que se acabe. H2 no se apaga nunca.';
+      '• <b>-KT2 (desconexión) nunca llega a parar</b>: cada pulso le pone el tiempo a cero antes de que se acabe. H3 no se apaga nunca.';
     if (!st.q1) return '<b>-Q1 abierto: el mando se queda sin tensión.</b> Las bobinas se sueltan y los pilotos se apagan.' +
       (st.offTiming ? ' Fíjate en el fuelle de -KT2: <b>sigue contando sin electricidad</b> (faltan ' + r2 + ' s). El tiempo lo marca el aire, no la corriente.' : ' Ciérralo para seguir.');
     if (st.coil && !st.onC){
       var pre = ev === 'retrig' ? '<b>Has vuelto a pulsar antes de que -KT2 acabara.</b> Su cuenta se ha puesto a cero: empezará otra vez cuando sueltes. ' : '<b>Las bobinas tienen tensión.</b> ';
-      return pre + '-KT2 (desconexión) ha cambiado <b>al momento</b>: su <span class="k">67-68</span> se cierra y se enciende H2. -KT1 (conexión) <b>está contando</b>: faltan <b>' + r1 + ' s</b>. Su 67-68 sigue abierto. Si sueltas antes, no llegará a actuar.';
+      return pre + '-KT2 (desconexión) ha cambiado <b>al momento</b>: su <span class="k">67-68</span> se cierra y se enciende H3. -KT1 (conexión) <b>está contando</b>: faltan <b>' + r1 + ' s</b>. Su 67-68 sigue abierto. Si sueltas antes, no llegará a actuar.';
     }
     if (st.coil && st.onC) return '<b>Han pasado ' + T + ' s con tensión</b>: el <span class="k">67-68</span> de -KT1 se cierra y se enciende H1. Ahora los dos están en trabajo. <b>Suelta el pulsador</b> y mira cuál vuelve antes a reposo.';
     if (st.offTiming){
       var p = ev === 'short' ? '<b>Has soltado antes de ' + T + ' s.</b> -KT1 (conexión) <b>no ha llegado a actuar</b>: H1 ni se ha encendido. ' :
                                '<b>Has soltado: las bobinas ya no tienen tensión.</b> -KT1 (conexión) vuelve a reposo <b>al momento</b>: H1 se apaga. ';
-      return p + '-KT2 (desconexión) <b>sigue en trabajo y cuenta</b>: faltan <b>' + r2 + ' s</b> para que vuelva a reposo y se apague H2.';
+      return p + '-KT2 (desconexión) <b>sigue en trabajo y cuenta</b>: faltan <b>' + r2 + ' s</b> para que vuelva a reposo y se apague H3.';
     }
-    if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste</b>: -KT2 vuelve a reposo y H2 se apaga. Todo en reposo otra vez. Mira el cronograma: el de conexión retrasa la <b>entrada</b>; el de desconexión retrasa la <b>salida</b>.';
-    return '<b>Todo en reposo.</b> Las bobinas no tienen tensión: los dos <span class="k">67-68</span> están abiertos y los dos <span class="k">55-56</span>, cerrados (por eso H3 y H4 están encendidos). Mantén pulsado <b>-S1</b> más de ' + T + ' s y suéltalo. Después prueba una pulsación corta (menos de ' + T + ' s).';
+    if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste</b>: -KT2 vuelve a reposo y H3 se apaga. Todo en reposo otra vez. Mira el cronograma: el de conexión retrasa la <b>entrada</b>; el de desconexión retrasa la <b>salida</b>.';
+    return '<b>Todo en reposo.</b> Las bobinas no tienen tensión: los dos <span class="k">67-68</span> están abiertos y los dos <span class="k">55-56</span>, cerrados (por eso H2 y H4 están encendidos). Mantén pulsado <b>-S1</b> más de ' + T + ' s y suéltalo. Después prueba una pulsación corta (menos de ' + T + ' s).';
   }
   function render(){
     var c = st.coil, h1 = st.q1 && st.onC, h2 = st.q1 && st.offC, h3 = st.q1 && !st.onC, h4 = st.q1 && !st.offC;
     rot($('kS1'), st.s1 ? 32 : 0); $('aS1').style.transform = st.s1 ? 'translateX(10px)' : '';
     rot($('kQ1'), st.q1 ? 0 : -32); $('aQ1').style.transform = st.q1 ? '' : 'translateX(-10px)';
     var dc = st.onC ? 32 : 0, dd = st.offC ? 32 : 0;
-    rot($('kC'), dc); rot($('kD'), dd); stub('stubC', 420, dc); stub('stubD', 560, dd);
-    rot($('kE'), st.onC ? -44 : 0); rot($('kF'), st.offC ? -44 : 0); stubN('stubE', 700, st.onC ? -44 : 0); stubN('stubF', 840, st.offC ? -44 : 0);
+    rot($('kC'), dc); rot($('kD'), dd); stub('stubC', 420, dc); stub('stubD', 700, dd);
+    rot($('kE'), st.onC ? -44 : 0); rot($('kF'), st.offC ? -44 : 0); stubN('stubE', 560, st.onC ? -44 : 0); stubN('stubF', 840, st.offC ? -44 : 0);
     $('wE').classList.toggle('live', h3); $('wF').classList.toggle('live', h4); $('fH3').classList.toggle('on', h3); $('fH4').classList.toggle('on', h4);
     $('glow3').classList.toggle('on', h3); $('glow4').classList.toggle('on', h4); $('dH3').classList.toggle('on', h3); $('dH4').classList.toggle('on', h4);
     $('wQ').classList.toggle('live', st.q1); $('wBus').classList.toggle('live', st.q1);
