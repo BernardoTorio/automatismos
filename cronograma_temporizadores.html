@@ -71,7 +71,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 /* cronograma */
 .chart{margin-top:0}
 .chartwrap{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px}
-.chartwrap canvas{display:block;width:100%;height:340px}
+.chartwrap canvas{display:block;width:100%;height:480px}
 .howread{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.95rem;color:var(--muted);margin:0 0 8px}
 .howread b{color:var(--ink)}
 .sw{display:inline-block;width:26px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
@@ -276,10 +276,10 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     <div class="howread">
       <span>El tiempo va de <b>izquierda a derecha</b>; lo de la derecha es <b>ahora</b>.</span>
       <span><span class="sw" style="background:#D0191C"></span><b>Bobinas</b>: arriba con tensión, abajo sin tensión.</span>
-      <span><span class="sw" style="background:#1F5FBF"></span><b>Contactos</b>: arriba en trabajo, abajo en reposo.</span>
+      <span><span class="sw" style="background:#1F5FBF"></span><b>Contactos</b>: arriba cerrado, abajo abierto. El <b>67-68</b> es el abierto (NA) y el <b>55-56</b>, el cerrado (NC).</span>
       <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
     </div>
-    <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de la bobina y de los contactos de KT1 y KT2"></canvas></div>
+    <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de la bobina y de los contactos 67-68 y 55-56 de KT1 y KT2"></canvas></div>
     </section>
 
     <div class="side">
@@ -363,7 +363,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     </div>
     <div class="card wide">
       <div class="box pista" style="margin-top:0"><b class="t">PISTA para el test:</b> mira la bobina y busca <b>qué cambio del contacto va retrasado</b>. Si el contacto tarda en <b>entrar</b> (en ir a trabajo) → <b>a la conexión</b>. Si tarda en <b>salir</b> (en volver a reposo) → <b>a la desconexión</b>. En el símbolo, el paraguas del de conexión tiene forma de <b>C</b>, la C de <b>C</b>onexión: <b style="font-size:1.2em">(</b>. El de desconexión, al revés: <b style="font-size:1.2em">)</b>.</div>
-      <p style="margin:10px 0 0">Cada bloque tiene también un <span class="k">55-56</span> (cerrado en reposo). Cambia <b>a la vez</b> que el <span class="k">67-68</span>, pero al revés: cuando el 67-68 se cierra, el 55-56 se abre. En el cronograma sería la misma línea, pero dada la vuelta.</p>
+      <p style="margin:10px 0 0">Cada bloque tiene también un <span class="k">55-56</span> (cerrado en reposo). Cambia <b>a la vez</b> que el <span class="k">67-68</span>, pero al revés: cuando el 67-68 se cierra, el 55-56 se abre. En el cronograma lo tienes justo debajo de cada 67-68: es la misma línea, pero dada la vuelta.</p>
     </div>
   </div>
   <p class="foot"><span class="pin">Doble clic</span> en el pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Fase en rojo, neutro en azul. Teclado: <kbd>M</kbd> pulsador, <kbd>C</kbd> pulsos cortos, <kbd>Q</kbd> magnetotérmico, <kbd>L</kbd> cámara lenta, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
@@ -514,12 +514,15 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var X = function(t){ return x1 - (now - t) * pps; };
     var rows = [
       { title: 'BOBINAS (-KT1 y -KT2)', hi: 'Con tensión', lo: 'Sin tensión', key: 'c', col: '#D0191C' },
-      { title: '-KT1 a la conexión · 67-68', hi: 'Trabajo', lo: 'Reposo', key: 'a', col: '#1F5FBF', iv: ivOn },
-      { title: '-KT2 a la desconexión · 67-68', hi: 'Trabajo', lo: 'Reposo', key: 'b', col: '#1F5FBF', iv: ivOff }
+      { title: '-KT1 a la conexión · 67-68 (NA)', hi: 'Cerrado', lo: 'Abierto', key: 'a', col: '#1F5FBF', iv: ivOn, h: 108 },
+      { title: '-KT1 a la conexión · 55-56 (NC)', hi: 'Cerrado', lo: 'Abierto', key: 'a', inv: true, col: '#1F5FBF', h: 82 },
+      { title: '-KT2 a la desconexión · 67-68 (NA)', hi: 'Cerrado', lo: 'Abierto', key: 'b', col: '#1F5FBF', iv: ivOff, h: 108 },
+      { title: '-KT2 a la desconexión · 55-56 (NC)', hi: 'Cerrado', lo: 'Abierto', key: 'b', inv: true, col: '#1F5FBF', h: 82 }
     ];
-    var rowH = (H - 6) / 3;
+    rows[0].h = 86;
+    var sumH = rows.reduce(function(a, r){ return a + r.h; }, 0), kH = (H - 6) / sumH, accH = 0;
     rows.forEach(function(rw, i){
-      var top = 4 + i * rowH, hiY = top + 34, loY = top + 64;
+      var top = 4 + accH * kH, hiY = top + 34, loY = top + 64; accH += rw.h;
       rw.hiY = hiY; rw.loY = loY;
       ctx.fillStyle = '#111'; ctx.font = '700 ' + (narrow ? 12 : 14) + 'px ' + FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(rw.title, 8, top + 12);
@@ -539,7 +542,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       ctx.strokeStyle = rw.col; ctx.lineWidth = 4; ctx.lineJoin = 'miter';
       ctx.beginPath(); var first = true, prev = null;
       for (var k = 0; k < samples.length; k++){
-        var s = samples[k], y = s[rw.key] ? rw.hiY : rw.loY, x = Math.max(x0, X(s.t));
+        var s = samples[k], y = (rw.inv ? !s[rw.key] : s[rw.key]) ? rw.hiY : rw.loY, x = Math.max(x0, X(s.t));
         if (first){ ctx.moveTo(x, y); first = false; }
         else if (prev !== y){ ctx.lineTo(x, prev); ctx.lineTo(x, y); }
         prev = y;

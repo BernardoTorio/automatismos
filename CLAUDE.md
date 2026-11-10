@@ -16,6 +16,7 @@ test_diciembre.html        test examen de diciembre (Práctica 3)
 test_t5_t6.html            test Temas 5 y 6 (100 preguntas: dimensionar protecciones, temporizadores, cambio de sentido y pinza)
 test_repaso.html           antiguo test: ahora redirige a index.html#tests
 medidas.html               práctica de medidas: polímetro (V~, Ω) y pinza en 7 circuitos, ligada a las preguntas de medida del test
+pinza.html                 cómo se usa la pinza amperimétrica (pestaña Medidas): arranque directo con 6 sitios para la pinza, selector A~/V~/Ω, motor normal, sobrecargado o sin una fase; vuelve a index.html#medidas
 *.html                     una animación por archivo (en la raíz)
 temas/                     apuntes en PDF
   T1_Esquemas_basicos_Automatismos.pdf

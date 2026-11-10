@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cómo se usa la pinza amperimétrica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:72vh}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
+.seg.col{flex-direction:column}
+.seg.col button{text-align:left}
+button.red{background:#C0392B;color:#fff;border-color:#C0392B}
+.dial{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center}
+.dial svg{width:90px;height:90px}
+.meter{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mlab{font-size:.85rem;color:var(--muted);font-weight:700}
+.mbig{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+.chipr{display:inline-block;border:2px solid var(--line);border-radius:8px;padding:1px 6px;margin:2px 3px 2px 0;font-weight:700;font-size:.85rem}
+.chipr.on{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.rngp .bad{color:var(--warn);font-weight:700}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+button:disabled{opacity:.45;cursor:default}
+.bar{margin-top:10px;font-size:.88rem;font-weight:700;color:var(--muted)}
+.trk{height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin-top:3px}
+.trk div{height:100%;width:0;background:linear-gradient(90deg,#F2B400,#E8590C,#C0392B)}
+.speed{margin-top:8px;font-weight:700;font-size:.92rem}
+.flow{fill:none;stroke:#F2B400;stroke-width:4;stroke-dasharray:10 10}
+@media (prefers-reduced-motion: reduce){.flow{stroke-dasharray:none}}
+
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
+
+.lcd{background:#c9d6c0;color:#10200c;border:3px solid #2b2f33;border-radius:10px;padding:8px 12px;text-align:right;font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;letter-spacing:.02em}
+.lcd small{display:block;font-size:.8rem;font-weight:700;text-align:left;opacity:.8}
+.pasos{list-style:none;padding:0;margin:0}
+.pasos li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;line-height:1.25}
+.pasos li i{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:.85rem}
+.pasos li.ok i{background:var(--ok);border-color:var(--ok);color:#fff}
+.spot{cursor:pointer}
+.flow{fill:none;stroke:#F2B400;stroke-width:4;stroke-dasharray:10 10;animation:corre .7s linear infinite;pointer-events:none}
+@keyframes corre{to{stroke-dashoffset:-20}}
+@media (prefers-reduced-motion: reduce){.flow{animation:none}}
+#svg{max-height:78vh}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#medidas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#medidas">Medidas</a><span class="sep">›</span><b>La pinza amperimétrica</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <h1>Cómo se usa la pinza amperimétrica</h1>
+  <p class="sub">La pinza mide la <b>corriente</b> que pasa por un cable <b>sin soltarlo</b>. Arranca el motor, pon la pinza en un cable y mira lo que marca. Recuerda: <b>borne = tornillo</b> del aparato.</p>
+
+  <div class="layout">
+    <div class="sheet stick" aria-label="Arranque directo de un motor: fuerza y mando">
+      <svg id="svg" viewBox="0 0 545 650" role="img" aria-label="Esquema de fuerza y mando con los sitios donde se puede poner la pinza"></svg>
+      <p class="verd" id="verd" aria-live="polite"></p>
+    </div>
+    <div class="side">
+      <div class="card ctl">
+        <h3>La pinza</h3>
+        <div class="lcd" id="lcd"><small id="lcdm">A~</small><span id="lcdv">0,0</span></div>
+        <p class="mlab" style="margin:10px 0 4px">Selector</p>
+        <div class="seg" id="sel"><button data-s="A" class="on">A~</button><button data-s="V">V~</button><button data-s="O">Ω</button></div>
+        <p class="foot" id="donde" style="margin:8px 0 0">Toca un círculo amarillo del esquema para poner ahí la pinza.</p>
+      </div>
+      <div class="card ctl">
+        <h3>El motor (placa: 6,4 A)</h3>
+        <div class="seg"><button id="bOn" class="go">Marcha</button><button id="bOff" class="red">Paro</button></div>
+        <p class="mlab" style="margin:10px 0 4px">¿Cómo está?</p>
+        <div class="seg col" id="fault"><button data-f="ok" class="on">Trabaja normal</button><button data-f="sob">Eje duro (sobrecarga)</button><button data-f="fase">Falta la fase L3</button></div>
+      </div>
+      <div class="card ctl">
+        <h3>Para medir bien</h3>
+        <ol class="pasos" id="pasos"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto">
+      <h2>Para qué sirve</h2>
+      <p style="margin:0">Con la pinza sabes <b>cuánta corriente pide el motor de verdad</b> y la comparas con la de su <b>placa</b>. Así ves si trabaja bien, si está <b>sobrecargado</b> o si le <b>falta una fase</b>, y si la ruleta del relé térmico está bien puesta.</p>
+    </div>
+    <div class="card ojo">
+      <h2>¡Ojo!</h2>
+      <ul style="margin-top:0">
+        <li>Se abraza <b>un solo cable</b>. Con los tres dentro marca <b>0 A</b>.</li>
+        <li>La pinza mide <b>corriente</b>, no tensión: con el motor parado marca 0 A aunque haya 230 V.</li>
+        <li>El selector, en <b>A~</b> (amperios de alterna).</li>
+        <li>En un motor sano, las <b>tres fases</b> marcan más o menos lo mismo.</li>
+      </ul>
+    </div>
+    <div class="card wide">
+      <h2>Cómo funciona esta animación</h2>
+      <ul>
+        <li>Arranca el motor tocando <b>-S1</b> en el esquema (o con el botón Marcha) y páralo con <b>-S0</b>. Con doble clic, un pulsador se queda <b>fijado</b>.</li>
+        <li>Toca un <b>círculo amarillo</b> para poner ahí la pinza: en una fase, en los tres cables a la vez o en el cable de la bobina.</li>
+        <li>La línea amarilla que se mueve es la <b>corriente</b>. La pantalla de la pinza marca lo que pasa por el cable que abrazas.</li>
+        <li>Cambia cómo está el motor (normal, eje duro, falta una fase) y vuelve a medir las tres fases.</li>
+        <li>Teclas: <kbd>M</kbd> marcha · <kbd>P</kbd> paro · <kbd>1</kbd> a <kbd>6</kbd> sitios de la pinza.</li>
+      </ul>
+    </div>
+  </div>
+</main>
+<script>
+(function(){
+var NS='http://www.w3.org/2000/svg', svg=document.getElementById('svg');
+function $(i){return document.getElementById(i);}
+var F='#D0191C', NE='#1F5FBF', K='#1a1a1a';
+var X=[110,170,230], XM=405, XR=502, PLACA=6.4;
+var st={sel:'A',km:false,s1:false,s0:false,l1:false,l0:false,fault:'ok',pos:null,seen:{}};
+var SPOT={a:{x:X[0],y:196,n:'L1, entre -Q1 y -KM1',k:0},b:{x:X[0],y:404,n:'L1, entre -F1 y el bornero',k:0},c:{x:X[1],y:404,n:'L2, entre -F1 y el bornero',k:1},d:{x:X[2],y:404,n:'L3, entre -F1 y el bornero',k:2},e:{x:X[1],y:486,n:'los tres cables del motor a la vez',k:-1},f:{x:XM,y:438,n:'el cable que llega al A1 de la bobina',k:-2}};
+var ORD=['a','b','c','d','e','f'];
+function f(v,d){return v.toFixed(d===undefined?1:d).replace('.',',');}
+function el(t,a,x,par){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(x!==undefined)e.textContent=x;(par||svg).appendChild(e);return e;}
+function ln(x1,y1,x2,y2,c,w){return el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:c||K,'stroke-width':w||3,'stroke-linecap':'round'});}
+function tx(x,y,s,o){var a={x:x,y:y,'font-size':17,fill:K,'class':'lbl'};for(var k in (o||{}))a[k]=o[k];return el('text',a,s);}
+function nom(x,y,s){tx(x,y+6,s,{'font-weight':700,'text-anchor':'end','font-size':18});}
+function dash(x1,y1,x2,y2){el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:K,'stroke-width':2,'stroke-dasharray':'6 5'});}
+function escalon(x,y,w,h){el('rect',{x:x-w/2,y:y,width:w,height:h,fill:'#fff',stroke:K,'stroke-width':3});el('polyline',{points:[x-5,y+h-5,x-5,y+h/2,x+5,y+h/2,x+5,y+5].join(' '),fill:'none',stroke:K,'stroke-width':2.5});}
+// magnetotérmico completo (un polo): contacto con aspa, disparo térmico y magnético
+function magneto(x,y,a,b,col){
+  ln(x,y-14,x,y+10,col); tx(x+8,y+6,a);
+  ln(x-6,y+6,x+6,y+18,K,3); ln(x+6,y+6,x-6,y+18,K,3);
+  ln(x,y+48,x,y+14,K,3.5);
+  escalon(x,y+52,24,24);
+  el('rect',{x:x-12,y:y+80,width:24,height:24,fill:'#fff',stroke:K,'stroke-width':3}); tx(x,y+97,'I>',{'text-anchor':'middle','font-size':14,'font-weight':700});
+  ln(x,y+48,x,y+52,col); ln(x,y+76,x,y+80,col); ln(x,y+104,x,y+112,col); tx(x+8,y+122,b);
+}
+// contacto abierto (NA): la lámina hacia la izquierda
+function na(x,y,a,b,cerr,col,arco){
+  ln(x,y,x,y+12,col); tx(x+8,y+10,a);
+  if(arco) el('path',{d:'M'+(x-7)+' '+(y+12)+' a7 7 0 0 0 14 0',fill:'none',stroke:K,'stroke-width':2.5});
+  if(cerr) ln(x,y+50,x,y+12,K,3.5); else ln(x,y+50,x-17,y+18,K,3.5);
+  ln(x,y+50,x,y+60,col); tx(x+8,y+60,b);
+}
+// contacto cerrado (NC): la lámina hacia la derecha
+function nc(x,y,a,b,abierto,col){
+  ln(x,y,x,y+12,col); tx(x+8,y+8,a); ln(x,y+12,x+13,y+12,K,3);
+  if(abierto) ln(x,y+50,x-15,y+20,K,3.5); else ln(x,y+50,x+11,y+12,K,3.5);
+  ln(x,y+50,x,y+60,col); tx(x+8,y+62,b);
+}
+function pulsador(x,y,fijo){ // accionamiento a la izquierda; la discontinua llega a la mitad de la lámina
+  dash(x-42,y+32,x-(fijo?2:6),y+32); ln(x-42,y+23,x-42,y+41,K,3); ln(x-42,y+23,x-36,y+23,K,3); ln(x-42,y+41,x-36,y+41,K,3);
+}
+function draw(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var i,x, on=st.km, coil=on;
+  // ---------- fuerza
+  ['L1','L2','L3'].forEach(function(t,k){tx(X[k],26,t,{'text-anchor':'middle','font-weight':700,'font-size':19});});
+  for(i=0;i<3;i++){ x=X[i];
+    magneto(x,50,String(2*i+1),String(2*i+2),F);
+    ln(x,162,x,222,F);
+    na(x,222,String(2*i+1),String(2*i+2),on,F,true);
+    ln(x,282,x,306,F);
+    ln(x,306,x,318,F); tx(x+8,316,String(2*i+1)); escalon(x,318,26,36); ln(x,354,x,366,F); tx(x+8,372,String(2*i+2));
+    ln(x,366,x,434,F);
+    el('circle',{cx:x,cy:440,r:6.5,fill:'#fff',stroke:K,'stroke-width':3}); tx(x+11,446,String(i+1));
+    tx(x+8,470,'UVW'[i],{'font-size':15});
+  }
+  ln(X[0],446,X[0],528,F); ln(X[0],528,141,556,F);
+  ln(X[1],446,X[1],543,F);
+  ln(X[2],446,X[2],528,F); ln(199,556,X[2],528,F);
+  el('circle',{cx:170,cy:585,r:42,fill:'#fff',stroke:K,'stroke-width':3.5});
+  tx(170,582,'M',{'text-anchor':'middle','font-size':26,'font-weight':700}); tx(170,606,'3~',{'text-anchor':'middle','font-size':17});
+  dash(70,82,X[2]-4,82); nom(64,82,'-Q1');
+  dash(70,256,X[2]-(on?2:10),256); nom(64,256,'-KM1');
+  dash(70,336,X[2]-14,336); nom(64,336,'-F1');
+  nom(92,440,'-X1'); nom(64,585,'-M1');
+  el('line',{x1:290,y1:14,x2:290,y2:636,stroke:'#8a949e','stroke-width':2,'stroke-dasharray':'7 7'});
+  // ---------- mando
+  tx(XM,26,'L',{'text-anchor':'middle','font-weight':700,'font-size':19});
+  magneto(XM,50,'1','2',F); dash(XM-34,82,XM-4,82); nom(XM-38,82,'-Q2');
+  ln(XM,162,XM,190,F);
+  nc(XM,190,'95','96',false,F); escalon(XM-50,210,22,24); dash(XM-39,222,XM+2,222); nom(XM-66,222,'-F1');
+  ln(XM,250,XM,262,F);
+  nc(XM,262,'1','2',st.s0,F); pulsador(XM,262,st.s0); nom(XM-48,294,'-S0');
+  ln(XM,322,XM,342,F); ln(XM,332,XR,332,F); ln(XR,332,XR,342,F); el('circle',{cx:XM,cy:332,r:5,fill:F});
+  na(XM,342,'3','4',st.s1,F); pulsador(XM,342,st.s1); nom(XM-48,374,'-S1');
+  na(XR,342,'13','14',on,F); nom(XR-22,374,'-KM1');
+  ln(XM,402,XM,468,F); ln(XR,402,XR,412,F); ln(XM,412,XR,412,F); el('circle',{cx:XM,cy:412,r:5,fill:F});
+  tx(XM+8,464,'A1'); el('rect',{x:XM-22,y:468,width:44,height:30,fill:coil?'#FFE28A':'#fff',stroke:K,'stroke-width':3.5}); tx(XM+8,514,'A2');
+  nom(XM-28,483,'-KM1');
+  ln(XM,498,XM,536,NE); ln(332,536,528,536,NE,3.5); tx(318,542,'N',{'text-anchor':'middle','font-weight':700,'font-size':19}); el('circle',{cx:XM,cy:536,r:5,fill:NE});
+  // recuadro de pulsador fijado
+  if(st.l1) el('rect',{x:XM-60,y:346,width:84,height:56,rx:8,fill:'rgba(242,180,0,.18)',stroke:'#F2B400','stroke-width':3});
+  if(st.l0) el('rect',{x:XM-60,y:266,width:84,height:56,rx:8,fill:'rgba(242,180,0,.18)',stroke:'#F2B400','stroke-width':3});
+  // ---------- corriente (solo por caminos cerrados hasta un consumo)
+  if(on){
+    for(i=0;i<3;i++){ if(st.fault==='fase'&&i===2) continue; x=X[i];
+      var d='M'+x+' 36 V'+(i===1?543:528)+(i===0?' L141 556':(i===2?' L199 556':''));
+      el('path',{d:d,'class':'flow'}); }
+    el('path',{d:'M'+XM+' 36 V332 '+(st.s1?'':'H'+XR+' V412 H'+XM+' ')+'V536','class':'flow'});
+  }
+  // ---------- sitios para la pinza
+  ORD.forEach(function(k,j){ var s=SPOT[k], cur=st.pos===k, g=el('g',{'class':'spot',tabindex:0,role:'button','aria-label':'Poner la pinza en '+s.n});
+    if(k==='e') el('ellipse',{cx:s.x,cy:s.y,rx:84,ry:17,fill:cur?'none':'rgba(255,221,64,.28)',stroke:cur?'#2b2f33':'#a67c00','stroke-width':cur?9:2.5,'stroke-dasharray':cur?'':'6 5'},undefined,g);
+    else el('circle',{cx:s.x,cy:s.y,r:17,fill:cur?'none':'rgba(255,221,64,.28)',stroke:cur?'#2b2f33':'#a67c00','stroke-width':cur?9:2.5,'stroke-dasharray':cur?'':'6 5'},undefined,g);
+    if(cur){ var hx=k==='e'?s.x+84:s.x+13, hy=k==='e'?s.y:s.y+13;
+      if(k==='e') el('ellipse',{cx:s.x,cy:s.y,rx:84,ry:17,fill:'none',stroke:'#F2B400','stroke-width':4},undefined,g); else el('circle',{cx:s.x,cy:s.y,r:17,fill:'none',stroke:'#F2B400','stroke-width':4},undefined,g);
+      el('line',{x1:hx,y1:hy,x2:hx+30,y2:hy+30,stroke:'#2b2f33','stroke-width':16,'stroke-linecap':'round'},undefined,g);
+      el('line',{x1:hx+8,y1:hy+8,x2:hx+26,y2:hy+26,stroke:'#F2B400','stroke-width':5,'stroke-linecap':'round'},undefined,g); }
+    el(k==='e'?'ellipse':'circle',k==='e'?{cx:s.x,cy:s.y,rx:90,ry:22,fill:'transparent'}:{cx:s.x,cy:s.y,r:24,fill:'transparent'},undefined,g);
+    g.addEventListener('click',function(){ponPinza(k);}); g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();ponPinza(k);}});
+  });
+  // ---------- zonas para tocar los pulsadores
+  [['s1',342],['s0',262]].forEach(function(p){ var r=el('rect',{x:XM-62,y:p[1]+2,width:88,height:58,fill:'transparent',style:'cursor:pointer',role:'button','aria-label':p[0]==='s1'?'Pulsador de marcha -S1':'Pulsador de paro -S0'});
+    r.addEventListener('pointerdown',function(e){e.preventDefault();aprieta(p[0]);}); });
+  panel();
+}
+var lastDown={s1:0,s0:0};
+function aprieta(b){ var t=Date.now(), L=b==='s1'?'l1':'l0';
+  if(t-lastDown[b]<380){ st[L]=!st[L]; st[b]=st[L]; lastDown[b]=0; }
+  else { if(st[L]){ st[L]=false; st[b]=false; } else st[b]=true; lastDown[b]=t; }
+  logica(); draw();
+}
+function suelta(){ var ch=false; if(st.s1&&!st.l1){st.s1=false;ch=true;} if(st.s0&&!st.l0){st.s0=false;ch=true;} if(ch){logica();draw();} }
+window.addEventListener('pointerup',suelta); window.addEventListener('pointercancel',suelta);
+function logica(){ var antes=st.km; st.km=!st.s0&&(st.s1||st.km); if(antes!==st.km) st.seen={}; }
+function ponPinza(k){ st.pos=st.pos===k?null:k; draw(); }
+function corr(){ var b=[6.4,6.3,6.5]; if(!st.km) return [0,0,0]; if(st.fault==='sob') return b.map(function(v){return v*1.18;}); if(st.fault==='fase') return [11.1,11.0,0]; return b; }
+function panel(){
+  var I=corr(), s=st.pos?SPOT[st.pos]:null, v=null, h='', vd='', ph=s&&s.k>=0;
+  if(st.sel==='A'&&s){ v=ph?I[s.k]:(s.k===-1?0:(st.km?0.04:0)); }
+  if(st.sel==='A'&&st.km&&ph) st.seen[s.k]=I[s.k];
+  var all=st.seen[0]!==undefined&&st.seen[1]!==undefined&&st.seen[2]!==undefined;
+  $('lcdm').textContent=st.sel==='A'?'A~':(st.sel==='V'?'V~':'Ω');
+  $('lcdv').textContent=st.sel!=='A'?'----':(v===null?'– –':f(v,st.pos==='f'&&v>0?2:1));
+  $('donde').innerHTML=s?'La pinza está en <b>'+s.n+'</b>. Toca otro círculo para moverla.':'Toca un círculo amarillo del esquema para poner ahí la pinza.';
+  if(st.sel!=='A'){ h='<p><span class="bad">El selector está en '+(st.sel==='V'?'V~ (voltios)':'Ω (ohmios)')+'.</span> La pinza abraza un cable y mide la <b>corriente</b> que pasa por él: pon el selector en <b>A~</b> (amperios de alterna).</p>'; vd='Selector mal puesto: tiene que estar en A~.'; }
+  else if(!s){ h='<p>'+(st.km?'El motor está <b>en marcha</b>.':'El motor está <b>parado</b>. Arráncalo tocando <b>-S1</b>.')+' Ahora elige dónde pones la pinza: toca un <b>círculo amarillo</b> del esquema.</p>'; vd=st.km?'Motor en marcha. Pon la pinza en un cable.':'Motor parado.'; }
+  else if(st.pos==='e'){ h=st.km?'<p><span class="bad">0 A con el motor en marcha.</span> Estás abrazando <b>los tres cables a la vez</b>: las tres corrientes se anulan entre sí y la pinza no ve nada.</p><p>→ Abraza <b>un solo cable</b>. En el bornero -X1 es fácil coger uno.</p>':'<p>0 A: el motor está parado. Y ojo: con los tres cables dentro marcaría 0 A también con el motor en marcha.</p>'; vd='Tres cables a la vez: 0,0 A. Hay que abrazar uno solo.'; }
+  else if(st.pos==='f'){ h=st.km?'<p>Es el cable que llega al <b>A1 de la bobina</b> de -KM1 (circuito de mando). Marca <b>0,04 A</b>: la bobina pide muy poca corriente, unas centésimas de amperio.</p><p>El motor pide amperios; la bobina, centésimas. Por eso los cables del mando son más finos que los de la fuerza.</p>':'<p>0 A: la bobina de -KM1 no tiene tensión. Pulsa -S1 y vuelve a mirar.</p>'; vd=st.km?'Cable de la bobina: 0,04 A (muy poca corriente).':'Bobina sin tensión: 0,00 A.'; }
+  else if(!st.km){ h='<p><span class="bad">0 A.</span> El motor está parado. En este cable '+(st.pos==='a'?'<b>hay tensión</b> (230 V), pero ':'')+'no pasa corriente.</p><p>La pinza mide <b>corriente</b>, no tensión. → Arranca el motor tocando <b>-S1</b>.</p>'; vd='Motor parado: 0,0 A. La pinza mide corriente, no tensión.'; }
+  else { var L='L'+(s.k+1), val=f(I[s.k]);
+    if(st.fault==='ok'){ h='<p><span class="ok">'+val+' A en '+L+'.</span> La placa del motor dice <b>'+f(PLACA)+' A</b>: trabaja normal.</p>';
+      if(st.pos==='a') h+='<p>Da igual medir antes o después del contactor: es <b>el mismo cable</b>, todo en serie, y la corriente es la misma en todo el camino.</p>';
+      h+=all?'<p><span class="ok">✔ Las tres fases marcan casi lo mismo</span> ('+f(I[0])+' · '+f(I[1])+' · '+f(I[2])+' A): el consumo es <b>simétrico</b>. Motor sano.</p>':'<p>→ Mide también las otras dos fases: en un motor sano marcan más o menos lo mismo.</p>';
+      vd=L+': '+val+' A. Placa: '+f(PLACA)+' A → normal.'; }
+    else if(st.fault==='sob'){ h='<p><span class="bad">'+val+' A en '+L+': más que los '+f(PLACA)+' A de la placa.</span> El motor está <b>sobrecargado</b> (eje duro: pide un 18 % más).</p>'+(all?'<p>Las tres fases marcan casi lo mismo ('+f(I[0])+' · '+f(I[1])+' · '+f(I[2])+' A): no falta ninguna fase, es sobrecarga.</p>':'<p>→ Mide las otras dos fases para ver si pasa lo mismo en las tres.</p>')+'<p>Si sigue así, saltará el relé térmico <b>-F1</b> (ruleta en '+f(PLACA)+' A). No se sube la ruleta: se busca por qué pide de más.</p>'; vd=L+': '+val+' A. Más que la placa → sobrecarga.'; }
+    else { h=s.k===2?'<p><span class="bad">0 A en L3 con el motor en marcha.</span> Por esta fase no pasa corriente: <b>falta una fase</b>.</p>':'<p><span class="bad">'+val+' A en '+L+': mucho más que los '+f(PLACA)+' A de la placa.</span> '+(all?'':'Mide las tres fases antes de decidir.')+'</p>';
+      if(all||s.k===2) h+='<p>Una fase a <b>0 A</b> y las otras dos mucho más altas ('+f(I[0])+' y '+f(I[1])+' A): el motor trabaja «a dos fases». Zumba, se calienta y acaba saltando el térmico.</p><p>→ Busca en L3 un <b>tornillo suelto</b>, un fusible fundido o un contacto del contactor quemado.</p>';
+      vd=L+': '+val+' A. '+(s.k===2?'Falta la fase L3.':'Mide las tres fases.'); }
+  }
+  $('now').innerHTML=h; $('verd').textContent=vd;
+  var P=[[st.sel==='A','Selector en <b>A~</b>.'],[st.km,'Motor <b>en marcha</b>: sin corriente no hay nada que medir.'],[st.sel==='A'&&ph,'Abraza <b>un solo cable</b>.'],[all,'Mide las <b>tres fases</b>: L1, L2 y L3.'],[all&&st.km,'Compara con la <b>placa</b> ('+f(PLACA)+' A).']];
+  $('pasos').innerHTML=P.map(function(p,i){return '<li'+(p[0]?' class="ok"':'')+'><i>'+(p[0]?'✓':(i+1))+'</i><span>'+p[1]+'</span></li>';}).join('');
+  [].forEach.call($('sel').children,function(b){b.classList.toggle('on',b.getAttribute('data-s')===st.sel);});
+  [].forEach.call($('fault').children,function(b){b.classList.toggle('on',b.getAttribute('data-f')===st.fault);});
+}
+[].forEach.call($('sel').children,function(b){b.onclick=function(){st.sel=b.getAttribute('data-s');draw();};});
+[].forEach.call($('fault').children,function(b){b.onclick=function(){st.fault=b.getAttribute('data-f');st.seen={};draw();};});
+function marcha(){ st.l0=false; st.s0=false; st.s1=true; logica(); st.s1=st.l1; draw(); }
+function paro(){ st.l1=false; st.s1=false; st.s0=true; logica(); st.s0=false; draw(); }
+$('bOn').onclick=marcha; $('bOff').onclick=paro;
+document.addEventListener('keydown',function(e){ var t=e.target.tagName; if(t==='INPUT'||t==='SELECT'||e.ctrlKey||e.metaKey||e.altKey) return;
+  var k=e.key.toLowerCase(); if(k==='m') marcha(); else if(k==='p') paro(); else if('123456'.indexOf(k)>=0&&k.length===1) ponPinza(ORD[+k-1]); });
+draw();
+})();
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#medidas';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+  } catch(e) {}
+})();</script>
+</body>
+</html>
