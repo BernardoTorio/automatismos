@@ -61,8 +61,8 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
 .t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
 .name{font-weight:700;font-size:18px}
-.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s}
-.flow.on{opacity:1;animation:run .7s linear infinite}
+.flow{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;transition:opacity .15s}
+.flow.on{opacity:.95;animation:run .9s linear infinite}
 @keyframes run{to{stroke-dashoffset:-18}}
 .blade{transition:transform .18s ease}
 .fb{transition:opacity .25s}
@@ -72,7 +72,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .coilfill{transition:fill .2s}
 .hl{fill:none;stroke:var(--flow);stroke-width:4;opacity:0;transition:opacity .25s}
 .hl.on{opacity:1}
-@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;opacity:.8} .blade{transition:none} }
 .rotor{transform-origin:43px 43px}
 .spin{animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}

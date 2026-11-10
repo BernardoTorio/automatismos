@@ -72,15 +72,15 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
 .t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
 .name{font-weight:700;font-size:18px}
-.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s;pointer-events:none}
-.flow.on{opacity:1;animation:run .7s linear infinite}
+.flow{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;transition:opacity .15s;pointer-events:none}
+.flow.on{opacity:.95;animation:run .9s linear infinite}
 @keyframes run{to{stroke-dashoffset:-18}}
 .blade{transition:transform .18s ease}
 .rm{transition:opacity .25s} .rm.off{opacity:.18}
 .bridge{display:none} .bridge.on{display:inline}
 .glow{opacity:0;transition:opacity .2s} .glow.on{opacity:.9}
 .coilfill{transition:fill .2s}
-@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;opacity:.8} .blade{transition:none} }
 .hit{cursor:pointer}
 .hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
 .hit:focus{outline:none}
