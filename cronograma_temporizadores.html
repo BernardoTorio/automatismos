@@ -103,14 +103,14 @@ kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;paddi
 .t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
 .name{font-weight:700;font-size:18px}
 .cdt{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:16px;fill:#9a6a00}
-.flow{fill:none;stroke:var(--flow);stroke-width:7;stroke-linecap:round;stroke-dasharray:4 14;opacity:0;transition:opacity .15s}
-.flow.on{opacity:1;animation:run .7s linear infinite}
+.flow{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;transition:opacity .15s}
+.flow.on{opacity:.95;animation:run .9s linear infinite}
 @keyframes run{to{stroke-dashoffset:-18}}
 .blade{transition:transform .14s ease}
 .glow{opacity:0;transition:opacity .15s}
 .glow.on{opacity:.9}
 .coilfill{transition:fill .15s}
-@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;stroke-dasharray:none;opacity:.55} .blade{transition:none} }
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;opacity:.8} .blade{transition:none} }
 .hit{cursor:pointer}
 .hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
 .hit:focus{outline:none}
@@ -161,12 +161,22 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 
         <!-- corriente -->
         <path id="fTop" class="flow" d="M40 40 H120 V222"/>
-        <path id="fA" class="flow" d="M120 222 V350 V600 H40"/>
-        <path id="fB" class="flow" d="M120 350 H260 V600 H40"/>
-        <path id="fH1" class="flow" d="M120 222 H420 V600 H40"/>
-        <path id="fH2" class="flow" d="M560 222 H700 V600 H560"/>
-        <path id="fH3" class="flow" d="M420 222 H560 V600 H420"/>
-        <path id="fH4" class="flow" d="M700 222 H840 V600 H700"/>
+        <path id="fA" class="flow" d="M120 222 V600"/>
+        <path id="fB" class="flow" d="M120 350 H260 V600"/>
+        <path id="fBus1" class="flow" d="M120 222 H420"/>
+        <path id="fBus2" class="flow" d="M420 222 H560"/>
+        <path id="fBus3" class="flow" d="M560 222 H700"/>
+        <path id="fBus4" class="flow" d="M700 222 H840"/>
+        <path id="fH1" class="flow" d="M420 222 V600"/>
+        <path id="fH3" class="flow" d="M560 222 V600"/>
+        <path id="fH2" class="flow" d="M700 222 V600"/>
+        <path id="fH4" class="flow" d="M840 222 V600"/>
+        <path id="fN1" class="flow" d="M840 600 H700"/>
+        <path id="fN2" class="flow" d="M700 600 H560"/>
+        <path id="fN3" class="flow" d="M560 600 H420"/>
+        <path id="fN4" class="flow" d="M420 600 H260"/>
+        <path id="fN5" class="flow" d="M260 600 H120"/>
+        <path id="fN6" class="flow" d="M120 600 H40"/>
 
         <!-- Q1 magnetotérmico completo -->
         <g id="gQ1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q1: abrir o cerrar">
@@ -517,13 +527,16 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var dc = st.onC ? 32 : 0, dd = st.offC ? 32 : 0;
     rot($('kC'), dc); rot($('kD'), dd); stub('stubC', 420, dc); stub('stubD', 700, dd);
     rot($('kE'), st.onC ? -44 : 0); rot($('kF'), st.offC ? -44 : 0); stubN('stubE', 560, st.onC ? -44 : 0); stubN('stubF', 840, st.offC ? -44 : 0);
-    $('wE').classList.toggle('live', h3); $('wF').classList.toggle('live', h4); $('fH3').classList.toggle('on', h3); $('fH4').classList.toggle('on', h4);
+    $('wE').classList.toggle('live', h3); $('wF').classList.toggle('live', h4);
     $('glow3').classList.toggle('on', h3); $('glow4').classList.toggle('on', h4); $('dH3').classList.toggle('on', h3); $('dH4').classList.toggle('on', h4);
     $('wQ').classList.toggle('live', st.q1); $('wBus').classList.toggle('live', st.q1);
     $('wS1').classList.toggle('live', c); $('wC').classList.toggle('live', h1); $('wD').classList.toggle('live', h2);
-    $('fTop').classList.toggle('on', c || h1 || h2 || h3 || h4);
-    $('fA').classList.toggle('on', c); $('fB').classList.toggle('on', c);
-    $('fH1').classList.toggle('on', h1); $('fH2').classList.toggle('on', h2);
+    // corriente: cada tramo se enciende solo si por él pasa corriente hacia algún consumo
+    var fl = { fTop: c || h1 || h2 || h3 || h4, fA: c, fB: c,
+      fBus1: h1 || h3 || h2 || h4, fBus2: h3 || h2 || h4, fBus3: h2 || h4, fBus4: h4,
+      fH1: h1, fH3: h3, fH2: h2, fH4: h4,
+      fN1: h4, fN2: h4 || h2, fN3: h4 || h2 || h3, fN4: h4 || h2 || h3 || h1, fN5: h4 || h2 || h3 || h1 || c, fN6: h4 || h2 || h3 || h1 || c };
+    for (var fk in fl) $(fk).classList.toggle('on', !!fl[fk]);
     $('coil1').style.fill = c ? '#FFE9A8' : '#fff'; $('coil2').style.fill = c ? '#FFE9A8' : '#fff';
     $('glow1').classList.toggle('on', h1); $('glow2').classList.toggle('on', h2);
     $('dH1').classList.toggle('on', h1); $('dH2').classList.toggle('on', h2);
