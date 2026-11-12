@@ -129,11 +129,25 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 .crumbs .sep{margin:0 6px;opacity:.7}
 .crumbs b{color:var(--ink)}
 .themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+/* tira del tema */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:#2E8B3E}
+.t6nav .steps a.cur.seen::after{color:#fff}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>5.2 El cronograma de los temporizadores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 5"><a class="arr off" aria-hidden="true" tabindex="-1">‹ 5.2</a><span class="where">Tema 5 · 1 de 2</span><a class="arr" href="usos_temporizadores.html" aria-label="Siguiente: 5.5 Para qué se usa un temporizador">5.5 ›</a><div class="steps"><a href="cronograma_temporizadores.html" class="cur" aria-current="page" title="El cronograma de los temporizadores">5.2</a><a href="usos_temporizadores.html" title="Para qué se usa un temporizador">5.5</a></div></nav>
   <h1>A la conexión y a la desconexión: el cronograma</h1>
   <p class="sub">El pulsador <b>-S1</b> da tensión <b>a la vez</b> a dos temporizadores: <b>-KT1 a la conexión</b> y <b>-KT2 a la desconexión</b>. Cada uno enciende un piloto con su <b>67-68</b> (H1 y H3) y otro con su <b>55-56</b> (H2 y H4). Mantén pulsado -S1 un rato, suéltalo y mira el cronograma de la derecha: se dibuja solo. Después prueba una pulsación corta.</p>
 
@@ -424,6 +438,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     </div>
   </div>
   <p class="foot"><span class="pin">Doble clic</span> en el pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Fase en rojo, neutro en azul. Teclado: <kbd>M</kbd> pulsador, <kbd>C</kbd> pulsos cortos, <kbd>Q</kbd> magnetotérmico, <kbd>L</kbd> cámara lenta, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
+  <a class="nextbig" href="usos_temporizadores.html">Siguiente: 5.5 Para qué se usa un temporizador →</a>
 </main>
 <script>
 (function(){
@@ -722,6 +737,14 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
 })();</script>
 </body>
 </html>

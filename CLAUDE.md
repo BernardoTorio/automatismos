@@ -36,7 +36,7 @@ subir.bat                  publica todo con doble clic
 - Arriba, el bloque **«Ahora en clase»** (apuntes, ejercicios y animaciones del tema que se está dando). Al pasar de tema solo se cambia un número: `var HOY = 6;`, al final del archivo. Los temas están en la lista `T` que va justo debajo.
 - Después, una fila de pestañas: `#inicio` («Por temas», por defecto: el curso tema a tema, el último arriba), `#temas` (Apuntes), `#practicas`, `#ejercicios`, `#animaciones`, `#tests` y `#medidas`. Las secciones tienen id `sec-inicio`, `sec-temas`, `sec-practicas`, `sec-ejercicios`, `sec-animaciones`, `sec-tests`, `sec-medidas` para que el navegador no salte al abrir con `#…`. **Los nombres de las pestañas (`#…`) no se cambian**: las animaciones y los tests vuelven a ellas.
 - En las demás páginas, la miga «Automatismos» lleva a `index.html` (la portada).
-- **Marca «✓ vista»**: las animaciones que ya se han abierto en ese navegador salen marcadas (clave `visto:<archivo>` en `localStorage`). La pone la portada al tocar una tarjeta y, además, cada animación del Tema 6 al abrirse (también desde un QR). No se marca en tests ni en medidas.
+- **Marca «✓ vista»**: las animaciones que ya se han abierto en ese navegador salen marcadas (clave `visto:<archivo>` en `localStorage`). La pone la portada al tocar una tarjeta y, además, cada animación de los Temas 5 y 6 al abrirse (también desde un QR). No se marca en tests ni en medidas.
 - Ejercicios: PDF de problemas y, debajo, las animaciones que ayudan a hacerlos (también salen en Animaciones). Esas animaciones vuelven a `index.html#ejercicios`.
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
@@ -69,6 +69,18 @@ subir.bat                  publica todo con doble clic
 | 3.8 | `rele_base.html` | Base (1-14), pegatina de dos fabricantes y esquema; modos Explorar / Polímetro / Reto |
 | 3.9 | `arranque_motor.html` | Arranque directo: fuerza + mando, térmico con sobrecarga y RESET |
 | 3.10 | `inversion_giro.html` | Inversión de giro: fuerza (KM2 cruza L1-L3) + mando con enclavamiento y F2 |
+
+## Animaciones del Tema 5 · Temporizadores y cambio de sentido
+| Apdo. | Archivo | Qué muestra |
+|---|---|---|
+| 5.2 | `cronograma_temporizadores.html` | Un pulsador da tensión a la vez a -KT1 (a la conexión) y -KT2 (a la desconexión): cronograma en directo con los 67-68 y los 55-56; pulsos cortos, cámara lenta y congelar |
+| 5.5 | `usos_temporizadores.html` | Para qué se usa un temporizador: los cuatro usos de la Práctica 4 (1 se para solo: conexión + 55-56 en serie; 2 arranca más tarde: -KT1 realimentado con su 13-14 y su 67-68 alimenta -KM1; 3 sigue un rato más: desconexión + 67-68; 4 hay que mantener pulsado: -KT1 detrás del NA de la marcha y su 67-68 en paralelo con el 13-14 de -KM1). Se abre en un caso con `#1`…`#4` |
+
+- Vuelven a `index.html#animaciones` y llevan la tira del tema (`.t6nav`, «Tema 5 · n de 2») y el botón grande «Siguiente»; se marcan como vistas al abrirse. Si se añade otra animación del tema, hay que actualizar la tira en todas.
+- `usos_temporizadores.html` sale en dos sitios de la portada: en Animaciones (Tema 5) y en Prácticas (grupo «Práctica 4 · antes de empezar»).
+- En 5.5 cada caso lleva tres columnas, de izquierda a derecha: **la parte del mando que hace falta** (sin -Q2, sin 95-96, sin fuerza y sin pilotos), **el cronograma** (al abrir, uno de ejemplo ya dibujado; «Ver cómo funciona» lo repite paso a paso y al tocar un pulsador se dibuja en directo) y **«Para qué sirve»**. Aquí «Para qué sirve» va a la derecha y no debajo porque así se pidió; «Qué está pasando» sigue debajo.
+- 5.5 **no da las soluciones de la Práctica 4**: solo las piezas. No lleva los cronogramas de la 4.5 ni de la 4.8 (son los que se entregan); de esos dos ejercicios solo dice, con las palabras de la pista del enunciado, qué casos se juntan.
+- Temporizador del aula: contactor con bloque temporizado delante; -KT1 tiene A1-A2, su 13-14 y los temporizados **55-56 (NC)** y **67-68 (NA)**. Paraguas `(` a la conexión y `)` a la desconexión; bobina con cuadro aspado (conexión) o relleno (desconexión).
 
 ## Animaciones del Tema 6 · Dimensionamiento de protecciones (carpeta Ejercicios)
 | Apdo. | Archivo | Qué muestra |

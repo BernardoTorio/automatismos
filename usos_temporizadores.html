@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temporizadores: para qué se usan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff; --azul:#1F4E79; --azult:#1F4E79;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; --azult:#8DB8E8; --ok:#5CC46C; --warn:#F0867A; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; --azult:#8DB8E8; --ok:#5CC46C; --warn:#F0867A; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1800px;margin:0 auto;padding:20px clamp(14px,2.2vw,40px) 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 14px;max-width:115ch}
+.sub b{color:var(--ink)}
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:44px;height:44px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0;touch-action:manipulation}
+@media (max-width:600px){.crumbs{display:none}}
+/* tira del tema */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+/* botones */
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible,a:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+.small{font-size:.84rem;font-weight:400;display:block;opacity:.85}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+/* los cuatro casos */
+.cases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.cases button{display:flex;align-items:center;gap:10px;text-align:left;padding:8px 12px;min-height:60px;touch-action:manipulation}
+.cases button:hover{border-color:#1F4E79}
+.cases .n{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1}
+.cases .l{display:block;line-height:1.15;min-width:0}
+.cases .l small{display:block;font-weight:400;font-size:.8rem;opacity:.85;margin-top:2px}
+.cases button.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+@media (max-width:980px){.cases{grid-template-columns:1fr 1fr}}
+/* las tres columnas: mando · cronograma · para qué sirve */
+.grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.2fr) minmax(0,.95fr);gap:14px;align-items:start}
+.col1{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.coltit{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
+.coltit .p{flex:none;width:22px;height:22px;border-radius:6px;background:var(--line);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;letter-spacing:0}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px}
+.sheet .coltit{color:#56606b;margin:2px 4px 0}
+.sheet .coltit .p{background:#dfe5eb;color:#1a1a1a}
+.sheet svg{display:block;width:100%;height:auto;max-height:62vh}
+@media (max-width:1240px){.grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.uso{grid-column:1 / -1;order:4}.explain{order:3}.uso .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}}
+@media (max-width:760px){.grid{grid-template-columns:1fr}.uso .cols{display:block}.sheet svg{max-height:none}}
+/* estado y mandos */
+.status{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}
+.status > div{display:flex;align-items:center;gap:8px;min-width:0;line-height:1.2}
+.status b{display:block;font-size:.84rem;color:var(--muted)}
+.status span.v{font-weight:700}
+.status span.v.run{color:var(--ok)}
+.status span.v.cnt{color:#B07800}
+:root[data-theme="dark"] .status span.v.cnt{color:#FFC94D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .status span.v.cnt{color:#FFC94D}}
+.dot{flex:none;width:22px;height:22px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .15s,box-shadow .15s}
+.dot.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.clock{flex:none;font-size:1.3rem;line-height:1}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.controls button{font-size:.98rem;padding:9px 6px;min-height:58px}
+.controls .small{font-size:.78rem}
+#bS2{border-color:#2E8B3E}
+#bS2.on{background:#2E8B3E;color:#fff}
+#bS1{border-color:#C0392B}
+#bS1.on{background:#C0392B;color:#fff}
+#bDemo{border-color:#1F4E79}
+button.tog.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.tog{touch-action:manipulation}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.controls .full{grid-column:1 / -1}
+.chartbtns{margin:0 0 10px}
+.chartbtns button{min-height:52px;padding:6px}
+.trow{display:flex;align-items:center;gap:12px;margin-top:12px}
+.trow label{flex:none;font-weight:700}
+.trow input{flex:1;min-width:0;accent-color:#1F4E79;height:28px}
+/* cronograma */
+.chartwrap{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px}
+.chartwrap canvas{display:block;width:100%;height:clamp(390px,46vh,520px)}
+@media (max-width:760px){.chartwrap canvas{height:360px}}
+.mode{margin-left:auto;font-size:.78rem;letter-spacing:0;border-radius:6px;padding:2px 8px;color:#fff;background:#1F4E79;white-space:nowrap}
+.mode.live{background:#2E8B3E}.mode.stop{background:#6b7480}
+.howread{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.9rem;color:var(--muted);margin:8px 0 0}
+.howread b{color:var(--ink)}
+.sw{display:inline-block;width:22px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
+/* para qué sirve */
+.uso h2{font-size:1.3rem;margin:0 0 6px;line-height:1.15}
+.uso h3{font-size:.95rem;margin:12px 0 2px;color:var(--muted)}
+.uso p{margin:0}
+.uso .big{font-size:1.08rem}
+.uso ul{margin:2px 0 0;padding-left:20px}
+.uso li{margin:3px 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.tag{white-space:nowrap;font-size:.8rem;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff}
+.tag.on{background:#2E8B3E}.tag.off{background:#B07800}.tag.ct{background:#1F5FBF}
+.box{border-radius:10px;padding:10px 12px;margin-top:10px;border:2px solid}
+.box b.t{display:block;font-size:.82rem;letter-spacing:.05em}
+.box.ojo{border-color:#C0392B}
+.box.ojo b.t{color:var(--warn)}
+.box.p4{border-color:#2E8B3E}
+.box.p4 b.t{color:var(--ok)}
+/* cajones de abajo */
+.explain{grid-column:1 / -1;border-left:6px solid var(--flow);min-height:6.2em;font-size:1.08rem}
+.explain h2{font-size:1rem;color:var(--muted);margin:0 0 4px}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.p4list{margin-top:14px}
+.p4list ul{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr));gap:8px}
+.p4list li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;line-height:1.25}
+.p4list .e{flex:none;min-width:4.4em;font-weight:700;font-size:1.05rem}
+.p4list .d{flex:1 1 170px;min-width:0;font-size:.95rem}
+.p4list .d small{display:block;color:var(--muted);font-size:.86rem}
+.p4list .go{flex:none;display:flex;gap:6px;margin-left:auto}
+.p4list .go button{padding:6px 10px;min-height:44px;touch-action:manipulation;border-color:#1F4E79;white-space:nowrap}
+.foot{color:var(--muted);font-size:.9rem;margin:14px 0 0}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+/* esquema */
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.note{font-size:14px;fill:#444}
+.cdt{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:16px;fill:#9a6a00}
+.flow{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;transition:opacity .15s}
+.flow.on{opacity:.95;animation:run .9s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .14s ease}
+.coilfill{transition:fill .15s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;opacity:.8} .blade{transition:none} }
+.hit{cursor:pointer;touch-action:none}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>5.5 Para qué se usa un temporizador</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 5"><a class="arr" href="cronograma_temporizadores.html" aria-label="Anterior: 5.2 El cronograma de los temporizadores">‹ 5.2</a><span class="where">Tema 5 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="cronograma_temporizadores.html" title="El cronograma de los temporizadores">5.2</a><a href="usos_temporizadores.html" class="cur" aria-current="page" title="Para qué se usa un temporizador">5.5</a></div></nav>
+
+  <h1>Para qué se usa un temporizador</h1>
+  <p class="sub">Te sirve para la <b>Práctica 4</b>: cuatro maneras de usar un temporizador. En cada una tienes <b>la parte del mando</b> que hace falta, su <b>cronograma</b> y <b>para qué sirve</b>. Elige un caso, mira el ejemplo y pruébalo tú: toca los pulsadores del esquema.</p>
+
+  <div class="cases" id="cases" role="tablist" aria-label="Elige un caso"></div>
+
+  <div class="grid">
+    <div class="col1">
+      <div class="sheet">
+        <div class="coltit"><span class="p">1</span>EL MANDO · SOLO LO NECESARIO</div>
+        <svg id="svg" viewBox="0 0 480 550" role="img" aria-labelledby="svgt"></svg>
+      </div>
+      <div class="card">
+        <div class="status" aria-live="off">
+          <div><span id="dM" class="dot"></span><div><b>Motor (-KM1)</b><span id="stM" class="v">Parado</span></div></div>
+          <div><span class="clock" aria-hidden="true">⏱</span><div><b>Temporizador -KT1</b><span id="stT" class="v">En reposo</span></div></div>
+        </div>
+        <div class="controls">
+          <button id="bS2" aria-pressed="false"><span id="bS2t">Marcha -S2</span><span class="small">mantén pulsado · tecla M</span></button>
+          <button id="bS1" aria-pressed="false">Paro -S1<span class="small">tecla P</span></button>
+        </div>
+        <div class="trow"><label for="T">Ruleta: T = <span id="Tv">4</span> s</label><input id="T" type="range" min="2" max="8" step="1" value="4" aria-label="Tiempo del temporizador en segundos"></div>
+      </div>
+    </div>
+
+    <section class="card" aria-label="Cronograma">
+      <div class="coltit"><span class="p">2</span>EL CRONOGRAMA <span id="mode" class="mode">ejemplo</span></div>
+      <div class="controls chartbtns">
+        <button id="bDemo" class="tog" aria-pressed="false"><span id="bDemot">▶ Ver cómo funciona</span><span class="small">lo hace solo · tecla D</span></button>
+        <button id="bFreeze" class="tog" aria-pressed="false"><span id="bFreezet">Congelar</span><span class="small">para el tiempo · tecla F</span></button>
+      </div>
+      <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de los pulsadores, de la bobina y del contacto de KT1 y del contactor KM1"></canvas></div>
+      <div class="howread">
+        <span>El tiempo va de <b>izquierda a derecha</b>, en segundos.</span>
+        <span><span class="sw" style="background:#555"></span>Lo que haces tú.</span>
+        <span><span class="sw" style="background:#D0191C"></span>Bobina de <b>-KT1</b>.</span>
+        <span><span class="sw" style="background:#1F5FBF"></span>Su contacto temporizado.</span>
+        <span><span class="sw" style="background:#2E8B3E"></span>El motor.</span>
+        <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
+      </div>
+    </section>
+
+    <aside class="card uso" aria-label="Para qué sirve">
+      <div class="coltit"><span class="p">3</span>PARA QUÉ SIRVE</div>
+      <div id="uso"></div>
+    </aside>
+
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+  </div>
+
+  <div class="card p4list">
+    <h2>En la Práctica 4: ¿qué caso necesita cada ejercicio?</h2>
+    <ul>
+      <li><span class="e">4.1 · 4.2</span><span class="d">Bomba de riego y motor con paro automático<small>Funcionan un tiempo y se paran solos.</small></span><span class="go"><button data-go="1">Caso 1</button></span></li>
+      <li><span class="e">4.3</span><span class="d">Cinta con aviso de arranque<small>Primero avisa; la cinta arranca después.</small></span><span class="go"><button data-go="2">Caso 2</button></span></li>
+      <li><span class="e">4.4</span><span class="d">Ventilador que se queda enfriando<small>Sigue un rato cuando la máquina ya ha parado.</small></span><span class="go"><button data-go="3">Caso 3</button></span></li>
+      <li><span class="e">4.5</span><span class="d">Dos motores con final de carrera<small>Dos temporizadores: uno arranca -M2 más tarde y el otro lo para todo.</small></span><span class="go"><button data-go="2">Caso 2</button><button data-go="1">Caso 1</button></span></li>
+      <li><span class="e">4.6</span><span class="d">Escalera mecánica con emergencia<small>Funciona 10 s y se para sola.</small></span><span class="go"><button data-go="1">Caso 1</button></span></li>
+      <li><span class="e">4.7</span><span class="d">Tres motores con un solo pulsador<small>El mismo caso tres veces, con tres tiempos.</small></span><span class="go"><button data-go="4">Caso 4</button></span></li>
+      <li><span class="e">4.8</span><span class="d">Reto: baliza intermitente<small>Dos a la conexión: el 67-68 de uno alimenta al otro y el 55-56 de ese corta al primero.</small></span><span class="go"><button data-go="2">Caso 2</button><button data-go="1">Caso 1</button></span></li>
+    </ul>
+  </div>
+
+  <p class="foot">Aquí solo está dibujada <b>la parte del mando que lleva el temporizador</b>. En tus esquemas faltan <b>-Q2</b>, el <b>95-96</b> del térmico, la fuerza y los pilotos, que van como siempre. «Borne» quiere decir <b>tornillo</b>. <span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Los puntos que se mueven por el cable son la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Teclado: <kbd>1</kbd>-<kbd>4</kbd> caso, <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>D</kbd> ver cómo funciona, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
+
+  <a class="nextbig" href="index.html#animaciones">Has llegado al final del Tema 5 · Volver a las animaciones →</a>
+</main>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var C0 = 440;                       // altura de las bobinas (todas iguales)
+
+  /* ================= piezas del dibujo ================= */
+  function tx(x, y, s, cls, anc){ return '<text class="t' + (cls ? ' ' + cls : '') + '" x="' + x + '" y="' + y + '"' + (anc ? ' text-anchor="' + anc + '"' : '') + '>' + s + '</text>'; }
+  function ln(x1, y1, x2, y2, extra){ return '<line class="sym" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"' + (extra || '') + '/>'; }
+  function hitG(id, label, x, y, inner){ return '<g id="' + id + '" class="hit" tabindex="0" role="button" aria-label="' + label + '"><rect class="hitbox" x="' + (x - 100) + '" y="' + (y - 6) + '" width="132" height="80" rx="8"/>' + inner + '</g>'; }
+  // contacto abierto (NA). o.push: pulsador · o.timed 'on' | 'off': temporizado · si no, instantáneo
+  function na(x, y, a, b, name, o){
+    var s = ln(x, y, x, y + 20) + ln(x, y + 50, x, y + 66) +
+      '<line id="' + o.id + '" class="sym blade" x1="' + x + '" y1="' + (y + 50) + '" x2="' + (x - 20) + '" y2="' + (y + 18) + '" style="transform-origin:' + x + 'px ' + (y + 50) + 'px"/>' +
+      tx(x + 8, y - 2, a) + tx(x + 8, y + 82, b);
+    if (o.push) return s + '<g id="' + o.act + '" class="blade"><line class="dash" x1="' + (x - 50) + '" y1="' + (y + 34) + '" x2="' + (x - 10) + '" y2="' + (y + 34) + '"/><path class="sym" d="M' + (x - 42) + ' ' + (y + 23) + ' H' + (x - 50) + ' V' + (y + 45) + ' H' + (x - 42) + '"/></g>' + tx(x - 58, y + 40, name, 'name', 'end');
+    if (o.timed) return s + umbrella(x, y, o.timed) + '<line id="stubT" class="sym" x1="' + (x - 39) + '" y1="' + (y + 34) + '" x2="' + (x - 10) + '" y2="' + (y + 34) + '" style="stroke-width:2.2"/>' + tx(x - 54, y + 40, name, 'name', 'end');
+    return s + tx(x - 28, y + 40, name, 'name', 'end');
+  }
+  // contacto cerrado (NC)
+  function nc(x, y, a, b, name, o){
+    if (o.push) return ln(x, y, x, y + 20) + ln(x, y + 20, x + 18, y + 20) + ln(x, y + 50, x, y + 66) +
+      '<line id="' + o.id + '" class="sym blade" x1="' + x + '" y1="' + (y + 50) + '" x2="' + (x + 22) + '" y2="' + (y + 14) + '" style="transform-origin:' + x + 'px ' + (y + 50) + 'px"/>' +
+      '<g id="' + o.act + '" class="blade"><line class="dash" x1="' + (x - 50) + '" y1="' + (y + 33) + '" x2="' + (x + 8) + '" y2="' + (y + 33) + '"/><path class="sym" d="M' + (x - 42) + ' ' + (y + 22) + ' H' + (x - 50) + ' V' + (y + 44) + ' H' + (x - 42) + '"/></g>' +
+      tx(x + 8, y - 2, a) + tx(x + 8, y + 80, b) + tx(x - 60, y + 39, name, 'name', 'end');
+    return ln(x, y, x, y + 20) + ln(x, y + 20, x + 15, y + 20) + ln(x, y + 50, x, y + 66) +
+      '<line id="' + o.id + '" class="sym blade" x1="' + x + '" y1="' + (y + 50) + '" x2="' + (x + 13) + '" y2="' + (y + 16) + '" style="transform-origin:' + x + 'px ' + (y + 50) + 'px"/>' +
+      umbrella(x, y, o.timed) + '<line id="stubT" class="sym" x1="' + (x - 39) + '" y1="' + (y + 34) + '" x2="' + (x + 6) + '" y2="' + (y + 34) + '" style="stroke-width:2.2"/>' +
+      tx(x + 8, y - 4, a) + tx(x + 8, y + 82, b) + tx(x - 54, y + 40, name, 'name', 'end');
+  }
+  // el paraguas: ( a la conexión · ) a la desconexión
+  function umbrella(x, y, type){
+    return type === 'on'
+      ? '<path class="sym" d="M' + (x - 32) + ' ' + (y + 21) + ' Q' + (x - 46) + ' ' + (y + 34) + ' ' + (x - 32) + ' ' + (y + 47) + '" style="stroke-width:2.6"/>'
+      : '<path class="sym" d="M' + (x - 46) + ' ' + (y + 21) + ' Q' + (x - 32) + ' ' + (y + 34) + ' ' + (x - 46) + ' ' + (y + 47) + '" style="stroke-width:2.6"/>';
+  }
+  // bobina: normal, o de temporizador ('on': cuadro aspado · 'off': cuadro relleno)
+  function coil(x, name, id, type){
+    var y = C0, s = ln(x, y, x, y + 8) + ln(x, y + 32, x, y + 40) +
+      '<rect id="' + id + '" class="symf coilfill" x="' + (x - 28) + '" y="' + (y + 8) + '" width="56" height="24"/>' +
+      tx(x + 8, y - 2, 'A1') + tx(x + 8, y + 56, 'A2');
+    if (type === 'on') s += '<rect class="symf" x="' + (x - 44) + '" y="' + (y + 8) + '" width="16" height="24"/>' + ln(x - 44, y + 8, x - 28, y + 32, ' style="stroke-width:2"') + ln(x - 28, y + 8, x - 44, y + 32, ' style="stroke-width:2"');
+    if (type === 'off') s += '<rect x="' + (x - 44) + '" y="' + (y + 8) + '" width="16" height="24" fill="#111" stroke="#111" stroke-width="3"/>';
+    return s + tx(x - (type ? 52 : 40), y + 26, name, 'name', 'end');
+  }
+  function S1(x, y){ return hitG('gS1', 'Pulsador de paro S1: mantener pulsado', x, y, nc(x, y, '1', '2', '-S1', { push: true, id: 'kS1', act: 'aS1' })); }
+  function S2(x, y, label){ return hitG('gS2', label, x, y, na(x, y, '3', '4', '-S2', { push: true, id: 'kS2', act: 'aS2' })); }
+
+  /* ================= los cuatro casos ================= */
+  var CASES = [
+  { n: 1, tab: 'Se para solo', sub: 'a la conexión · su 55-56', type: 'on', contact: 'nc', hasS1: true, piv: [170, 202],
+    alt: 'Esquema: paro S1, el 55-56 de KT1 en serie, marcha S2 en paralelo con el 13-14 de KM1, y las bobinas de KM1 y KT1 en paralelo',
+    W: [['M40 30 H170 V46', function(s){ return true; }],
+        ['M170 112 V152', function(s){ return !s.s1; }],
+        ['M170 218 V268 M170 242 H300 V268', function(s){ return !s.s1 && !s.c; }],
+        ['M170 334 V440 M300 334 V362 M170 362 H410 V440', function(s){ return s.km; }]],
+    N: 'M40 522 H410 M170 480 V522 M410 480 V522',
+    F: [['M40 30 H170 V242', function(s){ return s.km; }],
+        ['M170 242 V362', function(s){ return s.km && s.s2; }],
+        ['M170 242 H300 V362', function(s){ return s.km; }],
+        ['M300 362 H170', function(s){ return s.km && !s.s2; }],
+        ['M170 362 V522', function(s){ return s.km; }],
+        ['M300 362 H410 V522', function(s){ return s.kt; }],
+        ['M410 522 H170', function(s){ return s.kt; }],
+        ['M170 522 H40', function(s){ return s.km; }]],
+    dots: [[170, 242, 'f'], [170, 362, 'f'], [300, 362, 'f'], [170, 522, 'n']],
+    sym: function(){ return S1(170, 46) + nc(170, 152, '55', '56', '-KT1', { timed: 'on', id: 'kT' }) + S2(170, 268, 'Pulsador de marcha S2: mantener pulsado') +
+      na(300, 268, '13', '14', '-KM1', { id: 'kF' }) + coil(170, '-KM1', 'coilM') + coil(410, '-KT1', 'coilT', 'on') +
+      '<text id="cdT" class="cdt" x="204" y="197"></text>'; },
+    fClosed: function(s){ return s.km; },
+    logic: function(s){ var p = !s.s1 && !s.c && (s.s2 || s.km); s.km = p; s.kt = p; },
+    demo: function(T){ return { seg: [['s2', 1, 1.6]], end: 1 + T + 2.4 }; },
+    rows: ['s2', 's1', 'kt', 'ct', 'km'], ctTitle: '55-56 de -KT1 (NC)',
+    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: el motor arranca y -KT1 empieza a contar. Pasados <b>' + T + ' s</b>, su <span class="k">55-56</span> se abre un instante y el motor <b>se para solo</b>.'; },
+    uso: '<h2>Se para solo</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 55-56 (NC)</span></div>' +
+      '<div class="cols"><div><p class="big">El temporizador hace de <b>paro automático</b>: algo funciona un tiempo fijo y se para sin que nadie toque nada.</p>' +
+      '<h3>Por ejemplo</h3><ul><li>Un riego que funciona 20 segundos.</li><li>Un secamanos.</li><li>Una escalera mecánica que se para cuando ya no hay nadie.</li></ul></div>' +
+      '<div><h3>Cómo se monta</h3><ul><li>La bobina de <b>-KT1</b>, <b>en paralelo</b> con la de -KM1: empieza a contar cuando arranca el motor.</li><li>Su <b>55-56</b>, <b>en serie</b>, como un paro más.</li></ul>' +
+      '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicios <b>4.1</b>, <b>4.2</b> y <b>4.6</b>. También es lo que lo para todo al final de la <b>4.5</b>.</div>' +
+      '<div class="box ojo"><b class="t">¡OJO!</b>El 55-56 se abre solo un instante: al caer -KT1 se vuelve a cerrar y todo queda listo para otra marcha.</div></div></div>'
+  },
+  { n: 2, tab: 'Arranca más tarde', sub: 'a la conexión · su 67-68', type: 'on', contact: 'na', hasS1: true, piv: [410, 350],
+    alt: 'Esquema: paro S1, marcha S2 en paralelo con el 13-14 de KT1, bobina de KT1; el 67-68 de KT1 alimenta la bobina de KM1',
+    W: [['M40 30 H170 V46', function(s){ return true; }],
+        ['M170 112 V162 M170 136 H300 V162', function(s){ return !s.s1; }],
+        ['M170 228 V440 M300 228 V256 M170 256 H410 V300', function(s){ return s.kt; }],
+        ['M410 366 V440', function(s){ return s.km; }]],
+    N: 'M40 522 H410 M170 480 V522 M410 480 V522',
+    F: [['M40 30 H170 V136', function(s){ return s.kt; }],
+        ['M170 136 V256', function(s){ return s.kt && s.s2; }],
+        ['M170 136 H300 V256', function(s){ return (s.kt && !s.s2) || s.km; }],
+        ['M300 256 H170', function(s){ return s.kt && !s.s2; }],
+        ['M170 256 V522', function(s){ return s.kt; }],
+        ['M300 256 H410 V522', function(s){ return s.km; }],
+        ['M410 522 H170', function(s){ return s.km; }],
+        ['M170 522 H40', function(s){ return s.kt; }]],
+    dots: [[170, 136, 'f'], [170, 256, 'f'], [300, 256, 'f'], [170, 522, 'n']],
+    sym: function(){ return S1(170, 46) + S2(170, 162, 'Pulsador de marcha S2: mantener pulsado') + na(300, 162, '13', '14', '-KT1', { id: 'kF' }) +
+      na(410, 300, '67', '68', '-KT1', { timed: 'on', id: 'kT' }) + coil(170, '-KT1', 'coilT', 'on') + coil(410, '-KM1', 'coilM') +
+      '<text id="cdT" class="cdt" x="398" y="404" text-anchor="end"></text>'; },
+    fClosed: function(s){ return s.kt; },
+    logic: function(s){ var p = !s.s1 && (s.s2 || s.kt); s.kt = p; s.km = p && s.c; },
+    demo: function(T){ var a = 1 + T + 2.5; return { seg: [['s2', 1, 1.6], ['s1', a, a + 0.6]], end: a + 2.2 }; },
+    rows: ['s2', 's1', 'kt', 'ct', 'km'], ctTitle: '67-68 de -KT1 (NA)',
+    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: se activa -KT1, pero <b>el motor no arranca</b>. Pasados <b>' + T + ' s</b> se cierra el <span class="k">67-68</span> y el motor arranca. Sigue en marcha hasta que se pulsa el paro <b>-S1</b>.'; },
+    uso: '<h2>Arranca más tarde</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 67-68 (NA)</span></div>' +
+      '<div class="cols"><div><p class="big">El temporizador hace <b>esperar</b>: pulsas la marcha y lo importante arranca un rato después.</p>' +
+      '<h3>Por ejemplo</h3><ul><li>Una cinta que avisa con una luz antes de arrancar.</li><li>Un segundo motor que arranca después del primero, para que no se sumen los picos de arranque.</li></ul></div>' +
+      '<div><h3>Cómo se monta</h3><ul><li>La marcha activa solo <b>-KT1</b>, que se realimenta con <b>su propio 13-14</b> (es un contactor).</li><li>Su <b>67-68</b> alimenta la bobina de -KM1.</li></ul>' +
+      '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicio <b>4.3</b> y el segundo motor de la <b>4.5</b>.</div>' +
+      '<div class="box ojo"><b class="t">¡OJO!</b>-KT1 se realimenta con su 13-14 (instantáneo), no con su 67-68 (temporizado): si no, al soltar la marcha antes de T se soltaría todo.</div></div></div>'
+  },
+  { n: 3, tab: 'Sigue un rato más', sub: 'a la desconexión · su 67-68', type: 'off', contact: 'na', hasS1: false, piv: [360, 240],
+    alt: 'Esquema: el pulsador S2 (la condición) alimenta la bobina de KT1, a la desconexión; el 67-68 de KT1 alimenta la bobina de KM1',
+    W: [['M40 30 H360 V190 M170 30 V190', function(s){ return true; }],
+        ['M170 256 V440', function(s){ return s.kt; }],
+        ['M360 256 V440', function(s){ return s.km; }]],
+    N: 'M40 522 H360 M170 480 V522 M360 480 V522',
+    F: [['M40 30 H170', function(s){ return s.kt || s.km; }],
+        ['M170 30 V522', function(s){ return s.kt; }],
+        ['M170 30 H360 V522', function(s){ return s.km; }],
+        ['M360 522 H170', function(s){ return s.km; }],
+        ['M170 522 H40', function(s){ return s.kt || s.km; }]],
+    dots: [[170, 30, 'f'], [170, 522, 'n']],
+    sym: function(){ return S2(170, 190, 'Pulsador S2, la condición: mantener pulsado') + tx(112, 250, 'la condición', 'note', 'end') +
+      na(360, 190, '67', '68', '-KT1', { timed: 'off', id: 'kT' }) + coil(170, '-KT1', 'coilT', 'off') + coil(360, '-KM1', 'coilM') +
+      '<text id="cdT" class="cdt" x="394" y="235"></text>'; },
+    fClosed: function(s){ return false; },
+    logic: function(s){ s.kt = s.s2; s.km = s.c; },
+    demo: function(T){ return { seg: [['s2', 1, 3.5]], end: 3.5 + T + 1.8 }; },
+    rows: ['s2', 'kt', 'ct', 'km'], ctTitle: '67-68 de -KT1 (NA)', s2Title: '-S2 · la condición', s2Btn: 'Condición -S2',
+    story: function(T){ return 'Del segundo 1 al 3,5 hay condición (<b>-S2</b> pulsado): el <span class="k">67-68</span> se cierra <b>al momento</b> y el motor arranca. Al soltar, el motor <b>sigue ' + T + ' s más</b> y después se para solo.'; },
+    uso: '<h2>Sigue un rato más</h2><div class="tags"><span class="tag off">a la desconexión</span><span class="tag ct">su 67-68 (NA)</span></div>' +
+      '<div class="cols"><div><p class="big">El temporizador hace que algo <b>siga un rato</b> cuando ya no hay orden.</p>' +
+      '<h3>Por ejemplo</h3><ul><li>Un ventilador que sigue enfriando la máquina después de pararla.</li><li>La luz de la escalera.</li><li>El extractor del baño.</li></ul></div>' +
+      '<div><h3>Cómo se monta</h3><ul><li>La bobina de <b>-KT1</b> tiene tensión mientras haya <b>condición</b>: un pulsador, un detector o un contacto de otro contactor.</li><li>Su <b>67-68</b> alimenta -KM1: se cierra al momento y tarda T en abrirse.</li></ul>' +
+      '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicio <b>4.4</b>: la condición es que la máquina esté en marcha (un contacto NA de su contactor) y lo que sigue un rato es el ventilador.</div>' +
+      '<div class="box ojo"><b class="t">¡OJO!</b>El tiempo empieza a contar al <b>quitar</b> la condición, no al darla.</div></div></div>'
+  },
+  { n: 4, tab: 'Hay que mantener pulsado', sub: 'a la conexión · su 67-68', type: 'on', contact: 'na', hasS1: true, piv: [300, 212],
+    alt: 'Esquema: paro S1; la marcha S2 alimenta la bobina de KT1; el 67-68 de KT1, en paralelo con el 13-14 de KM1, alimenta la bobina de KM1',
+    W: [['M40 30 H170 V46', function(s){ return true; }],
+        ['M170 112 V162 M170 136 H420 V162 M300 136 V162', function(s){ return !s.s1; }],
+        ['M170 228 V440', function(s){ return s.kt; }],
+        ['M300 228 V440 M420 228 V256 H300', function(s){ return s.km; }]],
+    N: 'M40 522 H300 M170 480 V522 M300 480 V522',
+    F: [['M40 30 H170 V136', function(s){ return s.kt || s.km; }],
+        ['M170 136 V522', function(s){ return s.kt; }],
+        ['M170 136 H300', function(s){ return s.km; }],
+        ['M300 136 V256', function(s){ return s.km && s.c; }],
+        ['M300 136 H420 V256 H300', function(s){ return s.km; }],
+        ['M300 256 V522', function(s){ return s.km; }],
+        ['M300 522 H170', function(s){ return s.km; }],
+        ['M170 522 H40', function(s){ return s.kt || s.km; }]],
+    dots: [[170, 136, 'f'], [300, 136, 'f'], [300, 256, 'f'], [170, 522, 'n']],
+    sym: function(){ return S1(170, 46) + S2(170, 162, 'Pulsador de marcha S2: mantener pulsado') + na(300, 162, '67', '68', '-KT1', { timed: 'on', id: 'kT' }) +
+      na(420, 162, '13', '14', '-KM1', { id: 'kF' }) + coil(170, '-KT1', 'coilT', 'on') + coil(300, '-KM1', 'coilM') +
+      '<text id="cdT" class="cdt" x="290" y="248" text-anchor="end"></text>'; },
+    fClosed: function(s){ return s.km; },
+    logic: function(s){ s.kt = !s.s1 && s.s2; s.km = !s.s1 && (s.c || s.km); },
+    demo: function(T){ var a = 1 + T * 0.5, b = a + 1.4, c = b + T + 1.2, d = c + 1.8; return { seg: [['s2', 1, a], ['s2', b, c], ['s1', d, d + 0.6]], end: d + 2.1 }; },
+    rows: ['s2', 's1', 'kt', 'ct', 'km'], ctTitle: '67-68 de -KT1 (NA)',
+    story: function(T){ return 'Primero, una pulsación corta de <b>-S2</b>: no pasa nada (<b>&lt; T</b>). Después se mantiene pulsado más de <b>' + T + ' s</b>: se cierra el <span class="k">67-68</span>, el motor arranca y ya se puede soltar, porque -KM1 se realimenta. Se para con <b>-S1</b>.'; },
+    uso: '<h2>Hay que mantener pulsado</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 67-68 (NA)</span></div>' +
+      '<div class="cols"><div><p class="big">El temporizador <b>comprueba que aguantas pulsando</b>: con un toque corto no pasa nada.</p>' +
+      '<h3>Por ejemplo</h3><ul><li>Una máquina que no debe arrancar por un toque sin querer.</li><li>Un solo pulsador que hace más cosas cuanto más tiempo lo aprietas.</li><li>No hacer caso a un detector que se activa un instante por error.</li></ul></div>' +
+      '<div><h3>Cómo se monta</h3><ul><li>La bobina de <b>-KT1</b> va detrás del NA de la marcha: solo tiene tensión <b>mientras pulsas</b>.</li><li>Su <b>67-68</b>, en paralelo con el <b>13-14 de -KM1</b>: el temporizador arranca -KM1 y -KM1 se realimenta.</li></ul>' +
+      '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicio <b>4.7</b>: tres temporizadores con tiempos distintos (2, 4 y 6 s) detrás del mismo pulsador.</div>' +
+      '<div class="box ojo"><b class="t">¡OJO!</b>Aquí -KT1 <b>no</b> se realimenta: si lo hiciera, bastaría un toque corto.</div></div></div>'
+  }];
+
+  /* ================= estado ================= */
+  var cur = CASES[0], st = null, ev = 'inicio', demo = null, T = 4;
+  var samples = [], edges = [], ivs = [], curIv = null;
+  var wires = [], flows = [];
+  var latched = { s1: false, s2: false }, lastDown = {}, skipUp = {};
+
+  function reset(){
+    st = { s1: false, s2: false, kt: false, km: false, c: false, pkt: false, tOn: 0, tOff: 0, timing: false, notch: 0, simT: 0, frozen: false, example: false };
+    ev = 'inicio'; samples = []; edges = []; ivs = []; curIv = null; lastSig = ''; lastRec = '';
+    record();
+  }
+  function logic(){ for (var i = 0; i < 8; i++){ var a = st.kt, b = st.km; cur.logic(st); if (a === st.kt && b === st.km) break; } }
+  function closeIv(done){ if (curIv){ curIv.end = st.simT; curIv.done = done; curIv = null; } }
+  function timers(dt){
+    var s = st, rise = s.kt && !s.pkt, fall = !s.kt && s.pkt;
+    if (rise || fall) edges.push({ t: s.simT, from: 'kt' });
+    if (cur.type === 'on'){
+      if (rise){ s.tOn = 0; curIv = { start: s.simT, end: null, done: false }; ivs.push(curIv); if (ev !== 'auto') ev = 'rise'; }
+      if (s.kt){
+        s.tOn += dt;
+        if (!s.c && s.tOn >= T){ s.c = true; ev = 'acted'; closeIv(true); edges.push({ t: s.simT, from: 'ct' }); if (cur.n === 1) s.notch = 0.45; }
+      }
+      if (fall){
+        if (curIv){ closeIv(false); if (!s.s1) ev = 'short'; }
+        s.tOn = 0;
+        if (cur.n !== 1 && s.c){ s.c = false; edges.push({ t: s.simT, from: 'ct' }); }
+      }
+      if (cur.n === 1 && s.c && !s.kt){ s.notch -= dt; if (s.notch <= 0){ s.c = false; ev = 'auto'; edges.push({ t: s.simT, from: 'ct' }); } }
+    } else {
+      if (rise){
+        if (s.timing){ ev = 'retrig'; closeIv(false); } else { ev = 'rise'; edges.push({ t: s.simT, from: 'ct' }); }
+        s.timing = false; s.tOff = 0; s.c = true;
+      }
+      if (fall && s.c){ s.timing = true; s.tOff = 0; curIv = { start: s.simT, end: null, done: false }; ivs.push(curIv); ev = 'fall'; }
+      if (s.timing){
+        s.tOff += dt;
+        if (s.tOff >= T){ s.c = false; s.timing = false; ev = 'released'; closeIv(true); edges.push({ t: s.simT, from: 'ct' }); }
+      }
+    }
+    s.pkt = s.kt;
+  }
+  var lastRec = '';
+  function record(){
+    var s = st, ct = cur.contact === 'nc' ? !s.c : s.c;
+    var sig = '' + (+s.s1) + (+s.s2) + (+s.kt) + (+ct) + (+s.km);
+    if (sig === lastRec) return; lastRec = sig;
+    samples.push({ t: s.simT, s1: s.s1, s2: s.s2, kt: s.kt, ct: ct, km: s.km });
+  }
+  function setKey(which, down){
+    if (st[which] === down) return;
+    if (which === 's1' && down) ev = st.km ? 'paroRun' : (st.kt ? 'paroPre' : 'paro');
+    if (which === 's2' && down) ev = 'press';
+    st[which] = down; logic(); record();
+  }
+  function step(dt){
+    st.simT += dt;
+    if (demo){
+      var t = st.simT, a = false, b = false;
+      demo.seg.forEach(function(g){ if (t >= g[1] && t < g[2]){ if (g[0] === 's1') a = true; else b = true; } });
+      setKey('s1', a); setKey('s2', b);
+    }
+    logic(); timers(dt); logic(); record();
+    if (demo && st.simT >= demo.end) endDemo();
+    var keep = st.simT - span() - 1;
+    while (samples.length > 2 && samples[1].t < keep) samples.shift();
+    while (edges.length && edges[0].t < keep) edges.shift();
+    while (ivs.length && ivs[0].end !== null && ivs[0].end < keep) ivs.shift();
+  }
+  function span(){ return Math.max(8, cur.demo(T).end + 0.6); }
+  function endDemo(){ demo = null; st.s1 = false; st.s2 = false; logic(); record(); st.frozen = true; st.example = true; paintBtns(); }
+  // el cronograma de ejemplo: se calcula de golpe y se queda quieto
+  function example(){
+    clearLatch(); reset(); demo = cur.demo(T);
+    var guard = 0; while (demo && guard++ < 5000) step(0.02);
+    paintBtns(); render(true); drawChart();
+  }
+  // empezar de cero para probar a mano (o para la demostración paso a paso)
+  function fresh(){ demo = null; reset(); paintBtns(); }
+
+  /* ================= dibujo del esquema ================= */
+  function build(){
+    var h = '<title id="svgt">' + cur.alt + '</title>';
+    cur.W.forEach(function(w, i){ h += '<path id="w' + i + '" class="w wf" d="' + w[0] + '"/>'; });
+    h += '<path class="w wn" d="' + cur.N + '"/>';
+    h += tx(30, 36, 'L', 'name', 'end').replace('<text', '<text style="fill:var(--fase)"') + tx(30, 528, 'N', 'name', 'end').replace('<text', '<text style="fill:var(--neutro)"');
+    cur.F.forEach(function(f, i){ h += '<path id="f' + i + '" class="flow" d="' + f[0] + '"/>'; });
+    h += cur.sym();
+    cur.dots.forEach(function(d){ h += '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="5" fill="var(--' + (d[2] === 'f' ? 'fase' : 'neutro') + ')"/>'; });
+    $('svg').innerHTML = h;
+    wires = cur.W.map(function(w, i){ return $('w' + i); });
+    flows = cur.F.map(function(f, i){ return $('f' + i); });
+    if ($('gS1')) hold($('gS1'), 's1');
+    hold($('gS2'), 's2');
+  }
+  function rot(el, deg){ if (el) el.style.transform = 'rotate(' + deg + 'deg)'; }
+  function fmt(v){ return v.toFixed(1).replace('.', ',') + ' s'; }
+  var lastSig = '';
+  function render(force){
+    var s = st, left = cur.type === 'on' ? Math.max(0, T - s.tOn) : Math.max(0, T - s.tOff);
+    var counting = cur.type === 'on' ? (s.kt && !s.c) : s.timing;
+    var sig = [cur.n, +s.s1, +s.s2, +s.kt, +s.km, +s.c, +s.frozen, +s.example, +!!demo, T, ev, counting ? left.toFixed(1) : '', latched.s1, latched.s2].join('|');
+    if (!force && sig === lastSig) return; lastSig = sig;
+    rot($('kS1'), s.s1 ? -45 : 0); if ($('aS1')) $('aS1').style.transform = s.s1 ? 'translateX(12px)' : '';
+    rot($('kS2'), s.s2 ? 32 : 0); $('aS2').style.transform = s.s2 ? 'translateX(10px)' : '';
+    rot($('kF'), cur.fClosed(s) ? 32 : 0);
+    var deg = cur.contact === 'nc' ? (s.c ? -44 : 0) : (s.c ? 32 : 0);
+    rot($('kT'), deg);
+    var r = deg * Math.PI / 180, vx = cur.contact === 'nc' ? 6 : -10, vy = -16, l = $('stubT');
+    l.setAttribute('x2', (cur.piv[0] + vx * Math.cos(r) - vy * Math.sin(r)).toFixed(1));
+    l.setAttribute('y2', (cur.piv[1] + vx * Math.sin(r) + vy * Math.cos(r)).toFixed(1));
+    cur.W.forEach(function(w, i){ wires[i].classList.toggle('live', !!w[1](s)); });
+    cur.F.forEach(function(f, i){ flows[i].classList.toggle('on', !!f[1](s)); });
+    $('coilT').style.fill = s.kt ? '#FFE9A8' : '#fff'; $('coilM').style.fill = s.km ? '#FFE9A8' : '#fff';
+    $('cdT').textContent = counting ? '⏱ ' + fmt(left) : '';
+    $('dM').classList.toggle('on', s.km);
+    $('stM').textContent = s.km ? 'En marcha' : 'Parado'; $('stM').className = 'v' + (s.km ? ' run' : '');
+    var tt = 'En reposo', tc = '';
+    if (counting){ tt = 'Faltan ' + fmt(left); tc = ' cnt'; } else if (s.c){ tt = 'En trabajo'; tc = ' run'; }
+    $('stT').textContent = tt; $('stT').className = 'v' + tc;
+    var b2 = $('bS2'), b1 = $('bS1');
+    b2.classList.toggle('on', s.s2); b2.setAttribute('aria-pressed', s.s2);
+    b1.classList.toggle('on', s.s1); b1.setAttribute('aria-pressed', s.s1);
+    ['s1', 's2'].forEach(function(k){ var K = k.toUpperCase(); $('b' + K).classList.toggle('latched', !!latched[k]); if ($('g' + K)) $('g' + K).classList.toggle('latched', !!latched[k]); });
+    var md = $('mode');
+    if (s.example){ md.textContent = 'ejemplo'; md.className = 'mode'; }
+    else if (s.frozen){ md.textContent = 'congelado'; md.className = 'mode stop'; }
+    else { md.textContent = demo ? 'paso a paso' : 'en directo'; md.className = 'mode live'; }
+    $('explain').innerHTML = msg(left);
+  }
+  function paintBtns(){
+    $('bDemo').classList.toggle('on', !!demo); $('bDemo').setAttribute('aria-pressed', !!demo);
+    $('bDemot').textContent = demo ? '■ Parar' : '▶ Ver cómo funciona';
+    var fz = st.frozen && !st.example;
+    $('bFreeze').classList.toggle('on', fz); $('bFreeze').setAttribute('aria-pressed', fz);
+    $('bFreezet').textContent = fz ? 'Seguir' : 'Congelar';
+  }
+
+  /* ================= qué está pasando ================= */
+  function msg(left){
+    var s = st, n = cur.n, r = Math.max(0, Math.ceil(left - 1e-6));
+    if (s.example) return '<b>Este es el cronograma de ejemplo.</b> ' + cur.story(T) + ' Pulsa <b>«Ver cómo funciona»</b> para verlo paso a paso o toca tú los pulsadores del esquema.';
+    if (n === 1){
+      if (s.c) return '<b>Han pasado ' + T + ' s.</b> El <span class="k">55-56</span> de -KT1 <b>se abre</b> y corta el camino, igual que si alguien pulsara el paro. Caen -KM1 y -KT1.';
+      if (s.km) return (ev === 'auto' ? '<b>Sigues pulsando -S2</b>: por eso ha vuelto a arrancar en cuanto el 55-56 se ha cerrado. Suéltalo. ' : '<b>-S2 activa -KM1 y, a la vez, -KT1</b>: sus bobinas van en paralelo. -KM1 se realimenta con su <span class="k">13-14</span>' + (s.s2 ? ': ya puedes soltar. ' : '. ')) +
+        'El motor está en marcha y <b>-KT1 cuenta</b>: faltan <b>' + r + ' s</b>. Su <span class="k">55-56</span> sigue cerrado.';
+      if (ev === 'auto') return '<b>El motor se ha parado solo.</b> Al quedarse -KT1 sin tensión, su <span class="k">55-56</span> se ha vuelto a cerrar <b>al momento</b>: todo queda listo para otra marcha.';
+      if (ev === 'paroRun' || s.s1) return '<b>Paro -S1.</b> Caen -KM1 y -KT1 antes de tiempo. El tiempo contado <b>se pierde</b>: la próxima vez -KT1 empieza de cero.';
+      return '<b>Todo en reposo.</b> Da un toque a la marcha <b>-S2</b> y espera sin tocar nada: el motor se parará solo a los ' + T + ' s.';
+    }
+    if (n === 2){
+      if (s.km) return '<b>Han pasado ' + T + ' s.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra <b>-KM1</b>: arranca el motor. Sigue en marcha hasta que pulses el paro <b>-S1</b>.';
+      if (s.kt) return '<b>-S2 activa solo la bobina de -KT1</b>, que se realimenta con su propio <span class="k">13-14</span> (es un contactor)' + (s.s2 ? ': ya puedes soltar' : '') + '. El motor <b>todavía no arranca</b>: -KT1 está contando, faltan <b>' + r + ' s</b>. Su <span class="k">67-68</span> sigue abierto.';
+      if (ev === 'paroRun') return '<b>Paro -S1.</b> Se suelta -KT1: su <span class="k">67-68</span> se abre <b>al momento</b> y -KM1 cae. El motor se para.';
+      if (ev === 'paroPre') return '<b>Paro -S1 antes de tiempo.</b> -KT1 se suelta y el tiempo contado <b>se pierde</b>: el motor ni ha llegado a arrancar.';
+      return '<b>Todo en reposo.</b> Da un toque a la marcha <b>-S2</b>: verás que al principio <b>no arranca nada</b>. Espera ' + T + ' s.';
+    }
+    if (n === 3){
+      if (s.kt) return (ev === 'retrig' ? '<b>Ha vuelto la condición antes de acabar.</b> La cuenta se pone a cero: empezará otra vez cuando sueltes. ' : '<b>Hay condición</b> (-S2 pulsado). ') +
+        'La bobina de -KT1 tiene tensión y su <span class="k">67-68</span> está cerrado <b>desde el primer momento</b>: -KM1 está activado y el motor, en marcha. El temporizador <b>todavía no cuenta</b>: empezará cuando sueltes.';
+      if (s.timing) return '<b>Ya no hay condición.</b> La bobina de -KT1 se queda sin tensión, pero su <span class="k">67-68</span> <b>sigue cerrado</b>: el motor sigue en marcha. -KT1 cuenta: faltan <b>' + r + ' s</b>.';
+      if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste.</b> El <span class="k">67-68</span> se abre y -KM1 cae. El motor ha funcionado ' + T + ' s más que la condición.';
+      return '<b>Todo en reposo.</b> Mantén pulsado <b>-S2</b> (es la condición) un par de segundos, suéltalo y mira cuánto tarda en pararse el motor.';
+    }
+    if (s.km && s.kt) return '<b>Has aguantado ' + T + ' s.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra -KM1, que se realimenta con su <span class="k">13-14</span>. <b>Ya puedes soltar.</b>';
+    if (s.km) return '<b>Has soltado -S2.</b> -KT1 vuelve a reposo y su 67-68 se abre al momento, pero el motor <b>sigue en marcha</b>: -KM1 se realimenta con su <span class="k">13-14</span>. Se para con <b>-S1</b>.';
+    if (s.kt) return '<b>Mientras aprietas -S2</b>, la bobina de -KT1 tiene tensión y cuenta: faltan <b>' + r + ' s</b>. Si sueltas ahora, vuelve a cero.';
+    if (ev === 'short') return '<b>Has soltado antes de ' + T + ' s.</b> -KT1 se queda sin tensión y el tiempo contado <b>se pierde</b>: el motor no ha arrancado. Hay que aguantar ' + T + ' s <b>seguidos</b>.';
+    if (ev === 'paroRun' || s.s1) return '<b>Paro -S1.</b> Corta la realimentación: cae -KM1 y el motor se para.';
+    return '<b>Todo en reposo.</b> Da un <b>toque corto</b> a -S2: no pasa nada. Después <b>mantenlo pulsado</b> más de ' + T + ' s.';
+  }
+
+  /* ================= cronograma ================= */
+  var cv = $('cv'), ctx = cv.getContext('2d');
+  var FONT = '"Atkinson Hyperlegible",Verdana,Arial,sans-serif';
+  var ROWS = {
+    s2: { t: '-S2 · marcha', hi: 'Pulsado', lo: 'Suelto', col: '#555', h: 56, a: 26, b: 46 },
+    s1: { t: '-S1 · paro', hi: 'Pulsado', lo: 'Suelto', col: '#555', h: 56, a: 26, b: 46 },
+    kt: { t: 'Bobina de -KT1', hi: 'Con tensión', lo: 'Sin tensión', col: '#D0191C', h: 74, a: 28, b: 58 },
+    ct: { t: '', hi: 'Cerrado', lo: 'Abierto', col: '#1F5FBF', h: 96, a: 28, b: 58, iv: true },
+    km: { t: '-KM1 · el motor', hi: 'En marcha', lo: 'Parado', col: '#2E8B3E', h: 74, a: 28, b: 58, band: '#EEF8EF' }
+  };
+  function sizeCanvas(){
+    var r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    cv.width = Math.round(r.width * d); cv.height = Math.round(r.height * d);
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  function arrowLine(x1, x2, y, col){
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.6; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x1, y - 6); ctx.lineTo(x1, y + 6); ctx.moveTo(x2, y - 6); ctx.lineTo(x2, y + 6); ctx.stroke();
+    if (x2 - x1 > 14){
+      ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1 + 7, y - 4); ctx.lineTo(x1 + 7, y + 4); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2 - 7, y - 4); ctx.lineTo(x2 - 7, y + 4); ctx.closePath(); ctx.fill();
+    }
+  }
+  function drawChart(){
+    var W = cv.clientWidth, H = cv.clientHeight; if (!W) return;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    var narrow = W < 470, AX = 24;
+    var x0 = narrow ? 92 : 112, x1 = W - 12, sp = span(), now = st.simT, tL = Math.max(0, now - sp), pps = (x1 - x0) / sp;
+    var X = function(t){ return x0 + (t - tL) * pps; };
+    var rows = cur.rows.map(function(k){ var r = ROWS[k], o = {}; for (var p in r) o[p] = r[p]; o.key = k; return o; });
+    rows.forEach(function(r){ if (r.key === 'ct') r.t = cur.ctTitle; if (r.key === 's2' && cur.s2Title) r.t = cur.s2Title; });
+    var sum = rows.reduce(function(a, r){ return a + r.h; }, 0), k = (H - 4 - AX) / sum, acc = 0;
+    rows.forEach(function(r){
+      var top = 2 + acc * k; acc += r.h; r.top = top; r.hiY = top + r.a * k; r.loY = top + r.b * k; r.bot = top + r.h * k;
+      if (r.band){ ctx.fillStyle = r.band; ctx.fillRect(0, top + 1, W, r.h * k - 2); }
+      ctx.textBaseline = 'middle'; ctx.font = (narrow ? 11 : 13) + 'px ' + FONT; ctx.textAlign = 'right'; ctx.fillStyle = '#333';
+      ctx.fillText(r.hi, x0 - 8, r.hiY); ctx.fillText(r.lo, x0 - 8, r.loY);
+      ctx.strokeStyle = '#c4c4c4'; ctx.lineWidth = 1; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(x0, r.hiY); ctx.lineTo(x1, r.hiY); ctx.moveTo(x0, r.loY); ctx.lineTo(x1, r.loY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x0 - 4, r.hiY - 4); ctx.lineTo(x0 - 4, r.loY + 4); ctx.stroke();
+    });
+    var byKey = {}; rows.forEach(function(r){ byKey[r.key] = r; });
+    var last = rows[rows.length - 1], axY = H - AX + 2;
+    // regla de segundos
+    ctx.strokeStyle = '#888'; ctx.fillStyle = '#444'; ctx.lineWidth = 1; ctx.font = '12px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.beginPath(); ctx.moveTo(x0, axY); ctx.lineTo(x1, axY); ctx.stroke();
+    var every = pps >= 30 ? 1 : (pps >= 15 ? 2 : 5);
+    for (var sec = Math.ceil(tL); sec <= tL + sp + 1e-6; sec++){
+      var xs = X(sec); if (xs < x0 - 0.5 || xs > x1 + 0.5) continue;
+      ctx.beginPath(); ctx.moveTo(xs, axY); ctx.lineTo(xs, axY + (sec % every === 0 ? 5 : 3)); ctx.stroke();
+      if (sec % every === 0) ctx.fillText(sec, xs, axY + 6);
+    }
+    ctx.textAlign = 'right'; ctx.fillText('segundos', x0 - 10, axY + 6);
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, 0, x1 - x0 + 2, H - AX + 1); ctx.clip();
+    // líneas discontinuas en cada cambio de la bobina y del contacto
+    ctx.strokeStyle = '#666'; ctx.lineWidth = 1.1; ctx.setLineDash([5, 5]);
+    edges.forEach(function(e){ var x = X(e.t); if (x < x0 - 2) return; ctx.beginPath(); ctx.moveTo(x, byKey[e.from].hiY - 6); ctx.lineTo(x, last.loY + 6); ctx.stroke(); });
+    ctx.setLineDash([]);
+    // señales
+    rows.forEach(function(r){
+      ctx.strokeStyle = r.col; ctx.lineWidth = 4; ctx.lineJoin = 'miter';
+      ctx.beginPath(); var first = true, prev = null;
+      for (var i = 0; i < samples.length; i++){
+        var s = samples[i], y = s[r.key] ? r.hiY : r.loY, x = Math.max(x0, X(s.t));
+        if (first){ ctx.moveTo(x, y); first = false; }
+        else if (prev !== y){ ctx.lineTo(x, prev); ctx.lineTo(x, y); }
+        prev = y;
+      }
+      if (!first) ctx.lineTo(X(now), prev);
+      ctx.stroke();
+      if (r.iv) ivs.forEach(function(iv){
+        var a = X(iv.start), e = X(iv.end === null ? now : iv.end);
+        if (e < x0) return; a = Math.max(a, x0);
+        var y = r.loY + 16 * k, open = iv.end === null;
+        arrowLine(a, e, y, open ? '#B07800' : '#111');
+        var lbl = open ? '…' : (iv.done ? 'T' : '< T');
+        ctx.fillStyle = open ? '#B07800' : '#111'; ctx.font = '700 14px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        if (e - a > 18) ctx.fillText(lbl, (a + e) / 2, y + 3);
+      });
+    });
+    ctx.restore();
+    rows.forEach(function(r){
+      ctx.font = '700 ' + (narrow ? 12 : 14) + 'px ' + FONT; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      var tw = ctx.measureText(r.t).width; ctx.fillStyle = r.band || '#fff'; ctx.fillRect(4, r.top + 3 * k, tw + 10, 17 * k);
+      ctx.fillStyle = '#111'; ctx.fillText(r.t, 8, r.top + 11 * k);
+    });
+    // marca de "ahora"
+    if (!st.example){ var xn = Math.min(x1, X(now)); ctx.strokeStyle = '#F2B400'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xn, 4); ctx.lineTo(xn, H - AX); ctx.stroke(); }
+  }
+
+  /* ================= mandos ================= */
+  function clearLatch(){ latched.s1 = false; latched.s2 = false; }
+  function press(which, down){
+    if (which === 's1' && !cur.hasS1) return;
+    if (demo){ demo = null; st.s1 = false; st.s2 = false; logic(); paintBtns(); }
+    if (st.example || st.frozen){ if (!down) return; if (st.example) fresh(); st.frozen = false; paintBtns(); }
+    setKey(which, down); render();
+  }
+  function hold(el, which){
+    el.addEventListener('pointerdown', function(e){
+      e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      var now = Date.now();
+      if (latched[which]){ latched[which] = false; skipUp[which] = true; press(which, false); render(true); return; }
+      if (now - (lastDown[which] || 0) < 380){ latched[which] = true; skipUp[which] = true; lastDown[which] = 0; press(which, true); render(true); return; }
+      lastDown[which] = now; press(which, true);
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(n){ el.addEventListener(n, function(){
+      if (skipUp[which]){ skipUp[which] = false; return; } if (latched[which]) return; press(which, false);
+    }); });
+    el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(which, true); } });
+    el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !latched[which]) press(which, false); });
+  }
+  hold($('bS1'), 's1'); hold($('bS2'), 's2');
+  function toggleDemo(){
+    if (demo){ example(); return; }
+    clearLatch(); fresh(); demo = cur.demo(T); paintBtns(); render(true);
+  }
+  function toggleFreeze(){
+    if (demo) return;
+    if (st.example){ st.example = false; st.frozen = false; } else st.frozen = !st.frozen;
+    paintBtns(); render(true); drawChart();
+  }
+  $('bDemo').addEventListener('click', toggleDemo);
+  $('bFreeze').addEventListener('click', toggleFreeze);
+  $('T').addEventListener('input', function(){ T = +this.value; $('Tv').textContent = T; if (st.example) example(); else { render(true); drawChart(); } });
+
+  /* ================= cambiar de caso ================= */
+  function tabs(){
+    $('cases').innerHTML = CASES.map(function(c){
+      return '<button role="tab" id="tab' + c.n + '" data-n="' + c.n + '" aria-selected="false"><span class="n">' + c.n + '</span><span class="l">' + c.tab + '<small>' + c.sub + '</small></span></button>';
+    }).join('');
+    $('cases').addEventListener('click', function(e){ var b = e.target.closest('button'); if (b) pick(+b.dataset.n, true); });
+  }
+  function pick(n, user){
+    cur = CASES[n - 1] || CASES[0];
+    CASES.forEach(function(c){ var b = $('tab' + c.n); b.classList.toggle('cur', c === cur); b.setAttribute('aria-selected', c === cur); });
+    $('uso').innerHTML = cur.uso;
+    $('bS1').style.display = cur.hasS1 ? '' : 'none';
+    $('bS2').classList.toggle('full', !cur.hasS1);
+    $('bS2t').textContent = cur.s2Btn || 'Marcha -S2';
+    build(); example();
+    if (user){ try { history.replaceState(null, '', '#' + cur.n); } catch(e){} }
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('[data-go]'); if (!b) return;
+    pick(+b.dataset.go, true);
+    var top = $('cases').getBoundingClientRect().top + window.pageYOffset - 8;
+    window.scrollTo({ top: top, behavior: (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth' });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
+    var k = e.key.toLowerCase();
+    if (k >= '1' && k <= '4') pick(+k, true);
+    if (k === 'm') press('s2', true);
+    if (k === 'p') press('s1', true);
+    if (k === 'd') toggleDemo();
+    if (k === 'f') toggleFreeze();
+  });
+  document.addEventListener('keyup', function(e){
+    var k = e.key.toLowerCase();
+    if (k === 'm' && !latched.s2) press('s2', false);
+    if (k === 'p' && !latched.s1) press('s1', false);
+  });
+
+  /* ================= bucle ================= */
+  var lastTs = null;
+  function loop(ts){
+    if (lastTs === null) lastTs = ts;
+    var dt = Math.min(0.1, (ts - lastTs) / 1000); lastTs = ts;
+    if (!st.frozen){ step(dt); drawChart(); }
+    render();
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize', function(){ sizeCanvas(); drawChart(); });
+  tabs(); sizeCanvas();
+  var h0 = parseInt((location.hash || '').replace('#', ''), 10);
+  pick(h0 >= 1 && h0 <= 4 ? h0 : 1, false);
+  window.addEventListener('hashchange', function(){ var h = parseInt((location.hash || '').replace('#', ''), 10); if (h >= 1 && h <= 4 && h !== cur.n) pick(h, false); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ sizeCanvas(); drawChart(); });
+  requestAnimationFrame(loop);
+  window.__usos = { st: function(){ return st; }, cur: function(){ return cur; }, pick: pick, press: press, step: function(dt){ step(dt); render(true); drawChart(); }, samples: function(){ return samples; }, demo: toggleDemo };
+})();
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#animaciones';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '☀️' : '🌙';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
+})();</script>
+</body>
+</html>
