@@ -131,6 +131,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 .box b.t{display:block;font-size:.82rem;letter-spacing:.05em}
 .box.ojo{border-color:#C0392B}
 .box.ojo b.t{color:var(--warn)}
+.box.dif{border-color:#1F4E79}
+.box.dif b.t{color:var(--azult)}
 .box.p4{border-color:#2E8B3E}
 .box.p4 b.t{color:var(--ok)}
 /* cajones de abajo */
@@ -379,6 +381,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       '<h3>Por ejemplo</h3><ul><li>Un ventilador que sigue enfriando la máquina después de pararla.</li><li>La luz de la escalera.</li><li>El extractor del baño.</li></ul></div>' +
       '<div><h3>Cómo se monta</h3><ul><li>La bobina de <b>-KT1</b> tiene tensión mientras haya <b>condición</b>: un pulsador, un detector o un contacto de otro contactor.</li><li>Su <b>67-68</b> alimenta -KM1: se cierra al momento y tarda T en abrirse.</li></ul>' +
       '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicio <b>4.4</b>: la condición es que la máquina esté en marcha (un contacto NA de su contactor) y lo que sigue un rato es el ventilador.</div>' +
+      '<div class="box dif"><b class="t">LA DIFERENCIA CON EL CASO 1</b>Los dos acaban parándose solos. Pero aquí cada nueva pulsación <b>reinicia el tiempo</b>: si vuelves a pulsar antes de que se pare, la cuenta empieza de cero. En el caso 1, no: aunque pulses otra vez, se para cuando se cumple su tiempo.</div>' +
       '<div class="box ojo"><b class="t">¡OJO!</b>El tiempo empieza a contar al <b>quitar</b> la condición, no al darla.</div></div></div>'
   },
   { n: 4, tab: 'Hay que mantener pulsado', sub: 'a la conexión · su 67-68', type: 'on', contact: 'na', hasS1: true, piv: [300, 212],
@@ -464,7 +467,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   function setKey(which, down){
     if (st[which] === down) return;
     if (which === 's1' && down) ev = st.km ? 'paroRun' : (st.kt ? 'paroPre' : 'paro');
-    if (which === 's2' && down) ev = 'press';
+    if (which === 's2' && down) ev = (cur.n === 1 && st.km) ? 'repress' : 'press';
     st[which] = down; logic(); record();
   }
   function step(dt){
@@ -556,6 +559,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     if (s.example) return '<b>Este es el cronograma de ejemplo.</b> ' + cur.story(T) + ' Pulsa <b>«Ver cómo funciona»</b> para verlo paso a paso o toca tú los pulsadores del esquema.';
     if (n === 1){
       if (s.c) return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + '.</b> El <span class="k">55-56</span> de -KT1 <b>se abre</b> y corta el camino, igual que si alguien pulsara el paro. Caen -KM1 y -KT1.';
+      if (s.km && ev === 'repress') return '<b>Has vuelto a pulsar -S2 y no cambia nada.</b> -KM1 ya estaba realimentado y -KT1 sigue con su cuenta: faltan <b>' + r + ' s</b>. Aquí una pulsación nueva <b>no reinicia el tiempo</b> (en el caso 3, sí).';
       if (s.km) return (ev === 'auto' ? '<b>Sigues pulsando -S2</b>: por eso ha vuelto a arrancar en cuanto el 55-56 se ha cerrado. Suéltalo. ' : '<b>-S2 activa -KM1 y, a la vez, -KT1</b>: sus bobinas van en paralelo. -KM1 se realimenta con su <span class="k">13-14</span>' + (s.s2 ? ': ya puedes soltar. ' : '. ')) +
         'El motor está en marcha y <b>-KT1 cuenta</b>: faltan <b>' + r + ' s</b>. Su <span class="k">55-56</span> sigue cerrado.';
       if (ev === 'auto') return '<b>El motor se ha parado solo.</b> Al quedarse -KT1 sin tensión, su <span class="k">55-56</span> se ha vuelto a cerrar <b>al momento</b>: todo queda listo para otra marcha.';
