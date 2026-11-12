@@ -58,15 +58,16 @@ button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--li
 button:focus-visible,a:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
 .small{font-size:.84rem;font-weight:400;display:block;opacity:.85}
 kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
-/* los cuatro casos */
-.cases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px}
+/* los casos */
+.cases{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 14px}
 .cases button{display:flex;align-items:center;gap:10px;text-align:left;padding:8px 12px;min-height:60px;touch-action:manipulation}
 .cases button:hover{border-color:#1F4E79}
 .cases .n{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1}
 .cases .l{display:block;line-height:1.15;min-width:0}
 .cases .l small{display:block;font-weight:400;font-size:.8rem;opacity:.85;margin-top:2px}
 .cases button.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
-@media (max-width:980px){.cases{grid-template-columns:1fr 1fr}}
+@media (max-width:1180px){.cases{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.cases{grid-template-columns:1fr 1fr}}
 /* las tres columnas: mando · cronograma · para qué sirve */
 .grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.2fr) minmax(0,.95fr);gap:14px;align-items:start}
 .col1{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -180,7 +181,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   <nav class="t6nav" aria-label="Animaciones del Tema 5"><a class="arr" href="cronograma_temporizadores.html" aria-label="Anterior: 5.2 El cronograma de los temporizadores">‹ 5.2</a><span class="where">Tema 5 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="cronograma_temporizadores.html" title="El cronograma de los temporizadores">5.2</a><a href="usos_temporizadores.html" class="cur" aria-current="page" title="Para qué se usa un temporizador">5.5</a></div></nav>
 
   <h1>Para qué se usa un temporizador</h1>
-  <p class="sub">Te sirve para la <b>Práctica 4</b>: cuatro maneras de usar un temporizador. En cada una tienes <b>la parte del mando</b> que hace falta, su <b>cronograma</b> y <b>para qué sirve</b>. Elige un caso, mira el ejemplo y pruébalo tú: toca los pulsadores del esquema.</p>
+  <p class="sub">Te sirve para la <b>Práctica 4</b>: cinco maneras de usar un temporizador. En cada una tienes <b>la parte del mando</b> que hace falta, su <b>cronograma</b> y <b>para qué sirve</b>. Elige un caso, mira el ejemplo y pruébalo tú: toca los pulsadores del esquema.</p>
 
   <div class="cases" id="cases" role="tablist" aria-label="Elige un caso"></div>
 
@@ -213,7 +214,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       <div class="howread">
         <span>El tiempo va de <b>izquierda a derecha</b>, en segundos.</span>
         <span><span class="sw" style="background:#555"></span>Lo que haces tú.</span>
-        <span><span class="sw" style="background:#D0191C"></span>Bobina de <b>-KT1</b>.</span>
+        <span id="lgKt"><span class="sw" style="background:#D0191C"></span>Bobina de <b>-KT1</b>.</span>
         <span id="lgCt"><span class="sw" style="background:#1F5FBF"></span>Su contacto temporizado.</span>
         <span><span class="sw" style="background:#2E8B3E"></span>El motor.</span>
         <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
@@ -241,7 +242,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     </ul>
   </div>
 
-  <p class="foot">Aquí solo está dibujada <b>la parte del mando que lleva el temporizador</b>. En tus esquemas faltan <b>-Q2</b>, el <b>95-96</b> del térmico, la fuerza y los pilotos, que van como siempre. «Borne» quiere decir <b>tornillo</b>. <span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Los puntos que se mueven por el cable son la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Teclado: <kbd>1</kbd>-<kbd>4</kbd> caso, <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>D</kbd> ver cómo funciona, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
+  <p class="foot">Aquí solo está dibujada <b>la parte del mando que lleva el temporizador</b>. En tus esquemas faltan <b>-Q2</b>, el <b>95-96</b> del térmico, la fuerza y los pilotos, que van como siempre. «Borne» quiere decir <b>tornillo</b>. <span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Los puntos que se mueven por el cable son la <b>corriente</b>; los cables en rojo vivo tienen <b>tensión</b>. Teclado: <kbd>1</kbd>-<kbd>5</kbd> caso, <kbd>M</kbd> marcha, <kbd>P</kbd> paro, <kbd>D</kbd> ver cómo funciona, <kbd>F</kbd> congelar, <kbd>Esc</kbd> volver al índice.</p>
 
   <a class="nextbig" href="index.html#animaciones">Has llegado al final del Tema 5 · Volver a las animaciones →</a>
 </main>
@@ -292,7 +293,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   function S1(x, y){ return hitG('gS1', 'Pulsador de paro S1: mantener pulsado', x, y, nc(x, y, '1', '2', '-S1', { push: true, id: 'kS1', act: 'aS1' })); }
   function S2(x, y, label){ return hitG('gS2', label, x, y, na(x, y, '3', '4', '-S2', { push: true, id: 'kS2', act: 'aS2' })); }
 
-  /* ================= los cuatro casos ================= */
+  /* ================= los casos ================= */
   var CASES = [
   { n: 1, tab: 'Se para solo', sub: 'a la conexión · su 55-56', type: 'on', contact: 'nc', hasS1: true, piv: [170, 202],
     alt: 'Esquema: paro S1, el 55-56 de KT1 en serie, marcha S2 en paralelo con el 13-14 de KM1, y las bobinas de KM1 y KT1 en paralelo',
@@ -414,6 +415,33 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       '<div><h3>Cómo se monta</h3><ul><li>La bobina de <b>-KT1</b> va detrás del NA de la marcha: solo tiene tensión <b>mientras pulsas</b>.</li><li>Su <b>67-68</b>, en paralelo con el <b>13-14 de -KM1</b>: el temporizador arranca -KM1 y -KM1 se realimenta.</li></ul>' +
       '<div class="box p4"><b class="t">EN LA PRÁCTICA 4</b>Ejercicio <b>4.7</b>: tres temporizadores con tiempos distintos (2, 4 y 6 s) detrás del mismo pulsador.</div>' +
       '<div class="box ojo"><b class="t">¡OJO!</b>Aquí -KT1 <b>no</b> se realimenta: si lo hiciera, bastaría un toque corto.</div></div></div>'
+  },
+  { n: 5, tab: 'Filtro de señales dudosas', sub: 'a la desconexión · su 67-68', type: 'off', contact: 'na', hasS1: false, piv: [360, 240],
+    alt: 'Esquema: la salida del detector S3 alimenta la bobina de KT1, a la desconexión; el 67-68 de KT1 alimenta la bobina de KM1',
+    W: [['M40 30 H360 V190 M170 30 V190', function(s){ return true; }],
+        ['M170 256 V440', function(s){ return s.kt; }],
+        ['M360 256 V440', function(s){ return s.km; }]],
+    N: 'M40 522 H360 M170 480 V522 M360 480 V522',
+    F: [['M40 30 H170', function(s){ return s.kt || s.km; }],
+        ['M170 30 V522', function(s){ return s.kt; }],
+        ['M170 30 H360 V522', function(s){ return s.km; }],
+        ['M360 522 H170', function(s){ return s.km; }],
+        ['M170 522 H40', function(s){ return s.kt || s.km; }]],
+    dots: [[170, 30, 'f'], [170, 522, 'n']],
+    sym: function(){ return hitG('gS2', 'Detector S3: mantener pulsado para que dé señal', 170, 190, na(170, 190, 'COM', 'NA', '-S3', { id: 'kS2' }) + '<g id="aS2"></g>') + tx(142, 250, 'el detector', 'note', 'end') +
+      na(360, 190, '67', '68', '-KT1', { timed: 'off', id: 'kT' }) + coil(170, '-KT1', 'coilT', 'off') + coil(360, '-KM1', 'coilM') +
+      '<text id="cdT" class="cdt" x="394" y="235"></text>'; },
+    fClosed: function(s){ return false; },
+    logic: function(s){ s.kt = s.s2; s.km = s.c; },
+    demo: function(T){ return { seg: [['s2', 1, 1.4], ['s2', 1.8, 2.1], ['s2', 2.6, 3], ['s2', 3.3, 3.5], ['s2', 4, 4.4]], end: 4.4 + T + 1.4 }; },
+    rows: ['s2', 'km'], ivRow: 'km', edgeRows: { ct: 's2' }, s2Title: '-S3 · el detector', s2Hi: 'Da señal', s2Lo: 'No da', s2Btn: 'Detector -S3',
+    story: function(T){ return 'El detector <b>-S3</b> da una señal que va y viene: cinco toques cortos seguidos. El motor arranca con el primero y <b>no se para en los huecos</b>, porque duran menos de <b>' + T + ' s</b>. Se para ' + T + ' s después del último toque.'; },
+    uso: '<h2>Filtro de señales dudosas</h2><div class="tags"><span class="tag off">a la desconexión</span><span class="tag ct">su 67-68 (NA)</span></div>' +
+      '<div class="cols"><div><p class="big">El temporizador <b>da inercia</b> a la señal de un sensor: convierte una señal que va y viene en una señal continua.</p>' +
+      '<h3>Por ejemplo</h3><ul><li>Un detector que ve pasar cajas por una cinta: la cinta no se para en el hueco entre caja y caja.</li><li>Una boya de nivel con el agua movida: la bomba no arranca y para con cada ola.</li><li>Un detector que deja de ver a la persona un momento.</li></ul></div>' +
+      '<div><h3>Cómo se monta</h3><ul><li>El sensor alimenta la bobina de <b>-KT1</b> (a la desconexión).</li><li>Su <b>67-68</b> alimenta -KM1. Mientras los huecos de la señal duren <b>menos que T</b>, el 67-68 no llega a abrirse.</li></ul>' +
+      '<div class="box dif"><b class="t">ES EL MISMO MONTAJE QUE EL CASO 3</b>Lo que cambia es para qué se usa: allí alarga la marcha; aquí tapa los huecos de una señal.</div>' +
+      '<div class="box ojo"><b class="t">¡OJO!</b>T tiene que ser más largo que el hueco más largo. A cambio, cuando la señal se va de verdad, la salida tarda T en enterarse.</div></div></div>'
   }];
 
   /* ================= estado ================= */
@@ -580,6 +608,12 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       if (ev === 'released') return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + ' desde que soltaste.</b> El <span class="k">67-68</span> se abre y -KM1 cae. El motor ha funcionado ' + T + ' s más que la condición.';
       return '<b>Todo en reposo.</b> Mantén pulsado <b>-S2</b> (es la condición) un par de segundos, suéltalo y mira cuánto tarda en pararse el motor.';
     }
+    if (n === 5){
+      if (s.kt) return (ev === 'retrig' ? '<b>La señal ha vuelto antes de ' + T + ' s.</b> La cuenta se pone a cero: el motor <b>ni se ha enterado del hueco</b>. ' : '<b>El detector da señal.</b> El <span class="k">67-68</span> de -KT1 se cierra <b>al momento</b> y el motor arranca. ') + 'Suelta y vuelve a tocar enseguida.';
+      if (s.timing) return '<b>La señal se ha ido.</b> El <span class="k">67-68</span> aguanta cerrado y el motor sigue en marcha. Si la señal vuelve antes de <b>' + r + ' s</b>, no se habrá notado el hueco.';
+      if (ev === 'released') return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + ' sin señal.</b> Ahora sí: el <span class="k">67-68</span> se abre y el motor se para. La señal se había ido de verdad.';
+      return '<b>Todo en reposo.</b> Toca el detector <b>-S3</b> varias veces seguidas, con toques cortos, como una señal que va y viene: el motor no se para entre toque y toque.';
+    }
     if (s.km && s.kt) return '<b>Has aguantado ' + T + ' s.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra -KM1, que se realimenta con su <span class="k">13-14</span>. <b>Ya puedes soltar.</b>';
     if (s.km) return '<b>Has soltado -S2.</b> -KT1 vuelve a reposo y su 67-68 se abre al momento, pero el motor <b>sigue en marcha</b>: -KM1 se realimenta con su <span class="k">13-14</span>. Se para con <b>-S1</b>.';
     if (s.kt) return '<b>Mientras aprietas -S2</b>, la bobina de -KT1 tiene tensión y cuenta: faltan <b>' + r + ' s</b>. Si sueltas ahora, vuelve a cero.';
@@ -619,7 +653,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var x0 = narrow ? 92 : 112, x1 = W - 12, sp = span(), now = st.simT, tL = Math.max(0, now - sp), pps = (x1 - x0) / sp;
     var X = function(t){ return x0 + (t - tL) * pps; };
     var rows = cur.rows.map(function(k){ var r = ROWS[k], o = {}; for (var p in r) o[p] = r[p]; o.key = k; return o; });
-    rows.forEach(function(r){ if (r.key === 'ct') r.t = cur.ctTitle; if (r.key === 's2' && cur.s2Title) r.t = cur.s2Title; r.iv = r.key === (cur.ivRow || 'ct'); if (r.iv) r.h = 96; });
+    rows.forEach(function(r){ if (r.key === 'ct') r.t = cur.ctTitle; if (r.key === 's2' && cur.s2Title) r.t = cur.s2Title; if (r.key === 's2' && cur.s2Hi){ r.hi = cur.s2Hi; r.lo = cur.s2Lo; } r.iv = r.key === (cur.ivRow || 'ct'); if (r.iv) r.h = 96; });
     var sum = rows.reduce(function(a, r){ return a + r.h; }, 0), k = (H - 4 - AX) / sum, acc = 0;
     rows.forEach(function(r){
       var top = 2 + acc * k; acc += r.h; r.top = top; r.hiY = top + r.a * k; r.loY = top + r.b * k; r.bot = top + r.h * k;
@@ -645,7 +679,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     ctx.save(); ctx.beginPath(); ctx.rect(x0, 0, x1 - x0 + 2, H - AX + 1); ctx.clip();
     // líneas discontinuas en cada cambio de la bobina y del contacto
     ctx.strokeStyle = '#666'; ctx.lineWidth = 1.1; ctx.setLineDash([5, 5]);
-    edges.forEach(function(e){ var x = X(e.t); if (x < x0 - 2 || !byKey[e.from]) return; ctx.beginPath(); ctx.moveTo(x, byKey[e.from].hiY - 6); ctx.lineTo(x, last.loY + 6); ctx.stroke(); });
+    edges.forEach(function(e){ var x = X(e.t), er = byKey[(cur.edgeRows && cur.edgeRows[e.from]) || e.from]; if (x < x0 - 2 || !er) return; ctx.beginPath(); ctx.moveTo(x, er.hiY - 6); ctx.lineTo(x, last.loY + 6); ctx.stroke(); });
     ctx.setLineDash([]);
     // señales
     rows.forEach(function(r){
@@ -662,6 +696,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       if (r.iv) ivs.forEach(function(iv){
         var a = X(iv.start), e = X(iv.end === null ? now : iv.end);
         if (e < x0) return; a = Math.max(a, x0);
+        if (iv.end !== null && !iv.done && e - a < 26) return;   // huecos muy cortos: sin flecha, para no liar
         var y = r.loY + 16 * k, open = iv.end === null;
         arrowLine(a, e, y, open ? '#B07800' : '#111');
         var lbl = open ? '…' : (iv.done ? 'T' : '< T');
@@ -730,6 +765,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     $('bS2').classList.toggle('full', !cur.hasS1);
     $('bS2t').textContent = cur.s2Btn || 'Marcha -S2';
     $('lgCt').style.display = cur.rows.indexOf('ct') < 0 ? 'none' : '';
+    $('lgKt').style.display = cur.rows.indexOf('kt') < 0 ? 'none' : '';
     build(); example();
     if (user){ try { history.replaceState(null, '', '#' + cur.n); } catch(e){} }
   }
@@ -743,7 +779,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
     var k = e.key.toLowerCase();
-    if (k >= '1' && k <= '4') pick(+k, true);
+    if (k >= '1' && k <= '5') pick(+k, true);
     if (k === 'm') press('s2', true);
     if (k === 'p') press('s1', true);
     if (k === 'd') toggleDemo();
@@ -767,8 +803,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   window.addEventListener('resize', function(){ sizeCanvas(); drawChart(); });
   tabs(); sizeCanvas();
   var h0 = parseInt((location.hash || '').replace('#', ''), 10);
-  pick(h0 >= 1 && h0 <= 4 ? h0 : 1, false);
-  window.addEventListener('hashchange', function(){ var h = parseInt((location.hash || '').replace('#', ''), 10); if (h >= 1 && h <= 4 && h !== cur.n) pick(h, false); });
+  pick(h0 >= 1 && h0 <= 5 ? h0 : 1, false);
+  window.addEventListener('hashchange', function(){ var h = parseInt((location.hash || '').replace('#', ''), 10); if (h >= 1 && h <= 5 && h !== cur.n) pick(h, false); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ sizeCanvas(); drawChart(); });
   requestAnimationFrame(loop);
   window.__usos = { st: function(){ return st; }, cur: function(){ return cur; }, pick: pick, press: press, step: function(dt){ step(dt); render(true); drawChart(); }, samples: function(){ return samples; }, demo: toggleDemo };
