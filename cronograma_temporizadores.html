@@ -357,7 +357,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       <div class="card">
         <div class="controls">
           <button id="bS1" aria-pressed="false">Pulsador -S1<span class="small">mantén pulsado · tecla M</span></button>
-          <button id="bAuto" class="tog" aria-pressed="false">Pulsos cortos<span class="small">1 s sí, 1 s no · tecla C</span></button>
+          <button id="bAuto" class="tog" aria-pressed="false">Pulsos cortos<span class="small">medio segundo sí, medio no · tecla C</span></button>
           <button id="bQ1">Abrir -Q1<span class="small">tecla Q</span></button>
           <button id="bSlow" class="tog" aria-pressed="false">Cámara lenta<span class="small">tecla L</span></button>
           <button id="bFreeze" class="tog" aria-pressed="false">Congelar<span class="small">tecla F</span></button>
@@ -376,8 +376,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
           </svg>
           <div style="flex:1">
             <label for="T"><b>Ruleta de los dos bloques</b></label>
-            <div class="tval">T = <span id="Tv">5</span> s</div>
-            <input id="T" type="range" min="2" max="10" step="1" value="5" aria-label="Tiempo de los temporizadores en segundos">
+            <div class="tval">T = <span id="Tv">3</span> s</div>
+            <input id="T" type="range" min="1" max="5" step="1" value="3" aria-label="Tiempo de los temporizadores en segundos">
           </div>
         </div>
       </div>
@@ -444,7 +444,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var st = { q1:true, s1:false, coil:false, tOn:0, onC:false, offC:false, tOff:0, offTiming:false,
-             T:5, speed:1, frozen:false, auto:false, autoClock:0, simT:0 };
+             T:3, speed:1, frozen:false, auto:false, autoClock:0, simT:0 };
   var ev = 'inicio';
   var samples = [], edges = [], ivOn = [], ivOff = [];
   var curOn = null, curOff = null;
@@ -453,7 +453,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   function step(dt){
     if (st.frozen) return;
     dt *= st.speed; st.simT += dt;
-    if (st.auto){ st.autoClock += dt; st.s1 = (st.autoClock % 2) < 1; }
+    if (st.auto){ st.autoClock += dt; st.s1 = (st.autoClock % 1) < 0.5; }
     var c = st.q1 && st.s1;
     if (c && !st.coil){                       // se da tensión
       edges.push(st.simT);
@@ -517,8 +517,8 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   var lastMsg = '';
   function msg(){
     var T = st.T, r1 = Math.max(0, Math.ceil(T - st.tOn - 1e-6)), r2 = Math.max(0, Math.ceil(T - st.tOff - 1e-6));
-    if (st.auto) return '<b>Pulsos cortos: 1 s pulsado, 1 s suelto, una y otra vez</b> (T = ' + T + ' s).<br>' +
-      '• <b>-KT1 (conexión) nunca llega a actuar</b>: necesita ' + T + ' s <b>seguidos</b> con tensión y cada pulso dura solo 1 s. Al soltar, vuelve a empezar de cero. H1 no se enciende nunca.<br>' +
+    if (st.auto) return '<b>Pulsos cortos: medio segundo pulsado y medio suelto, una y otra vez</b> (T = ' + T + ' s).<br>' +
+      '• <b>-KT1 (conexión) nunca llega a actuar</b>: necesita ' + T + ' s <b>' + (T === 1 ? 'seguido' : 'seguidos') + '</b> con tensión y cada pulso dura solo medio segundo. Al soltar, vuelve a empezar de cero. H1 no se enciende nunca.<br>' +
       '• <b>-KT2 (desconexión) nunca llega a parar</b>: cada pulso le pone el tiempo a cero antes de que se acabe. H3 no se apaga nunca.';
     if (!st.q1) return '<b>-Q1 abierto: el mando se queda sin tensión.</b> Las bobinas se sueltan y los pilotos se apagan.' +
       (st.offTiming ? ' Fíjate en el fuelle de -KT2: <b>sigue contando sin electricidad</b> (faltan ' + r2 + ' s). El tiempo lo marca el aire, no la corriente.' : ' Ciérralo para seguir.');
@@ -526,13 +526,13 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       var pre = ev === 'retrig' ? '<b>Has vuelto a pulsar antes de que -KT2 acabara.</b> Su cuenta se ha puesto a cero: empezará otra vez cuando sueltes. ' : '<b>Las bobinas tienen tensión.</b> ';
       return pre + '-KT2 (desconexión) ha cambiado <b>al momento</b>: su <span class="k">67-68</span> se cierra y se enciende H3. -KT1 (conexión) <b>está contando</b>: faltan <b>' + r1 + ' s</b>. Su 67-68 sigue abierto. Si sueltas antes, no llegará a actuar.';
     }
-    if (st.coil && st.onC) return '<b>Han pasado ' + T + ' s con tensión</b>: el <span class="k">67-68</span> de -KT1 se cierra y se enciende H1. Ahora los dos están en trabajo. <b>Suelta el pulsador</b> y mira cuál vuelve antes a reposo.';
+    if (st.coil && st.onC) return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + ' con tensión</b>: el <span class="k">67-68</span> de -KT1 se cierra y se enciende H1. Ahora los dos están en trabajo. <b>Suelta el pulsador</b> y mira cuál vuelve antes a reposo.';
     if (st.offTiming){
       var p = ev === 'short' ? '<b>Has soltado antes de ' + T + ' s.</b> -KT1 (conexión) <b>no ha llegado a actuar</b>: H1 ni se ha encendido. ' :
                                '<b>Has soltado: las bobinas ya no tienen tensión.</b> -KT1 (conexión) vuelve a reposo <b>al momento</b>: H1 se apaga. ';
       return p + '-KT2 (desconexión) <b>sigue en trabajo y cuenta</b>: faltan <b>' + r2 + ' s</b> para que vuelva a reposo y se apague H3.';
     }
-    if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste</b>: -KT2 vuelve a reposo y H3 se apaga. Todo en reposo otra vez. Mira el cronograma: el de conexión retrasa la <b>entrada</b>; el de desconexión retrasa la <b>salida</b>.';
+    if (ev === 'released') return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + ' desde que soltaste</b>: -KT2 vuelve a reposo y H3 se apaga. Todo en reposo otra vez. Mira el cronograma: el de conexión retrasa la <b>entrada</b>; el de desconexión retrasa la <b>salida</b>.';
     return '<b>Todo en reposo.</b> Las bobinas no tienen tensión: los dos <span class="k">67-68</span> están abiertos y los dos <span class="k">55-56</span>, cerrados (por eso H2 y H4 están encendidos). Mantén pulsado <b>-S1</b> más de ' + T + ' s y suéltalo. Después prueba una pulsación corta (menos de ' + T + ' s).';
   }
   function render(){
@@ -655,17 +655,17 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   /* ---------- ruleta ---------- */
   (function(){
     var g = $('ticks'), html = '';
-    [2, 4, 6, 8, 10].forEach(function(v){
-      var a = (-135 + (v - 2) / 8 * 270) * Math.PI / 180, cx = 48 + Math.sin(a) * 29, cy = 48 - Math.cos(a) * 29;
+    [1, 2, 3, 4, 5].forEach(function(v){
+      var a = (-135 + (v - 1) / 4 * 270) * Math.PI / 180, cx = 48 + Math.sin(a) * 29, cy = 48 - Math.cos(a) * 29;
       html += '<text x="' + cx.toFixed(1) + '" y="' + (cy + 4).toFixed(1) + '" text-anchor="middle" font-family="Atkinson Hyperlegible,Verdana,sans-serif" font-size="11" font-weight="700" fill="#222">' + v + '</text>';
     });
-    for (var v = 2; v <= 10; v += 1){ var a = (-135 + (v - 2) / 8 * 270) * Math.PI / 180;
+    for (var v = 1; v <= 5; v += 0.5){ var a = (-135 + (v - 1) / 4 * 270) * Math.PI / 180;
       html += '<line x1="' + (48 + Math.sin(a) * 36).toFixed(1) + '" y1="' + (48 - Math.cos(a) * 36).toFixed(1) + '" x2="' + (48 + Math.sin(a) * 40).toFixed(1) + '" y2="' + (48 - Math.cos(a) * 40).toFixed(1) + '" stroke="#444" stroke-width="2"/>'; }
     g.innerHTML = html;
   })();
-  function setT(v){ st.T = v; $('Tv').textContent = v; $('needle').style.transform = 'rotate(' + (-135 + (v - 2) / 8 * 270) + 'deg)'; }
+  function setT(v){ st.T = v; $('Tv').textContent = v; $('needle').style.transform = 'rotate(' + (-135 + (v - 1) / 4 * 270) + 'deg)'; }
   $('T').addEventListener('input', function(){ setT(+this.value); });
-  setT(5);
+  setT(3);
 
   /* ---------- mandos ---------- */
   function press(down){ if (st.frozen) return; if (st.auto) setAuto(false); st.s1 = down; }

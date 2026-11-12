@@ -197,7 +197,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
           <button id="bS2" aria-pressed="false"><span id="bS2t">Marcha -S2</span><span class="small">mantén pulsado · tecla M</span></button>
           <button id="bS1" aria-pressed="false">Paro -S1<span class="small">tecla P</span></button>
         </div>
-        <div class="trow"><label for="T">Ruleta: T = <span id="Tv">4</span> s</label><input id="T" type="range" min="2" max="8" step="1" value="4" aria-label="Tiempo del temporizador en segundos"></div>
+        <div class="trow"><label for="T">Ruleta: T = <span id="Tv">3</span> s</label><input id="T" type="range" min="1" max="5" step="1" value="3" aria-label="Tiempo del temporizador en segundos"></div>
       </div>
     </div>
 
@@ -315,7 +315,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     logic: function(s){ var p = !s.s1 && !s.c && (s.s2 || s.km); s.km = p; s.kt = p; },
     demo: function(T){ return { seg: [['s2', 1, 1.6]], end: 1 + T + 2.4 }; },
     rows: ['s2', 'kt', 'km'], ivRow: 'kt',
-    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: el motor arranca y -KT1 empieza a contar. Pasados <b>' + T + ' s</b>, su <span class="k">55-56</span> se abre un instante y el motor <b>se para solo</b>.'; },
+    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: el motor arranca y -KT1 empieza a contar. Después de <b>' + T + ' s</b>, su <span class="k">55-56</span> se abre un instante y el motor <b>se para solo</b>.'; },
     uso: '<h2>Se para solo</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 55-56 (NC)</span></div>' +
       '<div class="cols"><div><p class="big">El temporizador hace de <b>paro automático</b>: algo funciona un tiempo fijo y se para sin que nadie toque nada.</p>' +
       '<h3>Por ejemplo</h3><ul><li>Un riego que funciona 20 segundos.</li><li>Un secamanos.</li></ul></div>' +
@@ -346,7 +346,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     logic: function(s){ var p = !s.s1 && (s.s2 || s.kt); s.kt = p; s.km = p && s.c; },
     demo: function(T){ var a = 1 + T + 2.5; return { seg: [['s2', 1, 1.6], ['s1', a, a + 0.6]], end: a + 2.2 }; },
     rows: ['s2', 's1', 'kt', 'ct', 'km'], ctTitle: '67-68 de -KT1 (NA)',
-    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: se activa -KT1, pero <b>el motor no arranca</b>. Pasados <b>' + T + ' s</b> se cierra el <span class="k">67-68</span> y el motor arranca. Sigue en marcha hasta que se pulsa el paro <b>-S1</b>.'; },
+    story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: se activa -KT1, pero <b>el motor no arranca</b>. Después de <b>' + T + ' s</b> se cierra el <span class="k">67-68</span> y el motor arranca. Sigue en marcha hasta que se pulsa el paro <b>-S1</b>.'; },
     uso: '<h2>Arranca más tarde</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 67-68 (NA)</span></div>' +
       '<div class="cols"><div><p class="big">El temporizador hace <b>esperar</b>: pulsas la marcha y lo importante arranca un rato después.</p>' +
       '<h3>Por ejemplo</h3><ul><li>Una cinta que avisa con una luz antes de arrancar.</li><li>Un segundo motor que arranca después del primero, para que no se sumen los picos de arranque.</li></ul></div>' +
@@ -414,7 +414,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
   }];
 
   /* ================= estado ================= */
-  var cur = CASES[0], st = null, ev = 'inicio', demo = null, T = 4;
+  var cur = CASES[0], st = null, ev = 'inicio', demo = null, T = 3;
   var samples = [], edges = [], ivs = [], curIv = null;
   var wires = [], flows = [];
   var latched = { s1: false, s2: false }, lastDown = {}, skipUp = {};
@@ -555,7 +555,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var s = st, n = cur.n, r = Math.max(0, Math.ceil(left - 1e-6));
     if (s.example) return '<b>Este es el cronograma de ejemplo.</b> ' + cur.story(T) + ' Pulsa <b>«Ver cómo funciona»</b> para verlo paso a paso o toca tú los pulsadores del esquema.';
     if (n === 1){
-      if (s.c) return '<b>Han pasado ' + T + ' s.</b> El <span class="k">55-56</span> de -KT1 <b>se abre</b> y corta el camino, igual que si alguien pulsara el paro. Caen -KM1 y -KT1.';
+      if (s.c) return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + '.</b> El <span class="k">55-56</span> de -KT1 <b>se abre</b> y corta el camino, igual que si alguien pulsara el paro. Caen -KM1 y -KT1.';
       if (s.km) return (ev === 'auto' ? '<b>Sigues pulsando -S2</b>: por eso ha vuelto a arrancar en cuanto el 55-56 se ha cerrado. Suéltalo. ' : '<b>-S2 activa -KM1 y, a la vez, -KT1</b>: sus bobinas van en paralelo. -KM1 se realimenta con su <span class="k">13-14</span>' + (s.s2 ? ': ya puedes soltar. ' : '. ')) +
         'El motor está en marcha y <b>-KT1 cuenta</b>: faltan <b>' + r + ' s</b>. Su <span class="k">55-56</span> sigue cerrado.';
       if (ev === 'auto') return '<b>El motor se ha parado solo.</b> Al quedarse -KT1 sin tensión, su <span class="k">55-56</span> se ha vuelto a cerrar <b>al momento</b>: todo queda listo para otra marcha.';
@@ -563,7 +563,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       return '<b>Todo en reposo.</b> Da un toque a la marcha <b>-S2</b> y espera sin tocar nada: el motor se parará solo a los ' + T + ' s.';
     }
     if (n === 2){
-      if (s.km) return '<b>Han pasado ' + T + ' s.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra <b>-KM1</b>: arranca el motor. Sigue en marcha hasta que pulses el paro <b>-S1</b>.';
+      if (s.km) return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + '.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra <b>-KM1</b>: arranca el motor. Sigue en marcha hasta que pulses el paro <b>-S1</b>.';
       if (s.kt) return '<b>-S2 activa solo la bobina de -KT1</b>, que se realimenta con su propio <span class="k">13-14</span> (es un contactor)' + (s.s2 ? ': ya puedes soltar' : '') + '. El motor <b>todavía no arranca</b>: -KT1 está contando, faltan <b>' + r + ' s</b>. Su <span class="k">67-68</span> sigue abierto.';
       if (ev === 'paroRun') return '<b>Paro -S1.</b> Se suelta -KT1: su <span class="k">67-68</span> se abre <b>al momento</b> y -KM1 cae. El motor se para.';
       if (ev === 'paroPre') return '<b>Paro -S1 antes de tiempo.</b> -KT1 se suelta y el tiempo contado <b>se pierde</b>: el motor ni ha llegado a arrancar.';
@@ -573,13 +573,13 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
       if (s.kt) return (ev === 'retrig' ? '<b>Ha vuelto la condición antes de acabar.</b> La cuenta se pone a cero: empezará otra vez cuando sueltes. ' : '<b>Hay condición</b> (-S2 pulsado). ') +
         'La bobina de -KT1 tiene tensión y su <span class="k">67-68</span> está cerrado <b>desde el primer momento</b>: -KM1 está activado y el motor, en marcha. El temporizador <b>todavía no cuenta</b>: empezará cuando sueltes.';
       if (s.timing) return '<b>Ya no hay condición.</b> La bobina de -KT1 se queda sin tensión, pero su <span class="k">67-68</span> <b>sigue cerrado</b>: el motor sigue en marcha. -KT1 cuenta: faltan <b>' + r + ' s</b>.';
-      if (ev === 'released') return '<b>Han pasado ' + T + ' s desde que soltaste.</b> El <span class="k">67-68</span> se abre y -KM1 cae. El motor ha funcionado ' + T + ' s más que la condición.';
+      if (ev === 'released') return '<b>' + (T === 1 ? 'Ha pasado 1 s' : 'Han pasado ' + T + ' s') + ' desde que soltaste.</b> El <span class="k">67-68</span> se abre y -KM1 cae. El motor ha funcionado ' + T + ' s más que la condición.';
       return '<b>Todo en reposo.</b> Mantén pulsado <b>-S2</b> (es la condición) un par de segundos, suéltalo y mira cuánto tarda en pararse el motor.';
     }
     if (s.km && s.kt) return '<b>Has aguantado ' + T + ' s.</b> El <span class="k">67-68</span> de -KT1 se cierra y entra -KM1, que se realimenta con su <span class="k">13-14</span>. <b>Ya puedes soltar.</b>';
     if (s.km) return '<b>Has soltado -S2.</b> -KT1 vuelve a reposo y su 67-68 se abre al momento, pero el motor <b>sigue en marcha</b>: -KM1 se realimenta con su <span class="k">13-14</span>. Se para con <b>-S1</b>.';
     if (s.kt) return '<b>Mientras aprietas -S2</b>, la bobina de -KT1 tiene tensión y cuenta: faltan <b>' + r + ' s</b>. Si sueltas ahora, vuelve a cero.';
-    if (ev === 'short') return '<b>Has soltado antes de ' + T + ' s.</b> -KT1 se queda sin tensión y el tiempo contado <b>se pierde</b>: el motor no ha arrancado. Hay que aguantar ' + T + ' s <b>seguidos</b>.';
+    if (ev === 'short') return '<b>Has soltado antes de ' + T + ' s.</b> -KT1 se queda sin tensión y el tiempo contado <b>se pierde</b>: el motor no ha arrancado. Hay que aguantar ' + T + ' s <b>' + (T === 1 ? 'seguido' : 'seguidos') + '</b>.';
     if (ev === 'paroRun' || s.s1) return '<b>Paro -S1.</b> Corta la realimentación: cae -KM1 y el motor se para.';
     return '<b>Todo en reposo.</b> Da un <b>toque corto</b> a -S2: no pasa nada. Después <b>mantenlo pulsado</b> más de ' + T + ' s.';
   }
