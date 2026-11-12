@@ -207,12 +207,12 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
         <button id="bDemo" class="tog" aria-pressed="false"><span id="bDemot">▶ Ver cómo funciona</span><span class="small">lo hace solo · tecla D</span></button>
         <button id="bFreeze" class="tog" aria-pressed="false"><span id="bFreezet">Congelar</span><span class="small">para el tiempo · tecla F</span></button>
       </div>
-      <div class="chartwrap"><canvas id="cv" aria-label="Cronograma de los pulsadores, de la bobina y del contacto de KT1 y del contactor KM1"></canvas></div>
+      <div class="chartwrap"><canvas id="cv" aria-label="Cronograma del caso elegido: lo que se pulsa, la bobina de KT1 y el contactor KM1"></canvas></div>
       <div class="howread">
         <span>El tiempo va de <b>izquierda a derecha</b>, en segundos.</span>
         <span><span class="sw" style="background:#555"></span>Lo que haces tú.</span>
         <span><span class="sw" style="background:#D0191C"></span>Bobina de <b>-KT1</b>.</span>
-        <span><span class="sw" style="background:#1F5FBF"></span>Su contacto temporizado.</span>
+        <span id="lgCt"><span class="sw" style="background:#1F5FBF"></span>Su contacto temporizado.</span>
         <span><span class="sw" style="background:#2E8B3E"></span>El motor.</span>
         <span><b>T</b> = el tiempo de la ruleta · <b>&lt; T</b> = no le dio tiempo.</span>
       </div>
@@ -314,7 +314,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     fClosed: function(s){ return s.km; },
     logic: function(s){ var p = !s.s1 && !s.c && (s.s2 || s.km); s.km = p; s.kt = p; },
     demo: function(T){ return { seg: [['s2', 1, 1.6]], end: 1 + T + 2.4 }; },
-    rows: ['s2', 's1', 'kt', 'ct', 'km'], ctTitle: '55-56 de -KT1 (NC)',
+    rows: ['s2', 'kt', 'km'], ivRow: 'kt',
     story: function(T){ return 'En el segundo 1 se da un toque a la marcha <b>-S2</b>: el motor arranca y -KT1 empieza a contar. Pasados <b>' + T + ' s</b>, su <span class="k">55-56</span> se abre un instante y el motor <b>se para solo</b>.'; },
     uso: '<h2>Se para solo</h2><div class="tags"><span class="tag on">a la conexión</span><span class="tag ct">su 55-56 (NC)</span></div>' +
       '<div class="cols"><div><p class="big">El temporizador hace de <b>paro automático</b>: algo funciona un tiempo fijo y se para sin que nadie toque nada.</p>' +
@@ -591,7 +591,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     s2: { t: '-S2 · marcha', hi: 'Pulsado', lo: 'Suelto', col: '#555', h: 56, a: 26, b: 46 },
     s1: { t: '-S1 · paro', hi: 'Pulsado', lo: 'Suelto', col: '#555', h: 56, a: 26, b: 46 },
     kt: { t: 'Bobina de -KT1', hi: 'Con tensión', lo: 'Sin tensión', col: '#D0191C', h: 74, a: 28, b: 58 },
-    ct: { t: '', hi: 'Cerrado', lo: 'Abierto', col: '#1F5FBF', h: 96, a: 28, b: 58, iv: true },
+    ct: { t: '', hi: 'Cerrado', lo: 'Abierto', col: '#1F5FBF', h: 96, a: 28, b: 58 },
     km: { t: '-KM1 · el motor', hi: 'En marcha', lo: 'Parado', col: '#2E8B3E', h: 74, a: 28, b: 58, band: '#EEF8EF' }
   };
   function sizeCanvas(){
@@ -615,7 +615,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     var x0 = narrow ? 92 : 112, x1 = W - 12, sp = span(), now = st.simT, tL = Math.max(0, now - sp), pps = (x1 - x0) / sp;
     var X = function(t){ return x0 + (t - tL) * pps; };
     var rows = cur.rows.map(function(k){ var r = ROWS[k], o = {}; for (var p in r) o[p] = r[p]; o.key = k; return o; });
-    rows.forEach(function(r){ if (r.key === 'ct') r.t = cur.ctTitle; if (r.key === 's2' && cur.s2Title) r.t = cur.s2Title; });
+    rows.forEach(function(r){ if (r.key === 'ct') r.t = cur.ctTitle; if (r.key === 's2' && cur.s2Title) r.t = cur.s2Title; r.iv = r.key === (cur.ivRow || 'ct'); if (r.iv) r.h = 96; });
     var sum = rows.reduce(function(a, r){ return a + r.h; }, 0), k = (H - 4 - AX) / sum, acc = 0;
     rows.forEach(function(r){
       var top = 2 + acc * k; acc += r.h; r.top = top; r.hiY = top + r.a * k; r.loY = top + r.b * k; r.bot = top + r.h * k;
@@ -641,7 +641,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     ctx.save(); ctx.beginPath(); ctx.rect(x0, 0, x1 - x0 + 2, H - AX + 1); ctx.clip();
     // líneas discontinuas en cada cambio de la bobina y del contacto
     ctx.strokeStyle = '#666'; ctx.lineWidth = 1.1; ctx.setLineDash([5, 5]);
-    edges.forEach(function(e){ var x = X(e.t); if (x < x0 - 2) return; ctx.beginPath(); ctx.moveTo(x, byKey[e.from].hiY - 6); ctx.lineTo(x, last.loY + 6); ctx.stroke(); });
+    edges.forEach(function(e){ var x = X(e.t); if (x < x0 - 2 || !byKey[e.from]) return; ctx.beginPath(); ctx.moveTo(x, byKey[e.from].hiY - 6); ctx.lineTo(x, last.loY + 6); ctx.stroke(); });
     ctx.setLineDash([]);
     // señales
     rows.forEach(function(r){
@@ -725,6 +725,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
     $('bS1').style.display = cur.hasS1 ? '' : 'none';
     $('bS2').classList.toggle('full', !cur.hasS1);
     $('bS2t').textContent = cur.s2Btn || 'Marcha -S2';
+    $('lgCt').style.display = cur.rows.indexOf('ct') < 0 ? 'none' : '';
     build(); example();
     if (user){ try { history.replaceState(null, '', '#' + cur.n); } catch(e){} }
   }
