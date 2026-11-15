@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Práctica 4 · 4.5 Dos motores con final de carrera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>:root{--paper:#fff;--bg:#EEF1F4;--ink:#1a1a1a;--muted:#56606b;--flow:#F2B400;--panel:#fff;--line:#cfd6de;--btn:#fff;box-sizing:border-box}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--panel:#1f252c;--line:#36404b;--btn:#262d35}}
+:root[data-theme="dark"]{--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--panel:#1f252c;--line:#36404b;--btn:#262d35}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:17px;line-height:1.45}
+main{max-width:1500px;margin:0 auto;padding:16px 14px 30px}
+h1{font-size:clamp(1.35rem,2.6vw,1.9rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1rem;margin:0 0 8px;color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 14px;max-width:90ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+.sheets{display:flex;gap:10px;align-items:flex-start;flex-wrap:nowrap}
+.sheet.fz{flex:0 0 clamp(180px,24%,320px)}
+.sheet.md{flex:1 1 0;min-width:0}
+@media (max-width:760px){.sheets{flex-wrap:wrap}.sheet.fz{flex-basis:100%;max-width:360px}.sheet.md{flex-basis:100%}}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:80vh}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card ul,.card ol{margin:4px 0 0;padding-left:20px}.card li{margin:4px 0}
+.below{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:1000px){.below{grid-template-columns:1fr}}
+.explain{border-left:6px solid var(--flow)}
+.explain p{margin:4px 0}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 8px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button .small{display:block;font-size:.78rem;font-weight:400;opacity:.8}
+button.b-push{border-color:#2E8B3E}button.b-push.on{background:#2E8B3E;color:#fff}
+button.b-toggle.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.b-trip{border-color:#C0392B}button.b-trip.on{background:#C0392B;color:#fff}
+button.b-q.on{background:#555;color:#fff}
+button.b-speed{width:100%;margin-top:8px}button.b-speed.on{background:#1F4E79;color:#fff}
+.leds{display:flex;flex-wrap:wrap;gap:8px 14px}
+.led{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.95rem}.led small{font-weight:400;color:var(--muted)}
+.dot{width:20px;height:20px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .15s,box-shadow .15s;--lc:#3DBB4E}
+.dot.on{background:var(--lc);box-shadow:0 0 12px var(--lc)}
+.dot.c{border-radius:4px;--lc:#FFC94D}.dot.m{--lc:#2E8B3E}
+.foot{color:var(--muted);font-size:.88rem;margin-top:12px}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+/* esquema */
+.w{stroke-width:1.9;stroke-linecap:round}
+.wf{stroke:#D0191C;opacity:.45}.wn{stroke:#1F5FBF}
+.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:3.4}
+.flow{stroke:var(--flow);stroke-width:4.5;stroke-linecap:round;stroke-dasharray:3 9;opacity:0;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-12}}
+.ct .act{display:none}.ct.on .act{display:inline}.ct.on .rest{display:none}
+.coil.on rect:first-of-type{fill:#FFE9A8}
+.glow{opacity:0;transition:opacity .15s}.glow.on{opacity:.85}
+.rotor{opacity:0}.mot.run .rotor{opacity:1;animation:spin 1s linear infinite}.mot.run.rev .rotor{animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cdt{font-weight:700;font-size:12px;fill:#9a6a00}
+.hit{cursor:pointer}.hit:focus{outline:none}
+.hb{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4}
+.hit:hover .hb,.hit:focus-visible .hb{stroke:#F2B400}
+.hit.latched .hb{fill:#FFF3C4;fill-opacity:.4;stroke:#F2B400;stroke-dasharray:none;stroke-width:3}
+@media (prefers-reduced-motion: reduce){.flow.on{animation:none;stroke-dasharray:none;opacity:.5}.mot.run .rotor{animation:none}}
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:700}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;font-size:.92rem;color:var(--muted)}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.1rem;cursor:pointer;padding:0}
+.pnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.pnav a{border:2px solid var(--line);border-radius:8px;padding:2px 10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.9rem}
+.pnav a.sel{background:#2E7D32;border-color:#2E7D32;color:#fff}
+/* índice */
+.sec{font-size:1.15rem;color:var(--ink);margin:22px 0 10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card2{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.card2:hover{border-color:#2E7D32}
+.card2 .num{flex:none;background:#1F4E79;color:#fff;font-weight:700;border-radius:8px;padding:8px 10px;min-width:52px;text-align:center}
+.card2 h2{color:var(--ink);font-size:1.05rem;margin:0 0 2px}.card2 p{margin:0;color:var(--muted);font-size:.9rem}
+.ru{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin:6px 0}
+.ru .rn{font-weight:700;white-space:nowrap}.ru .rn small{font-weight:400;color:var(--muted)}
+.ru input{width:100%;accent-color:#1F4E79}.ru b{min-width:3.2em;text-align:right}
+
+.card.ojo{grid-column:1/-1;border:2px solid #E0A100;background:#FFF6D6}
+.card.ojo h2{color:#9A6B00}
+[data-theme="dark"] .card.ojo{background:#3A3115;border-color:#C99A1E}
+[data-theme="dark"] .card.ojo h2{color:#F2C94C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .card.ojo{background:#3A3115;border-color:#C99A1E}:root:not([data-theme="light"]) .card.ojo h2{color:#F2C94C}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Práctica 4</a><span class="sep">›</span><b>4.5 Dos motores con final de carrera</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="pnav"><a href="p4_1_bomba_riego.html">4.1</a> <a href="p4_2_paro_automatico.html">4.2</a> <a href="p4_3_cinta_aviso.html">4.3</a> <a href="p4_4_ventilador.html">4.4</a> <a href="p4_5_dos_motores_fc.html" class="sel">4.5</a> <a href="p4_6_escalera_emergencia.html">4.6</a> <a href="p4_7_tres_motores.html">4.7</a> <a href="p4_8_baliza.html">4.8</a></nav>
+  <h1>4.5 Dos motores con final de carrera</h1>
+  <p class="sub">-M1 arranca con -S2 o con -FC1 y queda realimentado. A los 20 s arranca -M2 y, 30 s después, se para todo. -S1 para todo. En la animación, los tiempos se regulan con las ruletas, de 1 a 5 s.</p>
+  <div class="grid">
+    <div class="sheets"><div class="sheet fz"><svg viewBox="6 0 372 361" xmlns="http://www.w3.org/2000/svg" font-family="Atkinson Hyperlegible,Verdana,sans-serif"><defs><marker id="Farr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2E8B3E"/></marker></defs><g class="wires"><line id="Fw0" class="w wf" x1="104.0" y1="16.0" x2="104.0" y2="28.0"/>
+<line id="Ffw0" class="flow" x1="104.0" y1="16.0" x2="104.0" y2="28.0"/>
+<line id="Fw1" class="w wf" x1="128.0" y1="16.0" x2="128.0" y2="28.0"/>
+<line id="Ffw1" class="flow" x1="128.0" y1="16.0" x2="128.0" y2="28.0"/>
+<line id="Fw2" class="w wf" x1="152.0" y1="16.0" x2="152.0" y2="28.0"/>
+<line id="Ffw2" class="flow" x1="152.0" y1="16.0" x2="152.0" y2="28.0"/>
+<line id="Fw3" class="w wf" x1="104.0" y1="104.0" x2="104.0" y2="122.0"/>
+<line id="Ffw3" class="flow" x1="104.0" y1="104.0" x2="104.0" y2="122.0"/>
+<line id="Fw4" class="w wf" x1="104.0" y1="122.0" x2="104.0" y2="166.0"/>
+<line id="Ffw4" class="flow" x1="104.0" y1="122.0" x2="104.0" y2="166.0"/>
+<line id="Fw5" class="w wf" x1="104.0" y1="122.0" x2="280.0" y2="122.0"/>
+<line id="Ffw5" class="flow" x1="104.0" y1="122.0" x2="280.0" y2="122.0"/>
+<line id="Fw6" class="w wf" x1="280.0" y1="122.0" x2="280.0" y2="166.0"/>
+<line id="Ffw6" class="flow" x1="280.0" y1="122.0" x2="280.0" y2="166.0"/>
+<line id="Fw7" class="w wf" x1="128.0" y1="104.0" x2="128.0" y2="134.0"/>
+<line id="Ffw7" class="flow" x1="128.0" y1="104.0" x2="128.0" y2="134.0"/>
+<line id="Fw8" class="w wf" x1="128.0" y1="134.0" x2="128.0" y2="166.0"/>
+<line id="Ffw8" class="flow" x1="128.0" y1="134.0" x2="128.0" y2="166.0"/>
+<line id="Fw9" class="w wf" x1="128.0" y1="134.0" x2="304.0" y2="134.0"/>
+<line id="Ffw9" class="flow" x1="128.0" y1="134.0" x2="304.0" y2="134.0"/>
+<line id="Fw10" class="w wf" x1="304.0" y1="134.0" x2="304.0" y2="166.0"/>
+<line id="Ffw10" class="flow" x1="304.0" y1="134.0" x2="304.0" y2="166.0"/>
+<line id="Fw11" class="w wf" x1="152.0" y1="104.0" x2="152.0" y2="146.0"/>
+<line id="Ffw11" class="flow" x1="152.0" y1="104.0" x2="152.0" y2="146.0"/>
+<line id="Fw12" class="w wf" x1="152.0" y1="146.0" x2="152.0" y2="166.0"/>
+<line id="Ffw12" class="flow" x1="152.0" y1="146.0" x2="152.0" y2="166.0"/>
+<line id="Fw13" class="w wf" x1="152.0" y1="146.0" x2="328.0" y2="146.0"/>
+<line id="Ffw13" class="flow" x1="152.0" y1="146.0" x2="328.0" y2="146.0"/>
+<line id="Fw14" class="w wf" x1="328.0" y1="146.0" x2="328.0" y2="166.0"/>
+<line id="Ffw14" class="flow" x1="328.0" y1="146.0" x2="328.0" y2="166.0"/>
+<line id="Fw15" class="w wf" x1="104.0" y1="191.7" x2="104.0" y2="211.7"/>
+<line id="Ffw15" class="flow" x1="104.0" y1="191.7" x2="104.0" y2="211.7"/>
+<line id="Fw16" class="w wf" x1="128.0" y1="191.7" x2="128.0" y2="211.7"/>
+<line id="Ffw16" class="flow" x1="128.0" y1="191.7" x2="128.0" y2="211.7"/>
+<line id="Fw17" class="w wf" x1="152.0" y1="191.7" x2="152.0" y2="211.7"/>
+<line id="Ffw17" class="flow" x1="152.0" y1="191.7" x2="152.0" y2="211.7"/>
+<line id="Fw18" class="w wf" x1="104.0" y1="247.7" x2="104.0" y2="267.7"/>
+<line id="Ffw18" class="flow" x1="104.0" y1="247.7" x2="104.0" y2="267.7"/>
+<line id="Fw19" class="w wf" x1="128.0" y1="247.7" x2="128.0" y2="267.7"/>
+<line id="Ffw19" class="flow" x1="128.0" y1="247.7" x2="128.0" y2="267.7"/>
+<line id="Fw20" class="w wf" x1="152.0" y1="247.7" x2="152.0" y2="267.7"/>
+<line id="Ffw20" class="flow" x1="152.0" y1="247.7" x2="152.0" y2="267.7"/>
+<line id="Fw21" class="w wf" x1="104.0" y1="271.7" x2="104.0" y2="289.7"/>
+<line id="Ffw21" class="flow" x1="104.0" y1="271.7" x2="104.0" y2="289.7"/>
+<line id="Fw22" class="w wf" x1="104.0" y1="289.7" x2="111.4" y2="318.0"/>
+<line id="Ffw22" class="flow" x1="104.0" y1="289.7" x2="111.4" y2="318.0"/>
+<line id="Fw23" class="w wf" x1="128.0" y1="271.7" x2="128.0" y2="311.7"/>
+<line id="Ffw23" class="flow" x1="128.0" y1="271.7" x2="128.0" y2="311.7"/>
+<line id="Fw24" class="w wf" x1="152.0" y1="271.7" x2="152.0" y2="289.7"/>
+<line id="Ffw24" class="flow" x1="152.0" y1="271.7" x2="152.0" y2="289.7"/>
+<line id="Fw25" class="w wf" x1="152.0" y1="289.7" x2="144.6" y2="318.0"/>
+<line id="Ffw25" class="flow" x1="152.0" y1="289.7" x2="144.6" y2="318.0"/>
+<line id="Fw26" class="w wf" x1="280.0" y1="191.7" x2="280.0" y2="211.7"/>
+<line id="Ffw26" class="flow" x1="280.0" y1="191.7" x2="280.0" y2="211.7"/>
+<line id="Fw27" class="w wf" x1="304.0" y1="191.7" x2="304.0" y2="211.7"/>
+<line id="Ffw27" class="flow" x1="304.0" y1="191.7" x2="304.0" y2="211.7"/>
+<line id="Fw28" class="w wf" x1="328.0" y1="191.7" x2="328.0" y2="211.7"/>
+<line id="Ffw28" class="flow" x1="328.0" y1="191.7" x2="328.0" y2="211.7"/>
+<line id="Fw29" class="w wf" x1="280.0" y1="247.7" x2="280.0" y2="267.7"/>
+<line id="Ffw29" class="flow" x1="280.0" y1="247.7" x2="280.0" y2="267.7"/>
+<line id="Fw30" class="w wf" x1="304.0" y1="247.7" x2="304.0" y2="267.7"/>
+<line id="Ffw30" class="flow" x1="304.0" y1="247.7" x2="304.0" y2="267.7"/>
+<line id="Fw31" class="w wf" x1="328.0" y1="247.7" x2="328.0" y2="267.7"/>
+<line id="Ffw31" class="flow" x1="328.0" y1="247.7" x2="328.0" y2="267.7"/>
+<line id="Fw32" class="w wf" x1="280.0" y1="271.7" x2="280.0" y2="289.7"/>
+<line id="Ffw32" class="flow" x1="280.0" y1="271.7" x2="280.0" y2="289.7"/>
+<line id="Fw33" class="w wf" x1="280.0" y1="289.7" x2="287.4" y2="318.0"/>
+<line id="Ffw33" class="flow" x1="280.0" y1="289.7" x2="287.4" y2="318.0"/>
+<line id="Fw34" class="w wf" x1="304.0" y1="271.7" x2="304.0" y2="311.7"/>
+<line id="Ffw34" class="flow" x1="304.0" y1="271.7" x2="304.0" y2="311.7"/>
+<line id="Fw35" class="w wf" x1="328.0" y1="271.7" x2="328.0" y2="289.7"/>
+<line id="Ffw35" class="flow" x1="328.0" y1="271.7" x2="328.0" y2="289.7"/>
+<line id="Fw36" class="w wf" x1="328.0" y1="289.7" x2="320.6" y2="318.0"/>
+<line id="Ffw36" class="flow" x1="328.0" y1="289.7" x2="320.6" y2="318.0"/></g><text x="104.0" y="8.9" font-size="11.6" text-anchor="middle" fill="#111111" font-weight="700">L1</text>
+<text x="128.0" y="8.9" font-size="11.6" text-anchor="middle" fill="#111111" font-weight="700">L2</text>
+<text x="152.0" y="8.9" font-size="11.6" text-anchor="middle" fill="#111111" font-weight="700">L3</text>
+<g class="hit" data-dev="-Q1" data-hit="toggle">
+<g id="Fc1" class="ct" data-dev="-Q1">
+<g class="rest">
+<polyline points="104.0,53.7 90.9,27.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="104.0,53.7 104.0,28.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<polyline points="87.7,30.4 94.1,24.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="87.7,24.0 94.1,30.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,53.7 104.0,59.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="97.2" y="59.7" width="13.6" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="104.0,59.7 104.0,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,64.5 108.4,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="108.4,64.5 108.4,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="108.4,73.3 104.0,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,73.3 104.0,78.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,78.1 104.0,82.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="97.2" y="82.9" width="13.6" height="16.8" fill="none" stroke="#111111" stroke-width="1.98"/>
+<text x="104.0" y="94.3" font-size="8.7" text-anchor="middle" fill="#111111" font-weight="700">I&gt;</text>
+<polyline points="104.0,99.7 104.0,104.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="107.6" y="25.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="107.6" y="113.2" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<g id="Fc2" class="ct" data-dev="-Q1">
+<g class="rest">
+<polyline points="128.0,53.7 114.9,27.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="128.0,53.7 128.0,28.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<polyline points="111.7,30.4 118.1,24.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="111.7,24.0 118.1,30.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,53.7 128.0,59.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="121.2" y="59.7" width="13.6" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="128.0,59.7 128.0,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,64.5 132.4,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="132.4,64.5 132.4,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="132.4,73.3 128.0,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,73.3 128.0,78.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,78.1 128.0,82.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="121.2" y="82.9" width="13.6" height="16.8" fill="none" stroke="#111111" stroke-width="1.98"/>
+<text x="128.0" y="94.3" font-size="8.7" text-anchor="middle" fill="#111111" font-weight="700">I&gt;</text>
+<polyline points="128.0,99.7 128.0,104.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="131.6" y="25.2" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="131.6" y="113.2" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+<g id="Fc3" class="ct" data-dev="-Q1">
+<g class="rest">
+<polyline points="152.0,53.7 138.9,27.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="152.0,53.7 152.0,28.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<polyline points="135.7,30.4 142.1,24.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="135.7,24.0 142.1,30.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,53.7 152.0,59.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="145.2" y="59.7" width="13.6" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="152.0,59.7 152.0,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,64.5 156.4,64.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="156.4,64.5 156.4,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="156.4,73.3 152.0,73.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,73.3 152.0,78.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,78.1 152.0,82.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="145.2" y="82.9" width="13.6" height="16.8" fill="none" stroke="#111111" stroke-width="1.98"/>
+<text x="152.0" y="94.3" font-size="8.7" text-anchor="middle" fill="#111111" font-weight="700">I&gt;</text>
+<polyline points="152.0,99.7 152.0,104.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="155.6" y="25.2" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<text x="155.6" y="113.2" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+<polyline points="77.5,40.8 145.5,40.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="66.0" y="44.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-Q1</text>
+</g>
+<circle cx="104.0" cy="122.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="128.0" cy="134.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="152.0" cy="146.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Fc4" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="104.0,191.7 90.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M99.9 167.5 A4.4 4.4 0 0 0 108.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="104.0,191.7 104.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M99.9 167.5 A4.4 4.4 0 0 0 108.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="107.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="107.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+</g>
+<g id="Fc5" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="128.0,191.7 114.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M123.9 167.5 A4.4 4.4 0 0 0 132.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="128.0,191.7 128.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M123.9 167.5 A4.4 4.4 0 0 0 132.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="131.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="131.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+</g>
+<g id="Fc6" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="152.0,191.7 138.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M147.9 167.5 A4.4 4.4 0 0 0 156.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="152.0,191.7 152.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M147.9 167.5 A4.4 4.4 0 0 0 156.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="155.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<text x="155.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+</g>
+<polyline points="77.5,178.8 145.5,178.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="80.0" y="182.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM1</text>
+<g class="hit" data-dev="-F1" data-hit="trip">
+<polyline points="104.0,211.7 104.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,238.9 104.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="96.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="104.0,220.5 104.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,225.3 108.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="108.4,225.3 108.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="108.4,234.1 104.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="104.0,234.1 104.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="107.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="107.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<polyline points="128.0,211.7 128.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,238.9 128.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="120.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="128.0,220.5 128.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,225.3 132.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="132.4,225.3 132.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="132.4,234.1 128.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="128.0,234.1 128.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="131.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="131.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+<polyline points="152.0,211.7 152.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,238.9 152.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="144.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="152.0,220.5 152.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,225.3 156.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="156.4,225.3 156.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="156.4,234.1 152.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,234.1 152.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="155.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<text x="155.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+<polyline points="82.0,229.7 144.8,229.7" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="78.0" y="233.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F1</text>
+</g>
+<circle cx="104.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="109.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<circle cx="128.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="133.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<circle cx="152.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="157.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="86.0" y="271.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-X1</text>
+<g id="Fm7" class="mot" data-dev="-M1">
+<text x="107.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">U1</text>
+<text x="131.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">V1</text>
+<text x="155.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">W1</text>
+<circle cx="128.0" cy="336.5" r="24.8" fill="#ffffff" stroke="#111111" stroke-width="2.26"/>
+<text x="128.0" y="337.1" font-size="15.5" text-anchor="middle" fill="#111111" font-weight="700">M</text>
+<text x="128.0" y="351.0" font-size="10.6" text-anchor="middle" fill="#111111">3~</text>
+<text x="50.0" y="340.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-M1</text>
+<g class="rotor" style="transform-origin:128.0px 336.5px"><path d="M109.4 332.7 A19.8 19.8 0 0 1 133.0 316.6" fill="none" stroke="#2E8B3E" stroke-width="3" marker-end="url(#Farr)"/></g>
+</g>
+<g id="Fc8" class="ct" data-dev="-KM2">
+<g class="rest">
+<polyline points="280.0,191.7 266.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M275.9 167.5 A4.4 4.4 0 0 0 284.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="280.0,191.7 280.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M275.9 167.5 A4.4 4.4 0 0 0 284.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="283.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="283.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+</g>
+<g id="Fc9" class="ct" data-dev="-KM2">
+<g class="rest">
+<polyline points="304.0,191.7 290.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M299.9 167.5 A4.4 4.4 0 0 0 308.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="304.0,191.7 304.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M299.9 167.5 A4.4 4.4 0 0 0 308.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="307.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="307.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+</g>
+<g id="Fc10" class="ct" data-dev="-KM2">
+<g class="rest">
+<polyline points="328.0,191.7 314.9,165.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M323.9 167.5 A4.4 4.4 0 0 0 332.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<g class="act">
+<polyline points="328.0,191.7 328.0,166.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M323.9 167.5 A4.4 4.4 0 0 0 332.1 167.5" fill="none" stroke="#111111" stroke-width="1.98"/>
+</g>
+<text x="331.6" y="163.2" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<text x="331.6" y="200.9" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+</g>
+<polyline points="253.5,178.8 321.5,178.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="256.0" y="182.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM2</text>
+<g class="hit" data-dev="-F2" data-hit="trip">
+<polyline points="280.0,211.7 280.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="280.0,238.9 280.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="272.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="280.0,220.5 280.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="280.0,225.3 284.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="284.4,225.3 284.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="284.4,234.1 280.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="280.0,234.1 280.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="283.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="283.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<polyline points="304.0,211.7 304.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="304.0,238.9 304.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="296.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="304.0,220.5 304.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="304.0,225.3 308.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="308.4,225.3 308.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="308.4,234.1 304.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="304.0,234.1 304.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="307.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="307.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+<polyline points="328.0,211.7 328.0,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="328.0,238.9 328.0,247.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="320.8" y="220.5" width="14.4" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="328.0,220.5 328.0,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="328.0,225.3 332.4,225.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="332.4,225.3 332.4,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="332.4,234.1 328.0,234.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="328.0,234.1 328.0,238.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="331.6" y="208.9" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<text x="331.6" y="256.9" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+<polyline points="258.0,229.7 320.8,229.7" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="254.0" y="233.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F2</text>
+</g>
+<circle cx="280.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="285.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+<circle cx="304.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="309.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">5</text>
+<circle cx="328.0" cy="267.7" r="4.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="333.6" y="271.1" font-size="9.9" text-anchor="start" fill="#111111">6</text>
+<text x="262.0" y="271.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-X1</text>
+<g id="Fm11" class="mot" data-dev="-M2">
+<text x="283.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">U1</text>
+<text x="307.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">V1</text>
+<text x="331.2" y="284.1" font-size="9.0" text-anchor="start" fill="#111111">W1</text>
+<circle cx="304.0" cy="336.5" r="24.8" fill="#ffffff" stroke="#111111" stroke-width="2.26"/>
+<text x="304.0" y="337.1" font-size="15.5" text-anchor="middle" fill="#111111" font-weight="700">M</text>
+<text x="304.0" y="351.0" font-size="10.6" text-anchor="middle" fill="#111111">3~</text>
+<text x="226.0" y="340.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-M2</text>
+<g class="rotor" style="transform-origin:304.0px 336.5px"><path d="M285.4 332.7 A19.8 19.8 0 0 1 309.0 316.6" fill="none" stroke="#2E8B3E" stroke-width="3" marker-end="url(#Farr)"/></g>
+</g></svg></div><div class="sheet md"><svg viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg" font-family="Atkinson Hyperlegible,Verdana,sans-serif"><defs><marker id="Marr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2E8B3E"/></marker></defs><g class="wires"><line id="Mw0" class="w wf" x1="92.0" y1="20.0" x2="92.0" y2="28.0"/>
+<line id="Mfw0" class="flow" x1="92.0" y1="20.0" x2="92.0" y2="28.0"/>
+<line id="Mw1" class="w wf" x1="92.0" y1="28.0" x2="92.0" y2="48.0"/>
+<line id="Mfw1" class="flow" x1="92.0" y1="28.0" x2="92.0" y2="48.0"/>
+<line id="Mw2" class="w wf" x1="92.0" y1="124.0" x2="92.0" y2="130.0"/>
+<line id="Mfw2" class="flow" x1="92.0" y1="124.0" x2="92.0" y2="130.0"/>
+<line id="Mw3" class="w wf" x1="92.0" y1="130.0" x2="92.0" y2="150.0"/>
+<line id="Mfw3" class="flow" x1="92.0" y1="130.0" x2="92.0" y2="150.0"/>
+<line id="Mw4" class="w wf" x1="92.0" y1="175.7" x2="92.0" y2="195.7"/>
+<line id="Mfw4" class="flow" x1="92.0" y1="175.7" x2="92.0" y2="195.7"/>
+<line id="Mw5" class="w wf" x1="92.0" y1="221.3" x2="92.0" y2="241.3"/>
+<line id="Mfw5" class="flow" x1="92.0" y1="221.3" x2="92.0" y2="241.3"/>
+<line id="Mw6" class="w wf" x1="92.0" y1="267.0" x2="92.0" y2="287.0"/>
+<line id="Mfw6" class="flow" x1="92.0" y1="267.0" x2="92.0" y2="287.0"/>
+<line id="Mw7" class="w wf" x1="92.0" y1="312.6" x2="92.0" y2="324.6"/>
+<line id="Mfw7" class="flow" x1="92.0" y1="312.6" x2="92.0" y2="324.6"/>
+<line id="Mw8" class="w wf" x1="92.0" y1="324.6" x2="180.0" y2="324.6"/>
+<line id="Mfw8" class="flow" x1="92.0" y1="324.6" x2="180.0" y2="324.6"/>
+<line id="Mw9" class="w wf" x1="180.0" y1="324.6" x2="244.0" y2="324.6"/>
+<line id="Mfw9" class="flow" x1="180.0" y1="324.6" x2="244.0" y2="324.6"/>
+<line id="Mw10" class="w wf" x1="92.0" y1="324.6" x2="92.0" y2="344.6"/>
+<line id="Mfw10" class="flow" x1="92.0" y1="324.6" x2="92.0" y2="344.6"/>
+<line id="Mw11" class="w wf" x1="92.0" y1="370.3" x2="92.0" y2="386.6"/>
+<line id="Mfw11" class="flow" x1="92.0" y1="370.3" x2="92.0" y2="386.6"/>
+<line id="Mw12" class="w wf" x1="180.0" y1="324.6" x2="180.0" y2="344.6"/>
+<line id="Mfw12" class="flow" x1="180.0" y1="324.6" x2="180.0" y2="344.6"/>
+<line id="Mw13" class="w wf" x1="180.0" y1="370.3" x2="180.0" y2="386.6"/>
+<line id="Mfw13" class="flow" x1="180.0" y1="370.3" x2="180.0" y2="386.6"/>
+<line id="Mw14" class="w wf" x1="244.0" y1="324.6" x2="244.0" y2="344.6"/>
+<line id="Mfw14" class="flow" x1="244.0" y1="324.6" x2="244.0" y2="344.6"/>
+<line id="Mw15" class="w wf" x1="244.0" y1="370.3" x2="244.0" y2="386.6"/>
+<line id="Mfw15" class="flow" x1="244.0" y1="370.3" x2="244.0" y2="386.6"/>
+<line id="Mw16" class="w wf" x1="92.0" y1="386.6" x2="180.0" y2="386.6"/>
+<line id="Mfw16" class="flow" x1="92.0" y1="386.6" x2="180.0" y2="386.6"/>
+<line id="Mw17" class="w wf" x1="180.0" y1="386.6" x2="244.0" y2="386.6"/>
+<line id="Mfw17" class="flow" x1="180.0" y1="386.6" x2="244.0" y2="386.6"/>
+<line id="Mw18" class="w wf" x1="244.0" y1="386.6" x2="316.0" y2="386.6"/>
+<line id="Mfw18" class="flow" x1="244.0" y1="386.6" x2="316.0" y2="386.6"/>
+<line id="Mw19" class="w wf" x1="316.0" y1="386.6" x2="400.0" y2="386.6"/>
+<line id="Mfw19" class="flow" x1="316.0" y1="386.6" x2="400.0" y2="386.6"/>
+<line id="Mw20" class="w wf" x1="400.0" y1="386.6" x2="400.0" y2="406.6"/>
+<line id="Mfw20" class="flow" x1="400.0" y1="386.6" x2="400.0" y2="406.6"/>
+<line id="Mw21" class="w wf" x1="400.0" y1="444.3" x2="480.0" y2="444.3"/>
+<line id="Mfw21" class="flow" x1="400.0" y1="444.3" x2="480.0" y2="444.3"/>
+<line id="Mw22" class="w wf" x1="400.0" y1="432.3" x2="400.0" y2="444.3"/>
+<line id="Mfw22" class="flow" x1="400.0" y1="432.3" x2="400.0" y2="444.3"/>
+<line id="Mw23" class="w wf" x1="92.0" y1="130.0" x2="544.0" y2="130.0"/>
+<line id="Mfw23" class="flow" x1="92.0" y1="130.0" x2="544.0" y2="130.0"/>
+<line id="Mw24" class="w wf" x1="544.0" y1="130.0" x2="620.0" y2="130.0"/>
+<line id="Mfw24" class="flow" x1="544.0" y1="130.0" x2="620.0" y2="130.0"/>
+<line id="Mw25" class="w wf" x1="620.0" y1="130.0" x2="696.0" y2="130.0"/>
+<line id="Mfw25" class="flow" x1="620.0" y1="130.0" x2="696.0" y2="130.0"/>
+<line id="Mw26" class="w wf" x1="696.0" y1="130.0" x2="772.0" y2="130.0"/>
+<line id="Mfw26" class="flow" x1="696.0" y1="130.0" x2="772.0" y2="130.0"/>
+<line id="Mw27" class="w wf" x1="772.0" y1="130.0" x2="848.0" y2="130.0"/>
+<line id="Mfw27" class="flow" x1="772.0" y1="130.0" x2="848.0" y2="130.0"/>
+<line id="Mw28" class="w wf" x1="544.0" y1="130.0" x2="544.0" y2="150.0"/>
+<line id="Mfw28" class="flow" x1="544.0" y1="130.0" x2="544.0" y2="150.0"/>
+<line id="Mw29" class="w wf" x1="620.0" y1="130.0" x2="620.0" y2="150.0"/>
+<line id="Mfw29" class="flow" x1="620.0" y1="130.0" x2="620.0" y2="150.0"/>
+<line id="Mw30" class="w wf" x1="696.0" y1="130.0" x2="696.0" y2="150.0"/>
+<line id="Mfw30" class="flow" x1="696.0" y1="130.0" x2="696.0" y2="150.0"/>
+<line id="Mw31" class="w wf" x1="696.0" y1="175.7" x2="696.0" y2="195.7"/>
+<line id="Mfw31" class="flow" x1="696.0" y1="175.7" x2="696.0" y2="195.7"/>
+<line id="Mw32" class="w wf" x1="772.0" y1="130.0" x2="772.0" y2="150.0"/>
+<line id="Mfw32" class="flow" x1="772.0" y1="130.0" x2="772.0" y2="150.0"/>
+<line id="Mw33" class="w wf" x1="848.0" y1="130.0" x2="848.0" y2="150.0"/>
+<line id="Mfw33" class="flow" x1="848.0" y1="130.0" x2="848.0" y2="150.0"/>
+<line id="Mw34" class="w wf" x1="92.0" y1="386.6" x2="92.0" y2="476.3"/>
+<line id="Mfw34" class="flow" x1="92.0" y1="386.6" x2="92.0" y2="476.3"/>
+<line id="Mw35" class="w wn" x1="92.0" y1="504.3" x2="92.0" y2="526.3"/>
+<line id="Mfw35" class="flow" x1="92.0" y1="504.3" x2="92.0" y2="526.3"/>
+<line id="Mw36" class="w wf" x1="316.0" y1="386.6" x2="316.0" y2="476.3"/>
+<line id="Mfw36" class="flow" x1="316.0" y1="386.6" x2="316.0" y2="476.3"/>
+<line id="Mw37" class="w wn" x1="316.0" y1="504.3" x2="316.0" y2="526.3"/>
+<line id="Mfw37" class="flow" x1="316.0" y1="504.3" x2="316.0" y2="526.3"/>
+<line id="Mw38" class="w wf" x1="400.0" y1="444.3" x2="400.0" y2="476.3"/>
+<line id="Mfw38" class="flow" x1="400.0" y1="444.3" x2="400.0" y2="476.3"/>
+<line id="Mw39" class="w wn" x1="400.0" y1="504.3" x2="400.0" y2="526.3"/>
+<line id="Mfw39" class="flow" x1="400.0" y1="504.3" x2="400.0" y2="526.3"/>
+<line id="Mw40" class="w wf" x1="480.0" y1="444.3" x2="480.0" y2="476.3"/>
+<line id="Mfw40" class="flow" x1="480.0" y1="444.3" x2="480.0" y2="476.3"/>
+<line id="Mw41" class="w wn" x1="480.0" y1="504.3" x2="480.0" y2="526.3"/>
+<line id="Mfw41" class="flow" x1="480.0" y1="504.3" x2="480.0" y2="526.3"/>
+<line id="Mw42" class="w wf" x1="544.0" y1="175.7" x2="544.0" y2="476.3"/>
+<line id="Mfw42" class="flow" x1="544.0" y1="175.7" x2="544.0" y2="476.3"/>
+<line id="Mw43" class="w wn" x1="544.0" y1="500.3" x2="544.0" y2="526.3"/>
+<line id="Mfw43" class="flow" x1="544.0" y1="500.3" x2="544.0" y2="526.3"/>
+<line id="Mw44" class="w wf" x1="620.0" y1="175.7" x2="620.0" y2="476.3"/>
+<line id="Mfw44" class="flow" x1="620.0" y1="175.7" x2="620.0" y2="476.3"/>
+<line id="Mw45" class="w wn" x1="620.0" y1="500.3" x2="620.0" y2="526.3"/>
+<line id="Mfw45" class="flow" x1="620.0" y1="500.3" x2="620.0" y2="526.3"/>
+<line id="Mw46" class="w wf" x1="696.0" y1="221.3" x2="696.0" y2="476.3"/>
+<line id="Mfw46" class="flow" x1="696.0" y1="221.3" x2="696.0" y2="476.3"/>
+<line id="Mw47" class="w wn" x1="696.0" y1="500.3" x2="696.0" y2="526.3"/>
+<line id="Mfw47" class="flow" x1="696.0" y1="500.3" x2="696.0" y2="526.3"/>
+<line id="Mw48" class="w wf" x1="772.0" y1="175.7" x2="772.0" y2="476.3"/>
+<line id="Mfw48" class="flow" x1="772.0" y1="175.7" x2="772.0" y2="476.3"/>
+<line id="Mw49" class="w wn" x1="772.0" y1="500.3" x2="772.0" y2="526.3"/>
+<line id="Mfw49" class="flow" x1="772.0" y1="500.3" x2="772.0" y2="526.3"/>
+<line id="Mw50" class="w wf" x1="848.0" y1="175.7" x2="848.0" y2="476.3"/>
+<line id="Mfw50" class="flow" x1="848.0" y1="175.7" x2="848.0" y2="476.3"/>
+<line id="Mw51" class="w wn" x1="848.0" y1="500.3" x2="848.0" y2="526.3"/>
+<line id="Mfw51" class="flow" x1="848.0" y1="500.3" x2="848.0" y2="526.3"/>
+<line id="Mw52" class="w wn" x1="36.0" y1="526.3" x2="92.0" y2="526.3"/>
+<line id="Mfw52" class="flow" x1="36.0" y1="526.3" x2="92.0" y2="526.3"/>
+<line id="Mw53" class="w wn" x1="92.0" y1="526.3" x2="316.0" y2="526.3"/>
+<line id="Mfw53" class="flow" x1="92.0" y1="526.3" x2="316.0" y2="526.3"/>
+<line id="Mw54" class="w wn" x1="316.0" y1="526.3" x2="400.0" y2="526.3"/>
+<line id="Mfw54" class="flow" x1="316.0" y1="526.3" x2="400.0" y2="526.3"/>
+<line id="Mw55" class="w wn" x1="400.0" y1="526.3" x2="480.0" y2="526.3"/>
+<line id="Mfw55" class="flow" x1="400.0" y1="526.3" x2="480.0" y2="526.3"/>
+<line id="Mw56" class="w wn" x1="480.0" y1="526.3" x2="544.0" y2="526.3"/>
+<line id="Mfw56" class="flow" x1="480.0" y1="526.3" x2="544.0" y2="526.3"/>
+<line id="Mw57" class="w wn" x1="544.0" y1="526.3" x2="620.0" y2="526.3"/>
+<line id="Mfw57" class="flow" x1="544.0" y1="526.3" x2="620.0" y2="526.3"/>
+<line id="Mw58" class="w wn" x1="620.0" y1="526.3" x2="696.0" y2="526.3"/>
+<line id="Mfw58" class="flow" x1="620.0" y1="526.3" x2="696.0" y2="526.3"/>
+<line id="Mw59" class="w wn" x1="696.0" y1="526.3" x2="772.0" y2="526.3"/>
+<line id="Mfw59" class="flow" x1="696.0" y1="526.3" x2="772.0" y2="526.3"/>
+<line id="Mw60" class="w wn" x1="772.0" y1="526.3" x2="848.0" y2="526.3"/>
+<line id="Mfw60" class="flow" x1="772.0" y1="526.3" x2="848.0" y2="526.3"/></g><text x="92.0" y="14.2" font-size="12.0" text-anchor="middle" fill="#111111" font-weight="700">L</text>
+<g class="hit" data-dev="-Q2" data-hit="toggle">
+<g id="Mc1" class="ct" data-dev="-Q2">
+<g class="rest">
+<polyline points="92.0,73.7 78.9,47.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,73.7 92.0,48.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<polyline points="75.7,50.4 82.1,44.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="75.7,44.0 82.1,50.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,73.7 92.0,79.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="85.2" y="79.7" width="13.6" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="92.0,79.7 92.0,84.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,84.5 96.4,84.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="96.4,84.5 96.4,93.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="96.4,93.3 92.0,93.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,93.3 92.0,98.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,98.1 92.0,102.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="85.2" y="102.9" width="13.6" height="16.8" fill="none" stroke="#111111" stroke-width="1.98"/>
+<text x="92.0" y="114.3" font-size="8.7" text-anchor="middle" fill="#111111" font-weight="700">I&gt;</text>
+<polyline points="92.0,119.7 92.0,124.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="95.6" y="45.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="95.6" y="133.2" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<polyline points="65.5,60.8 85.5,60.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="54.0" y="64.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-Q2</text>
+</g>
+<g class="hit" data-dev="-F1" data-hit="trip">
+<g id="Mc2" class="ct" data-dev="-F1">
+<g class="rest">
+<polyline points="92.0,150.0 109.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,175.7 105.1,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,150.0 109.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,175.7 78.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">95</text>
+<text x="95.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">96</text>
+</g>
+<rect x="48.0" y="154.8" width="12.0" height="16.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="54.0,154.8 54.0,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="54.0,158.4 58.4,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.4,158.4 58.4,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.4,167.2 54.0,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="54.0,167.2 54.0,170.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60.0,162.8 98.5,162.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="44.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F1</text>
+</g>
+<g class="hit" data-dev="-F2" data-hit="trip">
+<g id="Mc3" class="ct" data-dev="-F2">
+<g class="rest">
+<polyline points="92.0,195.7 109.9,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,221.3 105.1,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,195.7 109.9,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,221.3 78.9,194.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="192.9" font-size="9.9" text-anchor="start" fill="#111111">95</text>
+<text x="95.6" y="230.5" font-size="9.9" text-anchor="start" fill="#111111">96</text>
+</g>
+<rect x="48.0" y="200.5" width="12.0" height="16.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="54.0,200.5 54.0,204.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="54.0,204.1 58.4,204.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.4,204.1 58.4,212.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.4,212.9 54.0,212.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="54.0,212.9 54.0,216.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="60.0,208.5 98.5,208.5" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="44.0" y="212.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F2</text>
+</g>
+<g class="hit" data-dev="-S1" data-hit="push">
+<g id="Mc4" class="ct" data-dev="-S1">
+<g class="rest">
+<polyline points="92.0,241.3 109.9,241.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,267.0 105.1,241.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,241.3 109.9,241.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,267.0 78.9,240.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="238.5" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="95.6" y="276.2" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+</g>
+<polyline points="50.0,261.0 50.0,247.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="50.0,254.2 58.8,254.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.8,254.2 98.5,254.2" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="45.2" y="258.2" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-S1</text>
+<rect class="hb" x="24.0" y="235.3" width="80.0" height="37.7" rx="6"/>
+</g>
+<g id="Mc5" class="ct" data-dev="-KT2">
+<g class="rest">
+<polyline points="92.0,287.0 109.9,287.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,312.6 105.1,287.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,287.0 109.9,287.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,312.6 78.9,286.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="284.2" font-size="9.9" text-anchor="start" fill="#111111">55</text>
+<text x="95.6" y="321.8" font-size="9.9" text-anchor="start" fill="#111111">56</text>
+</g>
+<path d="M70.6 293.3 A8.0 8.0 0 0 0 70.6 306.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="67.2,299.8 98.5,299.8" fill="none" stroke="#111111" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="61.6" y="303.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT2</text>
+<text class="cdt" data-dev="-KT2" x="96.8" y="334.6"></text>
+<circle cx="92.0" cy="324.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="180.0" cy="324.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g class="hit" data-dev="-S2" data-hit="push">
+<g id="Mc6" class="ct" data-dev="-S2">
+<g class="rest">
+<polyline points="92.0,370.3 78.9,343.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,370.3 92.0,344.6" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="341.9" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="95.6" y="379.5" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+</g>
+<polyline points="50.0,364.3 50.0,350.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="50.0,357.5 58.8,357.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.8,357.5 85.5,357.5" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="45.2" y="361.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-S2</text>
+<rect class="hb" x="24.0" y="338.6" width="80.0" height="37.7" rx="6"/>
+</g>
+<g class="hit" data-dev="-FC1" data-hit="toggle">
+<g id="Mc7" class="ct" data-dev="-FC1">
+<g class="rest">
+<polyline points="180.0,370.3 166.9,343.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="180.0,370.3 180.0,344.6" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="183.6" y="341.9" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="183.6" y="379.5" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+</g>
+<circle cx="140.0" cy="357.5" r="4.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="144.4,357.5 152.0,357.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="152.0,357.5 173.5,357.5" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="132.4" y="361.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-FC1</text>
+<rect class="hb" x="112.0" y="338.6" width="80.0" height="37.7" rx="6"/>
+</g>
+<g id="Mc8" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="244.0,370.3 230.9,343.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="244.0,370.3 244.0,344.6" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="247.6" y="341.9" font-size="9.9" text-anchor="start" fill="#111111">13</text>
+<text x="247.6" y="379.5" font-size="9.9" text-anchor="start" fill="#111111">14</text>
+<text x="222.0" y="361.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM1</text>
+</g>
+<circle cx="92.0" cy="386.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="180.0" cy="386.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="244.0" cy="386.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="316.0" cy="386.6" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Mc9" class="ct" data-dev="-KT1">
+<g class="rest">
+<polyline points="400.0,432.3 386.9,405.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="400.0,432.3 400.0,406.6" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="403.6" y="403.9" font-size="9.9" text-anchor="start" fill="#111111">67</text>
+<text x="403.6" y="441.5" font-size="9.9" text-anchor="start" fill="#111111">68</text>
+</g>
+<path d="M378.6 412.9 A8.0 8.0 0 0 0 378.6 426.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="375.2,419.5 393.5,419.5" fill="none" stroke="#111111" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="369.6" y="423.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT1</text>
+<text class="cdt" data-dev="-KT1" x="404.8" y="454.3"></text>
+<circle cx="400.0" cy="444.3" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="92.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="544.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="620.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="696.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="772.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Mc10" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="544.0,175.7 530.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="544.0,175.7 544.0,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="547.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">53</text>
+<text x="547.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">54</text>
+<text x="522.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM1</text>
+</g>
+<g id="Mc11" class="ct" data-dev="-KM2">
+<g class="rest">
+<polyline points="620.0,175.7 606.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="620.0,175.7 620.0,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="623.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">53</text>
+<text x="623.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">54</text>
+<text x="598.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM2</text>
+</g>
+<g id="Mc12" class="ct" data-dev="-KM1">
+<g class="rest">
+<polyline points="696.0,150.0 713.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="696.0,175.7 709.1,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="696.0,150.0 713.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="696.0,175.7 682.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="699.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">61</text>
+<text x="699.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">62</text>
+<text x="674.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM1</text>
+</g>
+<g id="Mc13" class="ct" data-dev="-KM2">
+<g class="rest">
+<polyline points="696.0,195.7 713.9,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="696.0,221.3 709.1,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="696.0,195.7 713.9,195.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="696.0,221.3 682.9,194.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="699.6" y="192.9" font-size="9.9" text-anchor="start" fill="#111111">61</text>
+<text x="699.6" y="230.5" font-size="9.9" text-anchor="start" fill="#111111">62</text>
+<text x="674.0" y="212.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM2</text>
+</g>
+<g class="hit" data-dev="-F1" data-hit="trip">
+<g id="Mc14" class="ct" data-dev="-F1">
+<g class="rest">
+<polyline points="772.0,175.7 758.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="772.0,175.7 772.0,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="775.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">97</text>
+<text x="775.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">98</text>
+</g>
+<rect x="728.0" y="154.8" width="12.0" height="16.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="734.0,154.8 734.0,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="734.0,158.4 738.4,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="738.4,158.4 738.4,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="738.4,167.2 734.0,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="734.0,167.2 734.0,170.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="740.0,162.8 765.5,162.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="724.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F1</text>
+</g>
+<g class="hit" data-dev="-F2" data-hit="trip">
+<g id="Mc15" class="ct" data-dev="-F2">
+<g class="rest">
+<polyline points="848.0,175.7 834.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="848.0,175.7 848.0,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="851.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">97</text>
+<text x="851.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">98</text>
+</g>
+<rect x="804.0" y="154.8" width="12.0" height="16.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="810.0,154.8 810.0,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="810.0,158.4 814.4,158.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="814.4,158.4 814.4,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="814.4,167.2 810.0,167.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="810.0,167.2 810.0,170.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="816.0,162.8 841.5,162.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="800.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-F2</text>
+</g>
+<g id="Mk16" class="coil" data-dev="-KM1">
+<rect x="82.0" y="476.3" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="95.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="95.6" y="513.5" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="77.2" y="494.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM1</text>
+</g>
+<g id="Mk17" class="coil" data-dev="-KT1">
+<rect x="306.0" y="476.3" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<rect x="296.4" y="476.3" width="9.6" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<polyline points="296.4,504.3 306.0,476.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="296.4,476.3 306.0,504.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="319.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="319.6" y="513.5" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="291.6" y="494.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT1</text>
+</g>
+<g id="Mk18" class="coil" data-dev="-KM2">
+<rect x="390.0" y="476.3" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="403.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="403.6" y="513.5" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="385.2" y="494.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KM2</text>
+</g>
+<g id="Mk19" class="coil" data-dev="-KT2">
+<rect x="470.0" y="476.3" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<rect x="460.4" y="476.3" width="9.6" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<polyline points="460.4,504.3 470.0,476.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="460.4,476.3 470.0,504.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="483.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="483.6" y="513.5" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="455.6" y="494.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT2</text>
+</g>
+<circle class="glow" id="Mgh20" cx="544.0" cy="488.3" r="20.4" fill="#9BE09B"/>
+<g id="Mh20" class="pil" data-dev="-H1">
+<circle cx="544.0" cy="488.3" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="535.5,496.8 552.5,479.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="535.5,479.8 552.5,496.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="547.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="547.6" y="509.5" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="527.2" y="492.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H1</text>
+</g>
+<circle class="glow" id="Mgh21" cx="620.0" cy="488.3" r="20.4" fill="#9BE09B"/>
+<g id="Mh21" class="pil" data-dev="-H2">
+<circle cx="620.0" cy="488.3" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="611.5,496.8 628.5,479.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="611.5,479.8 628.5,496.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="623.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="623.6" y="509.5" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="603.2" y="492.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H2</text>
+</g>
+<circle class="glow" id="Mgh22" cx="696.0" cy="488.3" r="20.4" fill="#F08080"/>
+<g id="Mh22" class="pil" data-dev="-H3">
+<circle cx="696.0" cy="488.3" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="687.5,496.8 704.5,479.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="687.5,479.8 704.5,496.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="699.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="699.6" y="509.5" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="679.2" y="492.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H3</text>
+</g>
+<circle class="glow" id="Mgh23" cx="772.0" cy="488.3" r="20.4" fill="#F4A04A"/>
+<g id="Mh23" class="pil" data-dev="-H4">
+<circle cx="772.0" cy="488.3" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="763.5,496.8 780.5,479.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="763.5,479.8 780.5,496.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="775.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="775.6" y="509.5" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="755.2" y="492.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H4</text>
+</g>
+<circle class="glow" id="Mgh24" cx="848.0" cy="488.3" r="20.4" fill="#F4A04A"/>
+<g id="Mh24" class="pil" data-dev="-H5">
+<circle cx="848.0" cy="488.3" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="839.5,496.8 856.5,479.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="839.5,479.8 856.5,496.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="851.6" y="473.5" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="851.6" y="509.5" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="831.2" y="492.4" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H5</text>
+</g>
+<text x="30.0" y="530.5" font-size="12.0" text-anchor="end" fill="#111111" font-weight="700">N</text>
+<circle cx="92.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="316.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="400.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="480.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="544.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="620.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="696.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="772.0" cy="526.3" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/></svg></div></div>
+    <div class="side">
+      <div class="card"><h2>Estado</h2><div id="leds" class="leds"></div></div>
+      <div class="card"><h2>Ruletas de los temporizadores</h2><div id="ruletas"></div></div>
+      <div class="card"><div id="btns" class="controls"></div>
+        <button id="bSpeed" type="button" class="b-speed">Tiempo normal<span class="small">acelera los temporizadores</span></button></div>
+    </div>
+  </div>
+  <div class="below">
+    <div class="card ojo"><h2>¡OJO! Sensores nuevos</h2><ul><li>Es un <b>final de carrera</b> (-FC): un interruptor que se acciona <b>mecánicamente</b>, cuando algo que se mueve (un carro, una puerta…) llega a su sitio y le empuja la palanca o la ruedecita.</li><li>Tiene dos contactos, como un pulsador: <b>NC 1-2</b> (se abre al pisarlo) y <b>NA 3-4</b> (se cierra al pisarlo). Se dibuja con un <b>circulito</b> (la ruedecita) a la izquierda del contacto.</li><li>No necesita alimentación: son solo contactos. Se queda accionado <b>mientras</b> está pisado.</li><li>En la animación, tócalo en el esquema (o en su botón) para pisarlo y vuelve a tocarlo para soltarlo.</li></ul></div>
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card"><h2>Cómo funciona</h2><ul><li>Marchas en paralelo: -S2, -FC1 y el 13-14 de -KM1. -KT1 (20 s) en paralelo con la bobina de -KM1; su 67-68 da paso a -KM2.</li><li>-KT2 (30 s) en paralelo con la bobina de -KM2: empieza a contar cuando arranca -M2.</li><li>El 55-56 de -KT2, en serie con -S1, para todo y deja los dos temporizadores a cero.</li><li>-H3 (todo parado): los 61-62 de -KM1 y -KM2 en serie.</li></ul></div>
+    <div class="card"><h2>Pruébalo</h2><ol><li>Pulsa -S2 (o pisa -FC1 y suéltalo).</li><li>Pon «Tiempo ×5» y sigue las dos cuentas atrás.</li><li>Deja -FC1 pisado hasta el final: ¿qué pasa cuando se para todo?</li></ol></div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Toca los aparatos del esquema: pulsadores, magnetotérmicos, térmicos (para dispararlos), finales de carrera y detectores. Cables en rojo vivo: tienen tensión. Línea amarilla: corriente.</p>
+</main>
+<script>var DRAW = [{"key": "F", "net": {"wires": [{"a": [2.6, 13.2], "b": [2.6, 12.9], "c": "f"}, {"a": [3.2, 13.2], "b": [3.2, 12.9], "c": "f"}, {"a": [3.8, 13.2], "b": [3.8, 12.9], "c": "f"}, {"a": [2.6, 11.0], "b": [2.6, 10.55], "c": "f"}, {"a": [2.6, 10.55], "b": [2.6, 9.45], "c": "f"}, {"a": [2.6, 10.55], "b": [7.0, 10.55], "c": "f"}, {"a": [7.0, 10.55], "b": [7.0, 9.45], "c": "f"}, {"a": [3.2, 11.0], "b": [3.2, 10.25], "c": "f"}, {"a": [3.2, 10.25], "b": [3.2, 9.45], "c": "f"}, {"a": [3.2, 10.25], "b": [7.6, 10.25], "c": "f"}, {"a": [7.6, 10.25], "b": [7.6, 9.45], "c": "f"}, {"a": [3.8, 11.0], "b": [3.8, 9.95], "c": "f"}, {"a": [3.8, 9.95], "b": [3.8, 9.45], "c": "f"}, {"a": [3.8, 9.95], "b": [8.2, 9.95], "c": "f"}, {"a": [8.2, 9.95], "b": [8.2, 9.45], "c": "f"}, {"a": [2.6, 8.808], "b": [2.6, 8.308], "c": "f"}, {"a": [3.2, 8.808], "b": [3.2, 8.308], "c": "f"}, {"a": [3.8, 8.808], "b": [3.8, 8.308], "c": "f"}, {"a": [2.6, 7.408], "b": [2.6, 6.908], "c": "f"}, {"a": [3.2, 7.408], "b": [3.2, 6.908], "c": "f"}, {"a": [3.8, 7.408], "b": [3.8, 6.908], "c": "f"}, {"a": [2.6, 6.808], "b": [2.6, 6.358], "c": "f"}, {"a": [2.6, 6.358], "b": [2.785, 5.649], "c": "f"}, {"a": [3.2, 6.808], "b": [3.2, 5.808], "c": "f"}, {"a": [3.8, 6.808], "b": [3.8, 6.358], "c": "f"}, {"a": [3.8, 6.358], "b": [3.615, 5.649], "c": "f"}, {"a": [7.0, 8.808], "b": [7.0, 8.308], "c": "f"}, {"a": [7.6, 8.808], "b": [7.6, 8.308], "c": "f"}, {"a": [8.2, 8.808], "b": [8.2, 8.308], "c": "f"}, {"a": [7.0, 7.408], "b": [7.0, 6.908], "c": "f"}, {"a": [7.6, 7.408], "b": [7.6, 6.908], "c": "f"}, {"a": [8.2, 7.408], "b": [8.2, 6.908], "c": "f"}, {"a": [7.0, 6.808], "b": [7.0, 6.358], "c": "f"}, {"a": [7.0, 6.358], "b": [7.185, 5.649], "c": "f"}, {"a": [7.6, 6.808], "b": [7.6, 5.808], "c": "f"}, {"a": [8.2, 6.808], "b": [8.2, 6.358], "c": "f"}, {"a": [8.2, 6.358], "b": [8.015, 5.649], "c": "f"}], "els": [{"id": "c1", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [2.6, 12.9], "b": [2.6, 12.258]}, {"id": "c2", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [3.2, 12.9], "b": [3.2, 12.258]}, {"id": "c3", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [3.8, 12.9], "b": [3.8, 12.258]}, {"id": "c4", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [2.6, 9.45], "b": [2.6, 8.808]}, {"id": "c5", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [3.2, 9.45], "b": [3.2, 8.808]}, {"id": "c6", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [3.8, 9.45], "b": [3.8, 8.808]}, {"id": "m7", "t": "motor", "dev": "-M1", "pts": [[2.6, 6.808], [3.2, 6.808], [3.8, 6.808]]}, {"id": "c8", "t": "contact", "dev": "-KM2", "kind": "na", "timed": null, "typ": "main", "a": [7.0, 9.45], "b": [7.0, 8.808]}, {"id": "c9", "t": "contact", "dev": "-KM2", "kind": "na", "timed": null, "typ": "main", "a": [7.6, 9.45], "b": [7.6, 8.808]}, {"id": "c10", "t": "contact", "dev": "-KM2", "kind": "na", "timed": null, "typ": "main", "a": [8.2, 9.45], "b": [8.2, 8.808]}, {"id": "m11", "t": "motor", "dev": "-M2", "pts": [[7.0, 6.808], [7.6, 6.808], [8.2, 6.808]]}], "links": [[[2.6, 12.258], [2.6, 11.0]], [[3.2, 12.258], [3.2, 11.0]], [[3.8, 12.258], [3.8, 11.0]], [[2.6, 8.308], [2.6, 7.408]], [[3.2, 8.308], [3.2, 7.408]], [[3.8, 8.308], [3.8, 7.408]], [[2.6, 6.908], [2.6, 6.808]], [[3.2, 6.908], [3.2, 6.808]], [[3.8, 6.908], [3.8, 6.808]], [[7.0, 8.308], [7.0, 7.408]], [[7.6, 8.308], [7.6, 7.408]], [[8.2, 8.308], [8.2, 7.408]], [[7.0, 6.908], [7.0, 6.808]], [[7.6, 6.908], [7.6, 6.808]], [[8.2, 6.908], [8.2, 6.808]]], "src": [["L1", 2.6, 13.32], ["L2", 3.2, 13.32], ["L3", 3.8, 13.32]]}}, {"key": "M", "net": {"wires": [{"a": [2.3, 13.5], "b": [2.3, 13.3], "c": "f"}, {"a": [2.3, 13.3], "b": [2.3, 12.8], "c": "f"}, {"a": [2.3, 10.9], "b": [2.3, 10.75], "c": "f"}, {"a": [2.3, 10.75], "b": [2.3, 10.25], "c": "f"}, {"a": [2.3, 9.608], "b": [2.3, 9.108], "c": "f"}, {"a": [2.3, 8.467], "b": [2.3, 7.967], "c": "f"}, {"a": [2.3, 7.325], "b": [2.3, 6.825], "c": "f"}, {"a": [2.3, 6.184], "b": [2.3, 5.884], "c": "f"}, {"a": [2.3, 5.884], "b": [4.5, 5.884], "c": "f"}, {"a": [4.5, 5.884], "b": [6.1, 5.884], "c": "f"}, {"a": [2.3, 5.884], "b": [2.3, 5.384], "c": "f"}, {"a": [2.3, 4.742], "b": [2.3, 4.334], "c": "f"}, {"a": [4.5, 5.884], "b": [4.5, 5.384], "c": "f"}, {"a": [4.5, 4.742], "b": [4.5, 4.334], "c": "f"}, {"a": [6.1, 5.884], "b": [6.1, 5.384], "c": "f"}, {"a": [6.1, 4.742], "b": [6.1, 4.334], "c": "f"}, {"a": [2.3, 4.334], "b": [4.5, 4.334], "c": "f"}, {"a": [4.5, 4.334], "b": [6.1, 4.334], "c": "f"}, {"a": [6.1, 4.334], "b": [7.9, 4.334], "c": "f"}, {"a": [7.9, 4.334], "b": [10.0, 4.334], "c": "f"}, {"a": [10.0, 4.334], "b": [10.0, 3.834], "c": "f"}, {"a": [10.0, 2.892], "b": [12.0, 2.892], "c": "f"}, {"a": [10.0, 3.192], "b": [10.0, 2.892], "c": "f"}, {"a": [2.3, 10.75], "b": [13.6, 10.75], "c": "f"}, {"a": [13.6, 10.75], "b": [15.5, 10.75], "c": "f"}, {"a": [15.5, 10.75], "b": [17.4, 10.75], "c": "f"}, {"a": [17.4, 10.75], "b": [19.3, 10.75], "c": "f"}, {"a": [19.3, 10.75], "b": [21.2, 10.75], "c": "f"}, {"a": [13.6, 10.75], "b": [13.6, 10.25], "c": "f"}, {"a": [15.5, 10.75], "b": [15.5, 10.25], "c": "f"}, {"a": [17.4, 10.75], "b": [17.4, 10.25], "c": "f"}, {"a": [17.4, 9.608], "b": [17.4, 9.108], "c": "f"}, {"a": [19.3, 10.75], "b": [19.3, 10.25], "c": "f"}, {"a": [21.2, 10.75], "b": [21.2, 10.25], "c": "f"}, {"a": [2.3, 4.334], "b": [2.3, 2.092], "c": "f"}, {"a": [2.3, 1.392], "b": [2.3, 0.842], "c": "n"}, {"a": [7.9, 4.334], "b": [7.9, 2.092], "c": "f"}, {"a": [7.9, 1.392], "b": [7.9, 0.842], "c": "n"}, {"a": [10.0, 2.892], "b": [10.0, 2.092], "c": "f"}, {"a": [10.0, 1.392], "b": [10.0, 0.842], "c": "n"}, {"a": [12.0, 2.892], "b": [12.0, 2.092], "c": "f"}, {"a": [12.0, 1.392], "b": [12.0, 0.842], "c": "n"}, {"a": [13.6, 9.608], "b": [13.6, 2.092], "c": "f"}, {"a": [13.6, 1.492], "b": [13.6, 0.842], "c": "n"}, {"a": [15.5, 9.608], "b": [15.5, 2.092], "c": "f"}, {"a": [15.5, 1.492], "b": [15.5, 0.842], "c": "n"}, {"a": [17.4, 8.467], "b": [17.4, 2.092], "c": "f"}, {"a": [17.4, 1.492], "b": [17.4, 0.842], "c": "n"}, {"a": [19.3, 9.608], "b": [19.3, 2.092], "c": "f"}, {"a": [19.3, 1.492], "b": [19.3, 0.842], "c": "n"}, {"a": [21.2, 9.608], "b": [21.2, 2.092], "c": "f"}, {"a": [21.2, 1.492], "b": [21.2, 0.842], "c": "n"}, {"a": [0.9, 0.842], "b": [2.3, 0.842], "c": "n"}, {"a": [2.3, 0.842], "b": [7.9, 0.842], "c": "n"}, {"a": [7.9, 0.842], "b": [10.0, 0.842], "c": "n"}, {"a": [10.0, 0.842], "b": [12.0, 0.842], "c": "n"}, {"a": [12.0, 0.842], "b": [13.6, 0.842], "c": "n"}, {"a": [13.6, 0.842], "b": [15.5, 0.842], "c": "n"}, {"a": [15.5, 0.842], "b": [17.4, 0.842], "c": "n"}, {"a": [17.4, 0.842], "b": [19.3, 0.842], "c": "n"}, {"a": [19.3, 0.842], "b": [21.2, 0.842], "c": "n"}], "els": [{"id": "c1", "t": "contact", "dev": "-Q2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 12.8], "b": [2.3, 12.158]}, {"id": "c2", "t": "contact", "dev": "-F1", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 10.25], "b": [2.3, 9.608]}, {"id": "c3", "t": "contact", "dev": "-F2", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 9.108], "b": [2.3, 8.467]}, {"id": "c4", "t": "contact", "dev": "-S1", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 7.967], "b": [2.3, 7.325]}, {"id": "c5", "t": "contact", "dev": "-KT2", "kind": "nc", "timed": "on", "typ": "aux", "a": [2.3, 6.825], "b": [2.3, 6.184]}, {"id": "c6", "t": "contact", "dev": "-S2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 5.384], "b": [2.3, 4.742]}, {"id": "c7", "t": "contact", "dev": "-FC1", "kind": "na", "timed": null, "typ": "aux", "a": [4.5, 5.384], "b": [4.5, 4.742]}, {"id": "c8", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "aux", "a": [6.1, 5.384], "b": [6.1, 4.742]}, {"id": "c9", "t": "contact", "dev": "-KT1", "kind": "na", "timed": "on", "typ": "aux", "a": [10.0, 3.834], "b": [10.0, 3.192]}, {"id": "c10", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "aux", "a": [13.6, 10.25], "b": [13.6, 9.608]}, {"id": "c11", "t": "contact", "dev": "-KM2", "kind": "na", "timed": null, "typ": "aux", "a": [15.5, 10.25], "b": [15.5, 9.608]}, {"id": "c12", "t": "contact", "dev": "-KM1", "kind": "nc", "timed": null, "typ": "aux", "a": [17.4, 10.25], "b": [17.4, 9.608]}, {"id": "c13", "t": "contact", "dev": "-KM2", "kind": "nc", "timed": null, "typ": "aux", "a": [17.4, 9.108], "b": [17.4, 8.467]}, {"id": "c14", "t": "contact", "dev": "-F1", "kind": "na", "timed": null, "typ": "aux", "a": [19.3, 10.25], "b": [19.3, 9.608]}, {"id": "c15", "t": "contact", "dev": "-F2", "kind": "na", "timed": null, "typ": "aux", "a": [21.2, 10.25], "b": [21.2, 9.608]}, {"id": "k16", "t": "coil", "dev": "-KM1", "a": [2.3, 2.092], "b": [2.3, 1.392]}, {"id": "k17", "t": "coil", "dev": "-KT1", "timer": "on", "a": [7.9, 2.092], "b": [7.9, 1.392]}, {"id": "k18", "t": "coil", "dev": "-KM2", "a": [10.0, 2.092], "b": [10.0, 1.392]}, {"id": "k19", "t": "coil", "dev": "-KT2", "timer": "on", "a": [12.0, 2.092], "b": [12.0, 1.392]}, {"id": "h20", "t": "pilot", "dev": "-H1", "color": "#9BE09B", "a": [13.6, 2.092], "b": [13.6, 1.492]}, {"id": "h21", "t": "pilot", "dev": "-H2", "color": "#9BE09B", "a": [15.5, 2.092], "b": [15.5, 1.492]}, {"id": "h22", "t": "pilot", "dev": "-H3", "color": "#F08080", "a": [17.4, 2.092], "b": [17.4, 1.492]}, {"id": "h23", "t": "pilot", "dev": "-H4", "color": "#F4A04A", "a": [19.3, 2.092], "b": [19.3, 1.492]}, {"id": "h24", "t": "pilot", "dev": "-H5", "color": "#F4A04A", "a": [21.2, 2.092], "b": [21.2, 1.492]}], "links": [[[2.3, 12.158], [2.3, 10.9]]], "src": [["L", 2.3, 13.75], ["N", 0.75, 0.842]]}}]; var CFG = {"timers": {"-KT1": 20, "-KT2": 30}}; var DRAWCOL = {"-H1": "#9BE09B", "-H2": "#9BE09B", "-H3": "#F08080", "-H4": "#F4A04A", "-H5": "#F4A04A"};</script>
+<script>(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var K3 = function(p){ return p[0].toFixed(3) + ',' + p[1].toFixed(3); };
+var G = { edges: [], cons: [], srcs: [], nsrc: [] };
+var DEV = {};
+function dev(name){ if (!DEV[name]) DEV[name] = { name: name, en: false, t: 0, out: false, on: true, pressed: false, tripped: false, latched: false, kind: '' }; return DEV[name]; }
+
+DRAW.forEach(function(d){
+  var k = d.key, net = d.net, nk = function(p){ return k + ':' + K3(p); };
+  var ends = [];
+  net.wires.forEach(function(w, i){
+    G.edges.push({ t: 'w', a: nk(w.a), b: nk(w.b), c: w.c, el: $(k + 'w' + i), fl: $(k + 'fw' + i) });
+    ends.push(w.a, w.b);
+  });
+  net.links.forEach(function(l){ G.edges.push({ t: 'l', a: nk(l[0]), b: nk(l[1]) }); });
+  net.els.forEach(function(e){
+    var el = $(k + e.id);
+    if (e.t === 'contact'){ G.edges.push({ t: 'c', a: nk(e.a), b: nk(e.b), dev: e.dev, kind: e.kind, timed: e.timed, el: el }); dev(e.dev); }
+    else if (e.t === 'motor'){ G.cons.push({ t: 'motor', dev: e.dev, pts: e.pts.map(nk), el: el }); }
+    else {
+      G.cons.push({ t: e.t, dev: e.dev, a: nk(e.a), b: nk(e.b), timer: e.timer, el: el, glow: e.t === 'pilot' ? $(k + 'g' + e.id) : null });
+      if (e.t === 'coil'){ var D = dev(e.dev); D.coil = true; if (e.timer) D.timer = e.timer; }
+    }
+  });
+  (net.src || []).forEach(function(s){
+    var best = null, bd = 1e9;
+    ends.forEach(function(p){ var dd = Math.abs(p[0] - s[1]) + Math.abs(p[1] - s[2]); if (dd < bd){ bd = dd; best = p; } });
+    if (best){ if (s[0] === 'N') G.nsrc.push(nk(best)); else G.srcs.push({ node: nk(best), lbl: s[0] }); }
+  });
+});
+// tipos de aparato a partir de la zona que se toca en el esquema
+Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){ var D = dev(h.getAttribute('data-dev')); D.kind = h.getAttribute('data-hit'); });
+Object.keys(DEV).forEach(function(n){
+  var D = DEV[n];
+  if (/^-Q/.test(n)) D.kind = 'q';
+  if (D.timer){ D.T = Math.max(1, Math.min(5, (CFG.animT && CFG.animT[n]) || (CFG.timers && CFG.timers[n]) || 3)); }
+});
+
+var short = false, speed = 1, lastMsg = '', ev = '';
+function actuated(e){
+  var D = DEV[e.dev];
+  if (/^-Q/.test(e.dev)) return D.on;
+  if (/^-F\d/.test(e.dev) && !D.coil) return D.tripped;
+  if (D.coil) return e.timed ? D.out : D.en;
+  return D.pressed;
+}
+function closed(e){
+  if (e.t !== 'c') return true;
+  var a = actuated(e);
+  return e.kind === 'nc' ? !a : a;
+}
+function live(){
+  var adj = {};
+  G.edges.forEach(function(e){ if (!closed(e)) return; (adj[e.a] = adj[e.a] || []).push(e.b); (adj[e.b] = adj[e.b] || []).push(e.a); });
+  var lab = {}, conflict = false;
+  G.srcs.forEach(function(s){
+    var st = [s.node];
+    while (st.length){
+      var n = st.pop();
+      if (!lab[n]) lab[n] = {};
+      if (lab[n][s.lbl]) continue;
+      lab[n][s.lbl] = 1;
+      if (Object.keys(lab[n]).length > 1) conflict = true;
+      (adj[n] || []).forEach(function(m){ st.push(m); });
+    }
+  });
+  return { lab: lab, conflict: conflict };
+}
+function solve(){
+  var L;
+  for (var it = 0; it < 60; it++){
+    L = live();
+    if (L.conflict){ short = true; Object.keys(DEV).forEach(function(n){ if (/^-Q1$/.test(n)) DEV[n].on = false; }); ev = 'short'; continue; }
+    var ch = false;
+    G.cons.forEach(function(c){
+      if (c.t !== 'coil') return;
+      var D = DEV[c.dev], en = !!L.lab[c.a];
+      if (D.en === en) return;
+      D.en = en; ch = true;
+      if (D.timer === 'off' && en){ D.out = true; D.t = 0; }
+      if (D.timer === 'off' && !en){ D.t = 0; }
+      if (D.timer === 'on' && !en){ D.out = false; D.t = 0; }
+      if (D.timer === 'on' && en){ D.t = 0; }
+    });
+    if (!ch) break;
+  }
+  return L;
+}
+function tick(dt){
+  var any = false;
+  Object.keys(DEV).forEach(function(n){
+    var D = DEV[n];
+    if (D.timer === 'on' && D.en && !D.out){ D.t += dt; if (D.t >= D.T){ D.out = true; any = true; } }
+    if (D.timer === 'off' && !D.en && D.out){ D.t += dt; if (D.t >= D.T){ D.out = false; any = true; } }
+  });
+  return any;
+}
+function seq3(lbls){ var o = ['L1', 'L2', 'L3']; return lbls.join() === 'L1,L2,L3' || lbls.join() === 'L2,L3,L1' || lbls.join() === 'L3,L1,L2'; }
+function render(L){
+  var lab = L.lab;
+  var phase = function(n){ return lab[n] ? Object.keys(lab[n])[0] : null; };
+  // contactos
+  G.edges.forEach(function(e){ if (e.t === 'c' && e.el) e.el.classList.toggle('on', actuated(e)); });
+  // consumos
+  var on = {}, runs = [];
+  G.cons.forEach(function(c){
+    if (c.t === 'motor'){
+      var ls = c.pts.map(phase), run = ls.every(function(x){ return x; }) && (new Set(ls)).size === 3;
+      c.run = run; c.rev = run && !seq3(ls);
+      c.el.classList.toggle('run', run); c.el.classList.toggle('rev', !!c.rev);
+      if (run) runs.push(c.dev + (c.rev ? ' (izquierdas)' : ''));
+    } else {
+      var en = !!lab[c.a]; c.en = en;
+      if (c.el) c.el.classList.toggle('on', en);
+      if (c.glow) c.glow.classList.toggle('on', en);
+      if (en) on[c.dev] = c.t;
+    }
+  });
+  // grafo de corriente: se podan las ramas muertas
+  var adj = {}, add = function(a, b, e){ (adj[a] = adj[a] || []).push([b, e]); (adj[b] = adj[b] || []).push([a, e]); };
+  G.edges.forEach(function(e){
+    if (!closed(e)) return;
+    if (e.t === 'w' && e.c === 'n') add(e.a, e.b, e);
+    else if (lab[e.a] && lab[e.b]) add(e.a, e.b, e);
+  });
+  G.cons.forEach(function(c){
+    if (c.t === 'motor'){ if (c.run){ add(c.pts[0], c.pts[1], null); add(c.pts[1], c.pts[2], null); } }
+    else if (c.en) add(c.a, c.b, null);
+  });
+  var term = {}; G.srcs.forEach(function(s){ term[s.node] = 1; }); G.nsrc.forEach(function(n){ term[n] = 1; });
+  var alive = {}; Object.keys(adj).forEach(function(n){ alive[n] = 1; });
+  var changed = true;
+  while (changed){
+    changed = false;
+    Object.keys(alive).forEach(function(n){
+      if (term[n]) return;
+      var deg = adj[n].filter(function(x){ return alive[x[0]]; }).length;
+      if (deg <= 1){ delete alive[n]; changed = true; }
+    });
+  }
+  G.edges.forEach(function(e){
+    if (e.t !== 'w') return;
+    var lv = e.c === 'f' && lab[e.a] && lab[e.b];
+    e.el.classList.toggle('live', !!lv);
+    var fl = alive[e.a] && alive[e.b] && closed(e) && (e.c === 'n' || lv);
+    e.fl.classList.toggle('on', !!fl);
+  });
+  // cuentas atrás
+  Array.prototype.forEach.call(document.querySelectorAll('.cdt'), function(t){
+    var D = DEV[t.getAttribute('data-dev')], s = '';
+    if (D && D.timer === 'on' && D.en && !D.out) s = '⏱ ' + (D.T - D.t).toFixed(1).replace('.', ',') + ' s';
+    if (D && D.timer === 'off' && !D.en && D.out) s = '⏱ ' + (D.T - D.t).toFixed(1).replace('.', ',') + ' s';
+    t.textContent = s;
+  });
+  // panel
+  Object.keys(LEDS).forEach(function(n){
+    var x = LEDS[n], D = DEV[n];
+    if (!x) return;
+    var a = D && D.coil ? D.en : !!on[n];
+    if (/^-M/.test(n)){ a = runs.some(function(r){ return r.indexOf(n) === 0; }); }
+    x.classList.toggle('on', !!a);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-btn]'), function(b){
+    var D = DEV[b.getAttribute('data-btn')], k = D.kind;
+    if (k === 'push') b.classList.toggle('on', D.pressed);
+    if (k === 'toggle') b.classList.toggle('on', D.pressed);
+    if (k === 'q'){ b.classList.toggle('on', !D.on); b.firstChild.nodeValue = (D.on ? 'Abrir ' : 'Cerrar ') + D.name; }
+    if (k === 'trip'){ b.classList.toggle('on', D.tripped); b.firstChild.nodeValue = (D.tripped ? 'RESET ' : 'Disparar ') + D.name; }
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){
+    var D = DEV[h.getAttribute('data-dev')];
+    h.classList.toggle('latched', !!D.latched);
+    h.classList.toggle('pressed', !!(D.pressed && D.kind === 'push'));
+  });
+  // qué está pasando
+  var m = [];
+  Object.keys(DEV).forEach(function(n){ var D = DEV[n]; if (D.kind === 'q' && !D.on) m.push('<b>' + n + ' está abierto</b>: no llega tensión a lo que hay detrás.'); });
+  if (short) m.push('<b>¡Cortocircuito!</b> Han entrado los dos contactores a la vez: ha saltado -Q1.');
+  Object.keys(DEV).forEach(function(n){ var D = DEV[n]; if (D.tripped) m.push('<b>Ha saltado ' + n + '</b>: su 95-96 se abre y su 97-98 se cierra. Pulsa RESET para rearmarlo.'); });
+  var act = Object.keys(DEV).filter(function(n){ return DEV[n].coil && DEV[n].en; });
+  m.push(act.length ? 'Bobinas con tensión: <b>' + act.join(', ') + '</b>.' : 'Ninguna bobina tiene tensión.');
+  Object.keys(DEV).forEach(function(n){
+    var D = DEV[n];
+    if (D.timer === 'on' && D.en && !D.out) m.push('<span class="k">' + n + '</span> (a la conexión) está contando: faltan <b>' + Math.ceil(D.T - D.t - 1e-6) + ' s</b> para que cambien sus 55-56 y 67-68.');
+    if (D.timer === 'on' && D.en && D.out) m.push('<span class="k">' + n + '</span> ya ha contado: su 67-68 está cerrado y su 55-56 abierto.');
+    if (D.timer === 'off' && D.en) m.push('<span class="k">' + n + '</span> (a la desconexión) tiene tensión: sus contactos han cambiado al momento.');
+    if (D.timer === 'off' && !D.en && D.out) m.push('<span class="k">' + n + '</span> (a la desconexión) ya no tiene tensión y cuenta: faltan <b>' + Math.ceil(D.T - D.t - 1e-6) + ' s</b> para volver a reposo.');
+  });
+  if (runs.length) m.push('Motores girando: <b>' + runs.join(', ') + '</b>.');
+  var lit = Object.keys(on).filter(function(n){ return on[n] === 'pilot'; });
+  if (lit.length) m.push('Pilotos encendidos: <b>' + lit.join(', ') + '</b>.');
+  var html = m.map(function(x){ return '<p>' + x + '</p>'; }).join('');
+  if (html !== lastMsg){ $('explain').innerHTML = html; lastMsg = html; }
+}
+
+// ---------------- mandos
+function press(n, down){ var D = DEV[n]; if (D.pressed === down) return; D.pressed = down; changed(); }
+function toggle(n){ var D = DEV[n]; if (D.kind === 'q'){ D.on = !D.on; if (D.on) short = false; } else if (D.kind === 'trip') D.tripped = !D.tripped; else D.pressed = !D.pressed; changed(); }
+var lastDown = {}, skipUp = {};
+function holdable(el, n){
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch(_){}
+    var D = DEV[n], now = Date.now();
+    if (D.latched){ D.latched = false; skipUp[n] = true; press(n, false); return; }
+    if (now - (lastDown[n] || 0) < 380){ D.latched = true; skipUp[n] = true; lastDown[n] = 0; press(n, true); return; }
+    lastDown[n] = now; press(n, true);
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(t){ el.addEventListener(t, function(){
+    if (skipUp[n]){ skipUp[n] = false; return; } if (DEV[n].latched) return; press(n, false);
+  }); });
+  el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(n, true); } });
+  el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !DEV[n].latched) press(n, false); });
+}
+function clickable(el, n){
+  el.addEventListener('click', function(){ toggle(n); });
+  el.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(n); } });
+}
+// botones del panel
+var BTN = $('btns'), LEDS = {};
+var order = Object.keys(DEV).sort(function(a, b){
+  var r = function(n){ var k = DEV[n].kind; return k === 'push' ? 0 : k === 'toggle' ? 1 : k === 'trip' ? 2 : k === 'q' ? 3 : 9; };
+  return r(a) - r(b) || a.localeCompare(b, 'es', { numeric: true });
+});
+order.forEach(function(n){
+  var D = DEV[n]; if (!D.kind || D.coil) return;
+  var b = document.createElement('button'); b.setAttribute('data-btn', n); b.type = 'button';
+  var lbl = { push: 'Pulsador ', toggle: '', trip: 'Disparar ', q: 'Abrir ' }[D.kind] + n;
+  var sm = { push: 'mantén pulsado · doble clic lo fija', toggle: /^-FC/.test(n) ? 'final de carrera: pisado / libre' : 'detector: detecta / no detecta', trip: 'relé térmico', q: 'magnetotérmico' }[D.kind];
+  b.appendChild(document.createTextNode(lbl));
+  var s = document.createElement('span'); s.className = 'small'; s.textContent = sm; b.appendChild(s);
+  b.className = 'b-' + D.kind;
+  BTN.appendChild(b);
+  if (D.kind === 'push') holdable(b, n); else clickable(b, n);
+});
+Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){
+  var n = h.getAttribute('data-dev'); h.setAttribute('tabindex', '0'); h.setAttribute('role', 'button'); h.setAttribute('aria-label', n);
+  if (DEV[n].kind === 'push') holdable(h, n); else clickable(h, n);
+});
+// leds de estado
+var LD = $('leds');
+var names = Object.keys(DEV).filter(function(n){ return DEV[n].coil; }).sort(function(a, b){ return a.localeCompare(b, 'es', { numeric: true }); });
+var pil = G.cons.filter(function(c){ return c.t === 'pilot'; });
+var mot = G.cons.filter(function(c){ return c.t === 'motor'; });
+names.forEach(function(n){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot c"></span>' + n + (DEV[n].timer ? ' <small>(' + DEV[n].T + ' s)</small>' : ''); LD.appendChild(s); LEDS[n] = s.firstChild; });
+pil.forEach(function(c){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot" style="--lc:' + (c.el ? (DRAWCOL[c.dev] || '#3DBB4E') : '#3DBB4E') + '"></span>' + c.dev; LD.appendChild(s); LEDS[c.dev] = s.firstChild; });
+mot.forEach(function(c){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot m"></span>' + c.dev; LD.appendChild(s); LEDS[c.dev] = s.firstChild; });
+// ruletas: un deslizador de 1 a 5 s por temporizador
+var RU = $('ruletas');
+Object.keys(DEV).filter(function(n){ return DEV[n].timer; }).sort(function(a, b){ return a.localeCompare(b, 'es', { numeric: true }); }).forEach(function(n){
+  var D = DEV[n];
+  D.T = Math.max(1, Math.min(5, Math.round(D.T)));
+  var row = document.createElement('label'); row.className = 'ru';
+  row.innerHTML = '<span class="rn">' + n + ' <small>' + (D.timer === 'on' ? 'conexión' : 'desconexión') + '</small></span><input type="range" min="1" max="5" step="1" value="' + D.T + '" aria-label="Tiempo de ' + n + '"><b>' + D.T + ' s</b>';
+  var inp = row.querySelector('input'), out = row.querySelector('b');
+  inp.addEventListener('input', function(){ D.T = +inp.value; out.textContent = D.T + ' s'; var lab = LEDS[n] && LEDS[n].parentNode.querySelector('small'); if (lab) lab.textContent = '(' + D.T + ' s)'; });
+  RU.appendChild(row);
+});
+if (!RU.children.length) RU.parentNode.style.display = 'none';
+// velocidad
+$('bSpeed').addEventListener('click', function(){ speed = speed === 1 ? 5 : 1; this.classList.toggle('on', speed > 1); this.firstChild.nodeValue = speed > 1 ? 'Tiempo ×5' : 'Tiempo normal'; });
+
+var L = solve();
+function changed(){ L = solve(); render(L); }
+var last = null;
+function loop(ts){
+  if (last === null) last = ts;
+  var dt = Math.min(0.1, (ts - last) / 1000) * speed; last = ts;
+  if (tick(dt)) L = solve();
+  render(L);
+  requestAnimationFrame(loop);
+}
+render(L);
+requestAnimationFrame(loop);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var t = e.target.tagName; if (t !== 'INPUT' && t !== 'TEXTAREA'){ e.preventDefault(); location.href = 'index.html#practicas'; } } });
+try { localStorage.setItem('visto:' + 'p4_5_dos_motores_fc.html', '1'); } catch(e){}
+window.__DEV = DEV;
+})();
+</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t; return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19'; }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t); try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>

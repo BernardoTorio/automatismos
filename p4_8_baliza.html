@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Práctica 4 · 4.8 RETO · Baliza intermitente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>:root{--paper:#fff;--bg:#EEF1F4;--ink:#1a1a1a;--muted:#56606b;--flow:#F2B400;--panel:#fff;--line:#cfd6de;--btn:#fff;box-sizing:border-box}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--panel:#1f252c;--line:#36404b;--btn:#262d35}}
+:root[data-theme="dark"]{--bg:#15191e;--ink:#eef1f4;--muted:#a9b3bd;--panel:#1f252c;--line:#36404b;--btn:#262d35}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:17px;line-height:1.45}
+main{max-width:1500px;margin:0 auto;padding:16px 14px 30px}
+h1{font-size:clamp(1.35rem,2.6vw,1.9rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1rem;margin:0 0 8px;color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 14px;max-width:90ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+.sheets{display:flex;gap:10px;align-items:flex-start;flex-wrap:nowrap}
+.sheet.fz{flex:0 0 clamp(180px,24%,320px)}
+.sheet.md{flex:1 1 0;min-width:0}
+@media (max-width:760px){.sheets{flex-wrap:wrap}.sheet.fz{flex-basis:100%;max-width:360px}.sheet.md{flex-basis:100%}}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:80vh}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card ul,.card ol{margin:4px 0 0;padding-left:20px}.card li{margin:4px 0}
+.below{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:1000px){.below{grid-template-columns:1fr}}
+.explain{border-left:6px solid var(--flow)}
+.explain p{margin:4px 0}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 8px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button .small{display:block;font-size:.78rem;font-weight:400;opacity:.8}
+button.b-push{border-color:#2E8B3E}button.b-push.on{background:#2E8B3E;color:#fff}
+button.b-toggle.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.b-trip{border-color:#C0392B}button.b-trip.on{background:#C0392B;color:#fff}
+button.b-q.on{background:#555;color:#fff}
+button.b-speed{width:100%;margin-top:8px}button.b-speed.on{background:#1F4E79;color:#fff}
+.leds{display:flex;flex-wrap:wrap;gap:8px 14px}
+.led{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.95rem}.led small{font-weight:400;color:var(--muted)}
+.dot{width:20px;height:20px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .15s,box-shadow .15s;--lc:#3DBB4E}
+.dot.on{background:var(--lc);box-shadow:0 0 12px var(--lc)}
+.dot.c{border-radius:4px;--lc:#FFC94D}.dot.m{--lc:#2E8B3E}
+.foot{color:var(--muted);font-size:.88rem;margin-top:12px}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+/* esquema */
+.w{stroke-width:1.9;stroke-linecap:round}
+.wf{stroke:#D0191C;opacity:.45}.wn{stroke:#1F5FBF}
+.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:3.4}
+.flow{stroke:var(--flow);stroke-width:4.5;stroke-linecap:round;stroke-dasharray:3 9;opacity:0;pointer-events:none}
+.flow.on{opacity:1;animation:run .7s linear infinite}
+@keyframes run{to{stroke-dashoffset:-12}}
+.ct .act{display:none}.ct.on .act{display:inline}.ct.on .rest{display:none}
+.coil.on rect:first-of-type{fill:#FFE9A8}
+.glow{opacity:0;transition:opacity .15s}.glow.on{opacity:.85}
+.rotor{opacity:0}.mot.run .rotor{opacity:1;animation:spin 1s linear infinite}.mot.run.rev .rotor{animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cdt{font-weight:700;font-size:12px;fill:#9a6a00}
+.hit{cursor:pointer}.hit:focus{outline:none}
+.hb{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4}
+.hit:hover .hb,.hit:focus-visible .hb{stroke:#F2B400}
+.hit.latched .hb{fill:#FFF3C4;fill-opacity:.4;stroke:#F2B400;stroke-dasharray:none;stroke-width:3}
+@media (prefers-reduced-motion: reduce){.flow.on{animation:none;stroke-dasharray:none;opacity:.5}.mot.run .rotor{animation:none}}
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-weight:700}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;font-size:.92rem;color:var(--muted)}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.1rem;cursor:pointer;padding:0}
+.pnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.pnav a{border:2px solid var(--line);border-radius:8px;padding:2px 10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.9rem}
+.pnav a.sel{background:#2E7D32;border-color:#2E7D32;color:#fff}
+/* índice */
+.sec{font-size:1.15rem;color:var(--ink);margin:22px 0 10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card2{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.card2:hover{border-color:#2E7D32}
+.card2 .num{flex:none;background:#1F4E79;color:#fff;font-weight:700;border-radius:8px;padding:8px 10px;min-width:52px;text-align:center}
+.card2 h2{color:var(--ink);font-size:1.05rem;margin:0 0 2px}.card2 p{margin:0;color:var(--muted);font-size:.9rem}
+.ru{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin:6px 0}
+.ru .rn{font-weight:700;white-space:nowrap}.ru .rn small{font-weight:400;color:var(--muted)}
+.ru input{width:100%;accent-color:#1F4E79}.ru b{min-width:3.2em;text-align:right}
+
+.card.ojo{grid-column:1/-1;border:2px solid #E0A100;background:#FFF6D6}
+.card.ojo h2{color:#9A6B00}
+[data-theme="dark"] .card.ojo{background:#3A3115;border-color:#C99A1E}
+[data-theme="dark"] .card.ojo h2{color:#F2C94C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .card.ojo{background:#3A3115;border-color:#C99A1E}:root:not([data-theme="light"]) .card.ojo h2{color:#F2C94C}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Práctica 4</a><span class="sep">›</span><b>4.8 RETO · Baliza intermitente</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="pnav"><a href="p4_1_bomba_riego.html">4.1</a> <a href="p4_2_paro_automatico.html">4.2</a> <a href="p4_3_cinta_aviso.html">4.3</a> <a href="p4_4_ventilador.html">4.4</a> <a href="p4_5_dos_motores_fc.html">4.5</a> <a href="p4_6_escalera_emergencia.html">4.6</a> <a href="p4_7_tres_motores.html">4.7</a> <a href="p4_8_baliza.html" class="sel">4.8</a></nav>
+  <h1>4.8 RETO · Baliza intermitente</h1>
+  <p class="sub">-S2 activa -KA1 (realimentado). Mientras está activado, -H1 parpadea: 2 s apagado, 2 s encendido. -S1 lo para todo. En la animación, los tiempos se regulan con las ruletas, de 1 a 5 s.</p>
+  <div class="grid">
+    <div class="sheets"><div class="sheet md"><svg viewBox="0 0 484 346" xmlns="http://www.w3.org/2000/svg" font-family="Atkinson Hyperlegible,Verdana,sans-serif"><defs><marker id="Marr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2E8B3E"/></marker></defs><g class="wires"><line id="Mw0" class="w wf" x1="92.0" y1="20.0" x2="92.0" y2="28.0"/>
+<line id="Mfw0" class="flow" x1="92.0" y1="20.0" x2="92.0" y2="28.0"/>
+<line id="Mw1" class="w wf" x1="92.0" y1="28.0" x2="92.0" y2="48.0"/>
+<line id="Mfw1" class="flow" x1="92.0" y1="28.0" x2="92.0" y2="48.0"/>
+<line id="Mw2" class="w wf" x1="92.0" y1="124.0" x2="92.0" y2="130.0"/>
+<line id="Mfw2" class="flow" x1="92.0" y1="124.0" x2="92.0" y2="130.0"/>
+<line id="Mw3" class="w wf" x1="92.0" y1="130.0" x2="92.0" y2="150.0"/>
+<line id="Mfw3" class="flow" x1="92.0" y1="130.0" x2="92.0" y2="150.0"/>
+<line id="Mw4" class="w wf" x1="92.0" y1="175.7" x2="92.0" y2="187.7"/>
+<line id="Mfw4" class="flow" x1="92.0" y1="175.7" x2="92.0" y2="187.7"/>
+<line id="Mw5" class="w wf" x1="92.0" y1="187.7" x2="152.0" y2="187.7"/>
+<line id="Mfw5" class="flow" x1="92.0" y1="187.7" x2="152.0" y2="187.7"/>
+<line id="Mw6" class="w wf" x1="92.0" y1="187.7" x2="92.0" y2="207.7"/>
+<line id="Mfw6" class="flow" x1="92.0" y1="187.7" x2="92.0" y2="207.7"/>
+<line id="Mw7" class="w wf" x1="92.0" y1="233.3" x2="92.0" y2="249.7"/>
+<line id="Mfw7" class="flow" x1="92.0" y1="233.3" x2="92.0" y2="249.7"/>
+<line id="Mw8" class="w wf" x1="152.0" y1="187.7" x2="152.0" y2="207.7"/>
+<line id="Mfw8" class="flow" x1="152.0" y1="187.7" x2="152.0" y2="207.7"/>
+<line id="Mw9" class="w wf" x1="152.0" y1="233.3" x2="152.0" y2="249.7"/>
+<line id="Mfw9" class="flow" x1="152.0" y1="233.3" x2="152.0" y2="249.7"/>
+<line id="Mw10" class="w wf" x1="92.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mfw10" class="flow" x1="92.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mw11" class="w wf" x1="92.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mfw11" class="flow" x1="92.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mw12" class="w wf" x1="152.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mfw12" class="flow" x1="152.0" y1="249.7" x2="152.0" y2="249.7"/>
+<line id="Mw13" class="w wf" x1="92.0" y1="130.0" x2="256.0" y2="130.0"/>
+<line id="Mfw13" class="flow" x1="92.0" y1="130.0" x2="256.0" y2="130.0"/>
+<line id="Mw14" class="w wf" x1="256.0" y1="130.0" x2="256.0" y2="150.0"/>
+<line id="Mfw14" class="flow" x1="256.0" y1="130.0" x2="256.0" y2="150.0"/>
+<line id="Mw15" class="w wf" x1="256.0" y1="175.7" x2="256.0" y2="187.7"/>
+<line id="Mfw15" class="flow" x1="256.0" y1="175.7" x2="256.0" y2="187.7"/>
+<line id="Mw16" class="w wf" x1="256.0" y1="187.7" x2="352.0" y2="187.7"/>
+<line id="Mfw16" class="flow" x1="256.0" y1="187.7" x2="352.0" y2="187.7"/>
+<line id="Mw17" class="w wf" x1="256.0" y1="187.7" x2="256.0" y2="207.7"/>
+<line id="Mfw17" class="flow" x1="256.0" y1="187.7" x2="256.0" y2="207.7"/>
+<line id="Mw18" class="w wf" x1="352.0" y1="187.7" x2="352.0" y2="207.7"/>
+<line id="Mfw18" class="flow" x1="352.0" y1="187.7" x2="352.0" y2="207.7"/>
+<line id="Mw19" class="w wf" x1="352.0" y1="233.3" x2="352.0" y2="245.3"/>
+<line id="Mfw19" class="flow" x1="352.0" y1="233.3" x2="352.0" y2="245.3"/>
+<line id="Mw20" class="w wf" x1="352.0" y1="245.3" x2="432.0" y2="245.3"/>
+<line id="Mfw20" class="flow" x1="352.0" y1="245.3" x2="432.0" y2="245.3"/>
+<line id="Mw21" class="w wf" x1="92.0" y1="249.7" x2="92.0" y2="281.7"/>
+<line id="Mfw21" class="flow" x1="92.0" y1="249.7" x2="92.0" y2="281.7"/>
+<line id="Mw22" class="w wn" x1="92.0" y1="309.7" x2="92.0" y2="331.7"/>
+<line id="Mfw22" class="flow" x1="92.0" y1="309.7" x2="92.0" y2="331.7"/>
+<line id="Mw23" class="w wf" x1="152.0" y1="249.7" x2="152.0" y2="281.7"/>
+<line id="Mfw23" class="flow" x1="152.0" y1="249.7" x2="152.0" y2="281.7"/>
+<line id="Mw24" class="w wn" x1="152.0" y1="305.7" x2="152.0" y2="331.7"/>
+<line id="Mfw24" class="flow" x1="152.0" y1="305.7" x2="152.0" y2="331.7"/>
+<line id="Mw25" class="w wf" x1="256.0" y1="233.3" x2="256.0" y2="281.7"/>
+<line id="Mfw25" class="flow" x1="256.0" y1="233.3" x2="256.0" y2="281.7"/>
+<line id="Mw26" class="w wn" x1="256.0" y1="309.7" x2="256.0" y2="331.7"/>
+<line id="Mfw26" class="flow" x1="256.0" y1="309.7" x2="256.0" y2="331.7"/>
+<line id="Mw27" class="w wf" x1="352.0" y1="245.3" x2="352.0" y2="281.7"/>
+<line id="Mfw27" class="flow" x1="352.0" y1="245.3" x2="352.0" y2="281.7"/>
+<line id="Mw28" class="w wn" x1="352.0" y1="309.7" x2="352.0" y2="331.7"/>
+<line id="Mfw28" class="flow" x1="352.0" y1="309.7" x2="352.0" y2="331.7"/>
+<line id="Mw29" class="w wf" x1="432.0" y1="245.3" x2="432.0" y2="281.7"/>
+<line id="Mfw29" class="flow" x1="432.0" y1="245.3" x2="432.0" y2="281.7"/>
+<line id="Mw30" class="w wn" x1="432.0" y1="305.7" x2="432.0" y2="331.7"/>
+<line id="Mfw30" class="flow" x1="432.0" y1="305.7" x2="432.0" y2="331.7"/>
+<line id="Mw31" class="w wn" x1="36.0" y1="331.7" x2="92.0" y2="331.7"/>
+<line id="Mfw31" class="flow" x1="36.0" y1="331.7" x2="92.0" y2="331.7"/>
+<line id="Mw32" class="w wn" x1="92.0" y1="331.7" x2="152.0" y2="331.7"/>
+<line id="Mfw32" class="flow" x1="92.0" y1="331.7" x2="152.0" y2="331.7"/>
+<line id="Mw33" class="w wn" x1="152.0" y1="331.7" x2="256.0" y2="331.7"/>
+<line id="Mfw33" class="flow" x1="152.0" y1="331.7" x2="256.0" y2="331.7"/>
+<line id="Mw34" class="w wn" x1="256.0" y1="331.7" x2="352.0" y2="331.7"/>
+<line id="Mfw34" class="flow" x1="256.0" y1="331.7" x2="352.0" y2="331.7"/>
+<line id="Mw35" class="w wn" x1="352.0" y1="331.7" x2="432.0" y2="331.7"/>
+<line id="Mfw35" class="flow" x1="352.0" y1="331.7" x2="432.0" y2="331.7"/></g><text x="92.0" y="14.2" font-size="12.0" text-anchor="middle" fill="#111111" font-weight="700">L</text>
+<g class="hit" data-dev="-Q2" data-hit="toggle">
+<g id="Mc1" class="ct" data-dev="-Q2">
+<g class="rest">
+<polyline points="92.0,73.7 78.9,47.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,73.7 92.0,48.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<polyline points="75.7,50.4 82.1,44.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="75.7,44.0 82.1,50.4" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,73.7 92.0,79.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="85.2" y="79.7" width="13.6" height="18.4" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="92.0,79.7 92.0,84.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,84.5 96.4,84.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="96.4,84.5 96.4,93.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="96.4,93.3 92.0,93.3" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,93.3 92.0,98.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,98.1 92.0,102.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="85.2" y="102.9" width="13.6" height="16.8" fill="none" stroke="#111111" stroke-width="1.98"/>
+<text x="92.0" y="114.3" font-size="8.7" text-anchor="middle" fill="#111111" font-weight="700">I&gt;</text>
+<polyline points="92.0,119.7 92.0,124.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="95.6" y="45.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="95.6" y="133.2" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+<polyline points="65.5,60.8 85.5,60.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="54.0" y="64.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-Q2</text>
+</g>
+<g class="hit" data-dev="-S1" data-hit="push">
+<g id="Mc2" class="ct" data-dev="-S1">
+<g class="rest">
+<polyline points="92.0,150.0 109.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,175.7 105.1,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,150.0 109.9,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="92.0,175.7 78.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">1</text>
+<text x="95.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">2</text>
+</g>
+<polyline points="50.0,169.6 50.0,156.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="50.0,162.8 58.8,162.8" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.8,162.8 98.5,162.8" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="45.2" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-S1</text>
+<rect class="hb" x="24.0" y="144.0" width="80.0" height="37.7" rx="6"/>
+</g>
+<circle cx="92.0" cy="187.7" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g class="hit" data-dev="-S2" data-hit="push">
+<g id="Mc3" class="ct" data-dev="-S2">
+<g class="rest">
+<polyline points="92.0,233.3 78.9,206.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="92.0,233.3 92.0,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="95.6" y="204.9" font-size="9.9" text-anchor="start" fill="#111111">3</text>
+<text x="95.6" y="242.5" font-size="9.9" text-anchor="start" fill="#111111">4</text>
+</g>
+<polyline points="50.0,227.3 50.0,213.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="50.0,220.5 58.8,220.5" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="58.8,220.5 85.5,220.5" fill="none" stroke="#111111" stroke-width="1.41" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3.1 2.8"/>
+<text x="45.2" y="224.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-S2</text>
+<rect class="hb" x="24.0" y="201.7" width="80.0" height="37.7" rx="6"/>
+</g>
+<g id="Mc4" class="ct" data-dev="-KA1">
+<g class="rest">
+<polyline points="152.0,233.3 138.9,206.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="152.0,233.3 152.0,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="155.6" y="204.9" font-size="9.9" text-anchor="start" fill="#111111">11</text>
+<text x="155.6" y="242.5" font-size="9.9" text-anchor="start" fill="#111111">14</text>
+<text x="130.0" y="224.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KA1</text>
+</g>
+<circle cx="92.0" cy="249.7" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="152.0" cy="249.7" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<circle cx="92.0" cy="130.0" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Mc5" class="ct" data-dev="-KA1">
+<g class="rest">
+<polyline points="256.0,175.7 242.9,149.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="256.0,175.7 256.0,150.0" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="259.6" y="147.2" font-size="9.9" text-anchor="start" fill="#111111">21</text>
+<text x="259.6" y="184.9" font-size="9.9" text-anchor="start" fill="#111111">24</text>
+<text x="234.0" y="166.9" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KA1</text>
+</g>
+<circle cx="256.0" cy="187.7" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Mc6" class="ct" data-dev="-KT2">
+<g class="rest">
+<polyline points="256.0,207.7 273.9,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="256.0,233.3 269.1,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="256.0,207.7 273.9,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="256.0,233.3 242.9,206.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="259.6" y="204.9" font-size="9.9" text-anchor="start" fill="#111111">55</text>
+<text x="259.6" y="242.5" font-size="9.9" text-anchor="start" fill="#111111">56</text>
+</g>
+<path d="M234.6 213.9 A8.0 8.0 0 0 0 234.6 227.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="231.2,220.5 262.5,220.5" fill="none" stroke="#111111" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="225.6" y="224.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT2</text>
+<text class="cdt" data-dev="-KT2" x="260.8" y="255.3"></text>
+<g id="Mc7" class="ct" data-dev="-KT1">
+<g class="rest">
+<polyline points="352.0,233.3 338.9,206.9" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g class="act">
+<polyline points="352.0,233.3 352.0,207.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="355.6" y="204.9" font-size="9.9" text-anchor="start" fill="#111111">67</text>
+<text x="355.6" y="242.5" font-size="9.9" text-anchor="start" fill="#111111">68</text>
+</g>
+<path d="M330.6 213.9 A8.0 8.0 0 0 0 330.6 227.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="327.2,220.5 345.5,220.5" fill="none" stroke="#111111" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="321.6" y="224.5" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT1</text>
+<text class="cdt" data-dev="-KT1" x="356.8" y="255.3"></text>
+<circle cx="352.0" cy="245.3" r="2.8" fill="#111111" stroke="#111111" stroke-width="1.41"/>
+<g id="Mk8" class="coil" data-dev="-KA1">
+<rect x="82.0" y="281.7" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<text x="95.6" y="278.9" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="95.6" y="318.9" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="77.2" y="299.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KA1</text>
+</g>
+<circle class="glow" id="Mgh9" cx="152.0" cy="293.7" r="20.4" fill="#9BE09B"/>
+<g id="Mh9" class="pil" data-dev="-H2">
+<circle cx="152.0" cy="293.7" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="143.5,302.1 160.5,285.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="143.5,285.2 160.5,302.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="155.6" y="278.9" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="155.6" y="314.9" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="135.2" y="297.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H2</text>
+</g>
+<g id="Mk10" class="coil" data-dev="-KT1">
+<rect x="246.0" y="281.7" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<rect x="236.4" y="281.7" width="9.6" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<polyline points="236.4,309.7 246.0,281.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="236.4,281.7 246.0,309.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="259.6" y="278.9" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="259.6" y="318.9" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="231.6" y="299.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT1</text>
+</g>
+<g id="Mk11" class="coil" data-dev="-KT2">
+<rect x="342.0" y="281.7" width="20.0" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<rect x="332.4" y="281.7" width="9.6" height="28.0" fill="#ffffff" stroke="#111111" stroke-width="1.98"/>
+<polyline points="332.4,309.7 342.0,281.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="332.4,281.7 342.0,309.7" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="355.6" y="278.9" font-size="9.9" text-anchor="start" fill="#111111">A1</text>
+<text x="355.6" y="318.9" font-size="9.9" text-anchor="start" fill="#111111">A2</text>
+<text x="327.6" y="299.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-KT2</text>
+</g>
+<circle class="glow" id="Mgh12" cx="432.0" cy="293.7" r="20.4" fill="#F4A04A"/>
+<g id="Mh12" class="pil" data-dev="-H1">
+<circle cx="432.0" cy="293.7" r="12.0" fill="none" stroke="#111111" stroke-width="1.98"/>
+<polyline points="423.5,302.1 440.5,285.2" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="423.5,285.2 440.5,302.1" fill="none" stroke="#111111" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="435.6" y="278.9" font-size="9.9" text-anchor="start" fill="#111111">X1</text>
+<text x="435.6" y="314.9" font-size="9.9" text-anchor="start" fill="#111111">X2</text>
+<text x="415.2" y="297.7" font-size="11.6" text-anchor="end" fill="#111111" font-weight="700">-H1</text>
+</g>
+<text x="30.0" y="335.9" font-size="12.0" text-anchor="end" fill="#111111" font-weight="700">N</text>
+<circle cx="92.0" cy="331.7" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="152.0" cy="331.7" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="256.0" cy="331.7" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/>
+<circle cx="352.0" cy="331.7" r="2.8" fill="#1f5fbf" stroke="#1f5fbf" stroke-width="1.41"/></svg></div></div>
+    <div class="side">
+      <div class="card"><h2>Estado</h2><div id="leds" class="leds"></div></div>
+      <div class="card"><h2>Ruletas de los temporizadores</h2><div id="ruletas"></div></div>
+      <div class="card"><div id="btns" class="controls"></div>
+        <button id="bSpeed" type="button" class="b-speed">Tiempo normal<span class="small">acelera los temporizadores</span></button></div>
+    </div>
+  </div>
+  <div class="below">
+    
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card"><h2>Cómo funciona</h2><ul><li>El 21-24 de -KA1 alimenta la baliza: -KT1 a través del 55-56 de -KT2; el 67-68 de -KT1 alimenta -KT2 y -H1.</li><li>-KT1 cuenta 2 s → cierra su 67-68 → -H1 se enciende y -KT2 cuenta 2 s → se abre el 55-56 de -KT2 → cae -KT1 → se apaga -H1, cae -KT2 → vuelta a empezar.</li></ul></div>
+    <div class="card"><h2>Pruébalo</h2><ol><li>Pulsa -S2 y mira las dos cuentas atrás pasándose la pelota.</li><li>Pulsa -S1: -H1 se queda apagado.</li></ol></div>
+  </div>
+  <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Toca los aparatos del esquema: pulsadores, magnetotérmicos, térmicos (para dispararlos), finales de carrera y detectores. Cables en rojo vivo: tienen tensión. Línea amarilla: corriente.</p>
+</main>
+<script>var DRAW = [{"key": "M", "net": {"wires": [{"a": [2.3, 11.1], "b": [2.3, 10.9], "c": "f"}, {"a": [2.3, 10.9], "b": [2.3, 10.4], "c": "f"}, {"a": [2.3, 8.5], "b": [2.3, 8.35], "c": "f"}, {"a": [2.3, 8.35], "b": [2.3, 7.85], "c": "f"}, {"a": [2.3, 7.208], "b": [2.3, 6.908], "c": "f"}, {"a": [2.3, 6.908], "b": [3.8, 6.908], "c": "f"}, {"a": [2.3, 6.908], "b": [2.3, 6.408], "c": "f"}, {"a": [2.3, 5.767], "b": [2.3, 5.358], "c": "f"}, {"a": [3.8, 6.908], "b": [3.8, 6.408], "c": "f"}, {"a": [3.8, 5.767], "b": [3.8, 5.358], "c": "f"}, {"a": [2.3, 5.358], "b": [3.8, 5.358], "c": "f"}, {"a": [2.3, 5.358], "b": [3.8, 5.358], "c": "f"}, {"a": [3.8, 5.358], "b": [3.8, 5.358], "c": "f"}, {"a": [2.3, 8.35], "b": [6.4, 8.35], "c": "f"}, {"a": [6.4, 8.35], "b": [6.4, 7.85], "c": "f"}, {"a": [6.4, 7.208], "b": [6.4, 6.908], "c": "f"}, {"a": [6.4, 6.908], "b": [8.8, 6.908], "c": "f"}, {"a": [6.4, 6.908], "b": [6.4, 6.408], "c": "f"}, {"a": [8.8, 6.908], "b": [8.8, 6.408], "c": "f"}, {"a": [8.8, 5.767], "b": [8.8, 5.467], "c": "f"}, {"a": [8.8, 5.467], "b": [10.8, 5.467], "c": "f"}, {"a": [2.3, 5.358], "b": [2.3, 4.558], "c": "f"}, {"a": [2.3, 3.858], "b": [2.3, 3.308], "c": "n"}, {"a": [3.8, 5.358], "b": [3.8, 4.558], "c": "f"}, {"a": [3.8, 3.958], "b": [3.8, 3.308], "c": "n"}, {"a": [6.4, 5.767], "b": [6.4, 4.558], "c": "f"}, {"a": [6.4, 3.858], "b": [6.4, 3.308], "c": "n"}, {"a": [8.8, 5.467], "b": [8.8, 4.558], "c": "f"}, {"a": [8.8, 3.858], "b": [8.8, 3.308], "c": "n"}, {"a": [10.8, 5.467], "b": [10.8, 4.558], "c": "f"}, {"a": [10.8, 3.958], "b": [10.8, 3.308], "c": "n"}, {"a": [0.9, 3.308], "b": [2.3, 3.308], "c": "n"}, {"a": [2.3, 3.308], "b": [3.8, 3.308], "c": "n"}, {"a": [3.8, 3.308], "b": [6.4, 3.308], "c": "n"}, {"a": [6.4, 3.308], "b": [8.8, 3.308], "c": "n"}, {"a": [8.8, 3.308], "b": [10.8, 3.308], "c": "n"}], "els": [{"id": "c1", "t": "contact", "dev": "-Q2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 10.4], "b": [2.3, 9.758]}, {"id": "c2", "t": "contact", "dev": "-S1", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 7.85], "b": [2.3, 7.208]}, {"id": "c3", "t": "contact", "dev": "-S2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 6.408], "b": [2.3, 5.767]}, {"id": "c4", "t": "contact", "dev": "-KA1", "kind": "na", "timed": null, "typ": "aux", "a": [3.8, 6.408], "b": [3.8, 5.767]}, {"id": "c5", "t": "contact", "dev": "-KA1", "kind": "na", "timed": null, "typ": "aux", "a": [6.4, 7.85], "b": [6.4, 7.208]}, {"id": "c6", "t": "contact", "dev": "-KT2", "kind": "nc", "timed": "on", "typ": "aux", "a": [6.4, 6.408], "b": [6.4, 5.767]}, {"id": "c7", "t": "contact", "dev": "-KT1", "kind": "na", "timed": "on", "typ": "aux", "a": [8.8, 6.408], "b": [8.8, 5.767]}, {"id": "k8", "t": "coil", "dev": "-KA1", "a": [2.3, 4.558], "b": [2.3, 3.858]}, {"id": "h9", "t": "pilot", "dev": "-H2", "color": "#9BE09B", "a": [3.8, 4.558], "b": [3.8, 3.958]}, {"id": "k10", "t": "coil", "dev": "-KT1", "timer": "on", "a": [6.4, 4.558], "b": [6.4, 3.858]}, {"id": "k11", "t": "coil", "dev": "-KT2", "timer": "on", "a": [8.8, 4.558], "b": [8.8, 3.858]}, {"id": "h12", "t": "pilot", "dev": "-H1", "color": "#F4A04A", "a": [10.8, 4.558], "b": [10.8, 3.958]}], "links": [[[2.3, 9.758], [2.3, 8.5]]], "src": [["L", 2.3, 11.35], ["N", 0.75, 3.308]]}}]; var CFG = {"timers": {"-KT1": 2, "-KT2": 2}}; var DRAWCOL = {"-H2": "#9BE09B", "-H1": "#F4A04A"};</script>
+<script>(function(){
+'use strict';
+var $ = function(id){ return document.getElementById(id); };
+var K3 = function(p){ return p[0].toFixed(3) + ',' + p[1].toFixed(3); };
+var G = { edges: [], cons: [], srcs: [], nsrc: [] };
+var DEV = {};
+function dev(name){ if (!DEV[name]) DEV[name] = { name: name, en: false, t: 0, out: false, on: true, pressed: false, tripped: false, latched: false, kind: '' }; return DEV[name]; }
+
+DRAW.forEach(function(d){
+  var k = d.key, net = d.net, nk = function(p){ return k + ':' + K3(p); };
+  var ends = [];
+  net.wires.forEach(function(w, i){
+    G.edges.push({ t: 'w', a: nk(w.a), b: nk(w.b), c: w.c, el: $(k + 'w' + i), fl: $(k + 'fw' + i) });
+    ends.push(w.a, w.b);
+  });
+  net.links.forEach(function(l){ G.edges.push({ t: 'l', a: nk(l[0]), b: nk(l[1]) }); });
+  net.els.forEach(function(e){
+    var el = $(k + e.id);
+    if (e.t === 'contact'){ G.edges.push({ t: 'c', a: nk(e.a), b: nk(e.b), dev: e.dev, kind: e.kind, timed: e.timed, el: el }); dev(e.dev); }
+    else if (e.t === 'motor'){ G.cons.push({ t: 'motor', dev: e.dev, pts: e.pts.map(nk), el: el }); }
+    else {
+      G.cons.push({ t: e.t, dev: e.dev, a: nk(e.a), b: nk(e.b), timer: e.timer, el: el, glow: e.t === 'pilot' ? $(k + 'g' + e.id) : null });
+      if (e.t === 'coil'){ var D = dev(e.dev); D.coil = true; if (e.timer) D.timer = e.timer; }
+    }
+  });
+  (net.src || []).forEach(function(s){
+    var best = null, bd = 1e9;
+    ends.forEach(function(p){ var dd = Math.abs(p[0] - s[1]) + Math.abs(p[1] - s[2]); if (dd < bd){ bd = dd; best = p; } });
+    if (best){ if (s[0] === 'N') G.nsrc.push(nk(best)); else G.srcs.push({ node: nk(best), lbl: s[0] }); }
+  });
+});
+// tipos de aparato a partir de la zona que se toca en el esquema
+Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){ var D = dev(h.getAttribute('data-dev')); D.kind = h.getAttribute('data-hit'); });
+Object.keys(DEV).forEach(function(n){
+  var D = DEV[n];
+  if (/^-Q/.test(n)) D.kind = 'q';
+  if (D.timer){ D.T = Math.max(1, Math.min(5, (CFG.animT && CFG.animT[n]) || (CFG.timers && CFG.timers[n]) || 3)); }
+});
+
+var short = false, speed = 1, lastMsg = '', ev = '';
+function actuated(e){
+  var D = DEV[e.dev];
+  if (/^-Q/.test(e.dev)) return D.on;
+  if (/^-F\d/.test(e.dev) && !D.coil) return D.tripped;
+  if (D.coil) return e.timed ? D.out : D.en;
+  return D.pressed;
+}
+function closed(e){
+  if (e.t !== 'c') return true;
+  var a = actuated(e);
+  return e.kind === 'nc' ? !a : a;
+}
+function live(){
+  var adj = {};
+  G.edges.forEach(function(e){ if (!closed(e)) return; (adj[e.a] = adj[e.a] || []).push(e.b); (adj[e.b] = adj[e.b] || []).push(e.a); });
+  var lab = {}, conflict = false;
+  G.srcs.forEach(function(s){
+    var st = [s.node];
+    while (st.length){
+      var n = st.pop();
+      if (!lab[n]) lab[n] = {};
+      if (lab[n][s.lbl]) continue;
+      lab[n][s.lbl] = 1;
+      if (Object.keys(lab[n]).length > 1) conflict = true;
+      (adj[n] || []).forEach(function(m){ st.push(m); });
+    }
+  });
+  return { lab: lab, conflict: conflict };
+}
+function solve(){
+  var L;
+  for (var it = 0; it < 60; it++){
+    L = live();
+    if (L.conflict){ short = true; Object.keys(DEV).forEach(function(n){ if (/^-Q1$/.test(n)) DEV[n].on = false; }); ev = 'short'; continue; }
+    var ch = false;
+    G.cons.forEach(function(c){
+      if (c.t !== 'coil') return;
+      var D = DEV[c.dev], en = !!L.lab[c.a];
+      if (D.en === en) return;
+      D.en = en; ch = true;
+      if (D.timer === 'off' && en){ D.out = true; D.t = 0; }
+      if (D.timer === 'off' && !en){ D.t = 0; }
+      if (D.timer === 'on' && !en){ D.out = false; D.t = 0; }
+      if (D.timer === 'on' && en){ D.t = 0; }
+    });
+    if (!ch) break;
+  }
+  return L;
+}
+function tick(dt){
+  var any = false;
+  Object.keys(DEV).forEach(function(n){
+    var D = DEV[n];
+    if (D.timer === 'on' && D.en && !D.out){ D.t += dt; if (D.t >= D.T){ D.out = true; any = true; } }
+    if (D.timer === 'off' && !D.en && D.out){ D.t += dt; if (D.t >= D.T){ D.out = false; any = true; } }
+  });
+  return any;
+}
+function seq3(lbls){ var o = ['L1', 'L2', 'L3']; return lbls.join() === 'L1,L2,L3' || lbls.join() === 'L2,L3,L1' || lbls.join() === 'L3,L1,L2'; }
+function render(L){
+  var lab = L.lab;
+  var phase = function(n){ return lab[n] ? Object.keys(lab[n])[0] : null; };
+  // contactos
+  G.edges.forEach(function(e){ if (e.t === 'c' && e.el) e.el.classList.toggle('on', actuated(e)); });
+  // consumos
+  var on = {}, runs = [];
+  G.cons.forEach(function(c){
+    if (c.t === 'motor'){
+      var ls = c.pts.map(phase), run = ls.every(function(x){ return x; }) && (new Set(ls)).size === 3;
+      c.run = run; c.rev = run && !seq3(ls);
+      c.el.classList.toggle('run', run); c.el.classList.toggle('rev', !!c.rev);
+      if (run) runs.push(c.dev + (c.rev ? ' (izquierdas)' : ''));
+    } else {
+      var en = !!lab[c.a]; c.en = en;
+      if (c.el) c.el.classList.toggle('on', en);
+      if (c.glow) c.glow.classList.toggle('on', en);
+      if (en) on[c.dev] = c.t;
+    }
+  });
+  // grafo de corriente: se podan las ramas muertas
+  var adj = {}, add = function(a, b, e){ (adj[a] = adj[a] || []).push([b, e]); (adj[b] = adj[b] || []).push([a, e]); };
+  G.edges.forEach(function(e){
+    if (!closed(e)) return;
+    if (e.t === 'w' && e.c === 'n') add(e.a, e.b, e);
+    else if (lab[e.a] && lab[e.b]) add(e.a, e.b, e);
+  });
+  G.cons.forEach(function(c){
+    if (c.t === 'motor'){ if (c.run){ add(c.pts[0], c.pts[1], null); add(c.pts[1], c.pts[2], null); } }
+    else if (c.en) add(c.a, c.b, null);
+  });
+  var term = {}; G.srcs.forEach(function(s){ term[s.node] = 1; }); G.nsrc.forEach(function(n){ term[n] = 1; });
+  var alive = {}; Object.keys(adj).forEach(function(n){ alive[n] = 1; });
+  var changed = true;
+  while (changed){
+    changed = false;
+    Object.keys(alive).forEach(function(n){
+      if (term[n]) return;
+      var deg = adj[n].filter(function(x){ return alive[x[0]]; }).length;
+      if (deg <= 1){ delete alive[n]; changed = true; }
+    });
+  }
+  G.edges.forEach(function(e){
+    if (e.t !== 'w') return;
+    var lv = e.c === 'f' && lab[e.a] && lab[e.b];
+    e.el.classList.toggle('live', !!lv);
+    var fl = alive[e.a] && alive[e.b] && closed(e) && (e.c === 'n' || lv);
+    e.fl.classList.toggle('on', !!fl);
+  });
+  // cuentas atrás
+  Array.prototype.forEach.call(document.querySelectorAll('.cdt'), function(t){
+    var D = DEV[t.getAttribute('data-dev')], s = '';
+    if (D && D.timer === 'on' && D.en && !D.out) s = '⏱ ' + (D.T - D.t).toFixed(1).replace('.', ',') + ' s';
+    if (D && D.timer === 'off' && !D.en && D.out) s = '⏱ ' + (D.T - D.t).toFixed(1).replace('.', ',') + ' s';
+    t.textContent = s;
+  });
+  // panel
+  Object.keys(LEDS).forEach(function(n){
+    var x = LEDS[n], D = DEV[n];
+    if (!x) return;
+    var a = D && D.coil ? D.en : !!on[n];
+    if (/^-M/.test(n)){ a = runs.some(function(r){ return r.indexOf(n) === 0; }); }
+    x.classList.toggle('on', !!a);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-btn]'), function(b){
+    var D = DEV[b.getAttribute('data-btn')], k = D.kind;
+    if (k === 'push') b.classList.toggle('on', D.pressed);
+    if (k === 'toggle') b.classList.toggle('on', D.pressed);
+    if (k === 'q'){ b.classList.toggle('on', !D.on); b.firstChild.nodeValue = (D.on ? 'Abrir ' : 'Cerrar ') + D.name; }
+    if (k === 'trip'){ b.classList.toggle('on', D.tripped); b.firstChild.nodeValue = (D.tripped ? 'RESET ' : 'Disparar ') + D.name; }
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){
+    var D = DEV[h.getAttribute('data-dev')];
+    h.classList.toggle('latched', !!D.latched);
+    h.classList.toggle('pressed', !!(D.pressed && D.kind === 'push'));
+  });
+  // qué está pasando
+  var m = [];
+  Object.keys(DEV).forEach(function(n){ var D = DEV[n]; if (D.kind === 'q' && !D.on) m.push('<b>' + n + ' está abierto</b>: no llega tensión a lo que hay detrás.'); });
+  if (short) m.push('<b>¡Cortocircuito!</b> Han entrado los dos contactores a la vez: ha saltado -Q1.');
+  Object.keys(DEV).forEach(function(n){ var D = DEV[n]; if (D.tripped) m.push('<b>Ha saltado ' + n + '</b>: su 95-96 se abre y su 97-98 se cierra. Pulsa RESET para rearmarlo.'); });
+  var act = Object.keys(DEV).filter(function(n){ return DEV[n].coil && DEV[n].en; });
+  m.push(act.length ? 'Bobinas con tensión: <b>' + act.join(', ') + '</b>.' : 'Ninguna bobina tiene tensión.');
+  Object.keys(DEV).forEach(function(n){
+    var D = DEV[n];
+    if (D.timer === 'on' && D.en && !D.out) m.push('<span class="k">' + n + '</span> (a la conexión) está contando: faltan <b>' + Math.ceil(D.T - D.t - 1e-6) + ' s</b> para que cambien sus 55-56 y 67-68.');
+    if (D.timer === 'on' && D.en && D.out) m.push('<span class="k">' + n + '</span> ya ha contado: su 67-68 está cerrado y su 55-56 abierto.');
+    if (D.timer === 'off' && D.en) m.push('<span class="k">' + n + '</span> (a la desconexión) tiene tensión: sus contactos han cambiado al momento.');
+    if (D.timer === 'off' && !D.en && D.out) m.push('<span class="k">' + n + '</span> (a la desconexión) ya no tiene tensión y cuenta: faltan <b>' + Math.ceil(D.T - D.t - 1e-6) + ' s</b> para volver a reposo.');
+  });
+  if (runs.length) m.push('Motores girando: <b>' + runs.join(', ') + '</b>.');
+  var lit = Object.keys(on).filter(function(n){ return on[n] === 'pilot'; });
+  if (lit.length) m.push('Pilotos encendidos: <b>' + lit.join(', ') + '</b>.');
+  var html = m.map(function(x){ return '<p>' + x + '</p>'; }).join('');
+  if (html !== lastMsg){ $('explain').innerHTML = html; lastMsg = html; }
+}
+
+// ---------------- mandos
+function press(n, down){ var D = DEV[n]; if (D.pressed === down) return; D.pressed = down; changed(); }
+function toggle(n){ var D = DEV[n]; if (D.kind === 'q'){ D.on = !D.on; if (D.on) short = false; } else if (D.kind === 'trip') D.tripped = !D.tripped; else D.pressed = !D.pressed; changed(); }
+var lastDown = {}, skipUp = {};
+function holdable(el, n){
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch(_){}
+    var D = DEV[n], now = Date.now();
+    if (D.latched){ D.latched = false; skipUp[n] = true; press(n, false); return; }
+    if (now - (lastDown[n] || 0) < 380){ D.latched = true; skipUp[n] = true; lastDown[n] = 0; press(n, true); return; }
+    lastDown[n] = now; press(n, true);
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(t){ el.addEventListener(t, function(){
+    if (skipUp[n]){ skipUp[n] = false; return; } if (DEV[n].latched) return; press(n, false);
+  }); });
+  el.addEventListener('keydown', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(n, true); } });
+  el.addEventListener('keyup', function(e){ if ((e.key === ' ' || e.key === 'Enter') && !DEV[n].latched) press(n, false); });
+}
+function clickable(el, n){
+  el.addEventListener('click', function(){ toggle(n); });
+  el.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(n); } });
+}
+// botones del panel
+var BTN = $('btns'), LEDS = {};
+var order = Object.keys(DEV).sort(function(a, b){
+  var r = function(n){ var k = DEV[n].kind; return k === 'push' ? 0 : k === 'toggle' ? 1 : k === 'trip' ? 2 : k === 'q' ? 3 : 9; };
+  return r(a) - r(b) || a.localeCompare(b, 'es', { numeric: true });
+});
+order.forEach(function(n){
+  var D = DEV[n]; if (!D.kind || D.coil) return;
+  var b = document.createElement('button'); b.setAttribute('data-btn', n); b.type = 'button';
+  var lbl = { push: 'Pulsador ', toggle: '', trip: 'Disparar ', q: 'Abrir ' }[D.kind] + n;
+  var sm = { push: 'mantén pulsado · doble clic lo fija', toggle: /^-FC/.test(n) ? 'final de carrera: pisado / libre' : 'detector: detecta / no detecta', trip: 'relé térmico', q: 'magnetotérmico' }[D.kind];
+  b.appendChild(document.createTextNode(lbl));
+  var s = document.createElement('span'); s.className = 'small'; s.textContent = sm; b.appendChild(s);
+  b.className = 'b-' + D.kind;
+  BTN.appendChild(b);
+  if (D.kind === 'push') holdable(b, n); else clickable(b, n);
+});
+Array.prototype.forEach.call(document.querySelectorAll('.hit'), function(h){
+  var n = h.getAttribute('data-dev'); h.setAttribute('tabindex', '0'); h.setAttribute('role', 'button'); h.setAttribute('aria-label', n);
+  if (DEV[n].kind === 'push') holdable(h, n); else clickable(h, n);
+});
+// leds de estado
+var LD = $('leds');
+var names = Object.keys(DEV).filter(function(n){ return DEV[n].coil; }).sort(function(a, b){ return a.localeCompare(b, 'es', { numeric: true }); });
+var pil = G.cons.filter(function(c){ return c.t === 'pilot'; });
+var mot = G.cons.filter(function(c){ return c.t === 'motor'; });
+names.forEach(function(n){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot c"></span>' + n + (DEV[n].timer ? ' <small>(' + DEV[n].T + ' s)</small>' : ''); LD.appendChild(s); LEDS[n] = s.firstChild; });
+pil.forEach(function(c){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot" style="--lc:' + (c.el ? (DRAWCOL[c.dev] || '#3DBB4E') : '#3DBB4E') + '"></span>' + c.dev; LD.appendChild(s); LEDS[c.dev] = s.firstChild; });
+mot.forEach(function(c){ var s = document.createElement('span'); s.className = 'led'; s.innerHTML = '<span class="dot m"></span>' + c.dev; LD.appendChild(s); LEDS[c.dev] = s.firstChild; });
+// ruletas: un deslizador de 1 a 5 s por temporizador
+var RU = $('ruletas');
+Object.keys(DEV).filter(function(n){ return DEV[n].timer; }).sort(function(a, b){ return a.localeCompare(b, 'es', { numeric: true }); }).forEach(function(n){
+  var D = DEV[n];
+  D.T = Math.max(1, Math.min(5, Math.round(D.T)));
+  var row = document.createElement('label'); row.className = 'ru';
+  row.innerHTML = '<span class="rn">' + n + ' <small>' + (D.timer === 'on' ? 'conexión' : 'desconexión') + '</small></span><input type="range" min="1" max="5" step="1" value="' + D.T + '" aria-label="Tiempo de ' + n + '"><b>' + D.T + ' s</b>';
+  var inp = row.querySelector('input'), out = row.querySelector('b');
+  inp.addEventListener('input', function(){ D.T = +inp.value; out.textContent = D.T + ' s'; var lab = LEDS[n] && LEDS[n].parentNode.querySelector('small'); if (lab) lab.textContent = '(' + D.T + ' s)'; });
+  RU.appendChild(row);
+});
+if (!RU.children.length) RU.parentNode.style.display = 'none';
+// velocidad
+$('bSpeed').addEventListener('click', function(){ speed = speed === 1 ? 5 : 1; this.classList.toggle('on', speed > 1); this.firstChild.nodeValue = speed > 1 ? 'Tiempo ×5' : 'Tiempo normal'; });
+
+var L = solve();
+function changed(){ L = solve(); render(L); }
+var last = null;
+function loop(ts){
+  if (last === null) last = ts;
+  var dt = Math.min(0.1, (ts - last) / 1000) * speed; last = ts;
+  if (tick(dt)) L = solve();
+  render(L);
+  requestAnimationFrame(loop);
+}
+render(L);
+requestAnimationFrame(loop);
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var t = e.target.tagName; if (t !== 'INPUT' && t !== 'TEXTAREA'){ e.preventDefault(); location.href = 'index.html#practicas'; } } });
+try { localStorage.setItem('visto:' + 'p4_8_baliza.html', '1'); } catch(e){}
+window.__DEV = DEV;
+})();
+</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t; return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19'; }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t); try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+</body>
+</html>
