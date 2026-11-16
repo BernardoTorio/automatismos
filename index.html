@@ -131,7 +131,7 @@ a.card,.pdf,details.grp,.rub{border-radius:6px;box-shadow:none}
 a.card{transition:none}
 a.card:hover,a.card:focus-visible{transform:none;border-color:var(--green)}
 .card h2{color:var(--ink)}
-.num{background:transparent;color:var(--ink);border:2px solid var(--ink);border-radius:999px;height:40px;min-width:58px;font-size:1.05rem;font-variant-numeric:tabular-nums;position:relative;padding:0 10px 0 22px}
+.num{background:transparent;color:var(--ink);border:2px solid var(--ink);border-radius:999px;height:40px;min-width:58px;font-size:1.05rem;font-variant-numeric:tabular-nums;position:relative;padding:0 10px 0 26px}
 .num::before{content:"";position:absolute;left:7px;top:50%;width:10px;height:10px;margin-top:-6px;border:2px solid var(--ink);border-radius:50%;background:linear-gradient(135deg,transparent 42%,var(--ink) 42%,var(--ink) 58%,transparent 58%)}
 .pdf{border:1px solid var(--line);border-left:8px solid var(--green)}
 .pdf .ico{background:transparent;color:var(--fase);border:2px solid var(--fase);width:42px;height:48px}
@@ -246,15 +246,15 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p1_1_serie.html">
-    <div class="num">1.1</div>
+    <div class="num">P1.1</div>
     <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
   </a>
   <a class="card" href="p1_2_paralelo.html">
-    <div class="num">1.2</div>
+    <div class="num">P1.2</div>
     <div><h2>Pulsadores en paralelo</h2><p>-S3 o -S4 activan -KM1: con uno basta.</p></div>
   </a>
   <a class="card" href="p1_3_excluyentes.html">
-    <div class="num">1.3</div>
+    <div class="num">P1.3</div>
     <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
   </a>
     </div>
@@ -263,19 +263,19 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p2_1_prioridades.html">
-    <div class="num">2.1</div>
+    <div class="num">P2.1</div>
     <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
   </a>
   <a class="card" href="p2_2_compartidos.html">
-    <div class="num">2.2</div>
+    <div class="num">P2.2</div>
     <div><h2>Marchas y paros compartidos</h2><p>-S2 para los dos; -S4 arranca -KM1 y para -KM2 a la vez.</p></div>
   </a>
   <a class="card" href="p2_3_totales.html">
-    <div class="num">2.3</div>
+    <div class="num">P2.3</div>
     <div><h2>Marcha y paro totales</h2><p>Tres contactores, paro total -S4 y marcha total -S5 con un relé auxiliar de 3 contactos.</p></div>
   </a>
   <a class="card" href="p2_4_cascada.html">
-    <div class="num">2.4</div>
+    <div class="num">P2.4</div>
     <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
   </a>
     </div>
@@ -284,11 +284,11 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 3 · animaciones de las soluciones</span><span class="gn">2 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p3_1_termicos_serie.html">
-    <div class="num">3.1</div>
+    <div class="num">P3.1</div>
     <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
   </a>
   <a class="card" href="p3_3_dos_o_mas.html">
-    <div class="num">3.2 y 3.3</div>
+    <div class="num">P3.2 y 3.3</div>
     <div><h2>Cada térmico para su motor · paro si saltan dos o más</h2><p>Solución por pasos de los dos apartados: primero cada 95-96 en la rama de su contactor (3.2); después relés de avería con el 97-98, parejas 1-2, 1-3 y 3-2 que activan -KA5; -KA5 para todo (también el motor sano) y enciende la alarma (3.3).</p></div>
   </a>
     </div>
@@ -297,39 +297,39 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 4 · para qué se usa cada temporizador y soluciones</span><span class="gn">9 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="usos_temporizadores.html">
-    <div class="num">5.5</div>
+    <div class="num">T5.5</div>
     <div><h2>Para qué se usa un temporizador</h2><p>Los usos del temporizador que pide la Práctica 4, y uno más, con su mando, su cronograma y para qué sirven: se para solo, arranca más tarde, sigue un rato más, hay que mantener pulsado y filtro de señales dudosas.</p></div>
   </a>
   <a class="card" href="p4_1_bomba_riego.html">
-    <div class="num">4.1</div>
+    <div class="num">P4.1</div>
     <div><h2>Bomba de riego</h2><p>Al pulsar la marcha -S2, la bomba -M1 funciona 20 s y se para sola. El paro -S1 la para en cualquier momento.</p></div>
   </a>
   <a class="card" href="p4_2_paro_automatico.html">
-    <div class="num">4.2</div>
+    <div class="num">P4.2</div>
     <div><h2>Motor con paro automático</h2><p>Marcha -S2 y paro -S1. Al arrancar el motor, -KT1 empieza a contar y a los 12 s para todo. Pilotos: verde en marcha, rojo parado y naranja si salta el térmico.</p></div>
   </a>
   <a class="card" href="p4_3_cinta_aviso.html">
-    <div class="num">4.3</div>
+    <div class="num">P4.3</div>
     <div><h2>Cinta con aviso de arranque</h2><p>Al pulsar -S2 se enciende el aviso -H1; a los 8 s arranca la cinta -M1 y el aviso se apaga. -S1 lo para todo.</p></div>
   </a>
   <a class="card" href="p4_4_ventilador.html">
-    <div class="num">4.4</div>
+    <div class="num">P4.4</div>
     <div><h2>Ventilador que se queda enfriando</h2><p>Con -S2 arrancan la máquina -M1 y el ventilador -M2. Con -S1 se para la máquina, pero el ventilador sigue 30 s más.</p></div>
   </a>
   <a class="card" href="p4_5_dos_motores_fc.html">
-    <div class="num">4.5</div>
+    <div class="num">P4.5</div>
     <div><h2>Dos motores con final de carrera</h2><p>-M1 arranca con -S2 o con -FC1 y queda realimentado. A los 20 s arranca -M2 y, 30 s después, se para todo. -S1 para todo.</p></div>
   </a>
   <a class="card" href="p4_6_escalera_emergencia.html">
-    <div class="num">4.6</div>
+    <div class="num">P4.6</div>
     <div><h2>Escalera mecánica con emergencia</h2><p>La escalera arranca con -S2 o con el detector -S3 y funciona 10 s. -S4 o -S5 activan la emergencia (-KA1): se para y no arranca hasta el rearme -S6.</p></div>
   </a>
   <a class="card" href="p4_7_tres_motores.html">
-    <div class="num">4.7</div>
+    <div class="num">P4.7</div>
     <div><h2>Tres motores con un solo pulsador</h2><p>Según lo que mantengas pulsado -S2: a los 2 s arranca -M1, a los 4 s -M2 y a los 6 s -M3. Al soltar, los que arrancaron siguen. -S1 para todo.</p></div>
   </a>
   <a class="card" href="p4_8_baliza.html">
-    <div class="num">4.8</div>
+    <div class="num">P4.8</div>
     <div><h2>RETO · Baliza intermitente</h2><p>-S2 activa -KA1 (realimentado). Mientras está activado, -H1 parpadea: 2 s apagado, 2 s encendido. -S1 lo para todo.</p></div>
   </a>
     </div>
@@ -346,11 +346,11 @@ details.grp summary{color:var(--ink)}
   </a>
     <div class="cards2">
   <a class="card" href="examen_ej1_bombas.html">
-    <div class="num">Ej. 1</div>
+    <div class="num">E1</div>
     <div><h2>Bomba de reserva</h2><p>Solo mando. Si salta -F1, su 97-98 activa -KA1, que arranca la bomba de reserva; enclavamiento con el 61-62 de -KM1 (la principal siempre manda). Toca cada apartado (a, b, c…) para ver qué parte lo resuelve.</p></div>
   </a>
   <a class="card" href="examen_ej2_cinta.html">
-    <div class="num">Ej. 2</div>
+    <div class="num">E2</div>
     <div><h2>Cinta y triturador</h2><p>Fuerza y mando. Triturador con prioridad al paro, cinta con prioridad a la marcha y solo si funciona el triturador; cualquier térmico para todo. Solución por apartados.</p></div>
   </a>
     </div>
@@ -366,27 +366,27 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Tema 6 · animaciones para hacer los ejercicios</span><span class="gn">6 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="intensidad_calor.html">
-    <div class="num">6.4</div>
+    <div class="num">T6.4</div>
     <div><h2>La intensidad calienta los cables</h2><p>Qué es la intensidad, por qué calienta los cables, por qué ayuda subir la tensión y el pico de arranque del motor.</p></div>
   </a>
   <a class="card" href="regla_ib_in_iz.html">
-    <div class="num">6.5</div>
+    <div class="num">T6.5</div>
     <div><h2>La regla de oro: IB ≤ In ≤ Iz</h2><p>Para comprobar una línea: si no se cumple, qué subir o bajar, el calibre o la sección del cable. Con reto.</p></div>
   </a>
   <a class="card" href="curvas_disparo.html">
-    <div class="num">6.6</div>
+    <div class="num">T6.6</div>
     <div><h2>Las curvas de disparo</h2><p>Pasar la curva a amperios según el calibre y usarla en los problemas: zonas, tiempos y si el motor arranca.</p></div>
   </a>
   <a class="card" href="arranque_curvas.html">
-    <div class="num">6.7</div>
+    <div class="num">T6.7</div>
     <div><h2>El arranque de los motores sobre las curvas</h2><p>Varias curvas a la vez y hasta cuatro motores con su pico: el escalón de cada motor dice si arranca o no.</p></div>
   </a>
   <a class="card" href="proteger_motor.html">
-    <div class="num">6.8</div>
+    <div class="num">T6.8</div>
     <div><h2>Tres formas de proteger un motor</h2><p>Magnetotérmico + térmico, fusibles aM/gG + térmico o guardamotor: qué salta con una sobrecarga, un cortocircuito o el arranque. La ruleta del térmico. Apartados 6.8, 6.9 y 6.10.</p></div>
   </a>
   <a class="card" href="cuadro_motores.html">
-    <div class="num">6.11</div>
+    <div class="num">T6.11</div>
     <div><h2>Un cuadro con varios motores</h2><p>Leer la placa (estrella o triángulo), la línea general y la selectividad, las pinzas en las tres fases y la falta de una fase.</p></div>
   </a>
     </div>
@@ -398,47 +398,47 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Tema 3 · Conexionado básico II · teoría</span><span class="gn">11 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="pulsadores_na.html">
-    <div class="num">3.1</div>
+    <div class="num">T3.1</div>
     <div><h2>Pulsadores NA en paralelo y en serie</h2><p>Tres marchas en paralelo (basta una) y tres en serie (hacen falta todas), con bobinas de contactor.</p></div>
   </a>
   <a class="card" href="pulsadores_nc.html">
-    <div class="num">3.2</div>
+    <div class="num">T3.2</div>
     <div><h2>Pulsadores NC en serie y en paralelo</h2><p>Tres paros en serie (cualquiera para) y tres en paralelo (hay que pulsar todos), con bobinas de contactor.</p></div>
   </a>
   <a class="card" href="realimentacion.html">
-    <div class="num">3.3</div>
+    <div class="num">T3.3</div>
     <div><h2>La realimentación del contactor</h2><p>Marcha y paro con prioridad al paro: por qué el contactor se "sujeta solo" con su 13-14.</p></div>
   </a>
   <a class="card" href="realimentacion_marcha.html">
-    <div class="num">3.3</div>
+    <div class="num">T3.3</div>
     <div><h2>Realimentación con prioridad a la marcha</h2><p>El paro solo corta la realimentación: si pulsas marcha y paro a la vez, gana la marcha.</p></div>
   </a>
   <a class="card" href="combinaciones.html">
-    <div class="num">3.4</div>
+    <div class="num">T3.4</div>
     <div><h2>Una combinación de paros y marchas</h2><p>Dos paros en paralelo con otro en serie; dos marchas en serie con otra en paralelo y la realimentación.</p></div>
   </a>
   <a class="card" href="condicionada.html">
-    <div class="num">3.5</div>
+    <div class="num">T3.5</div>
     <div><h2>Activación condicionada</h2><p>El 53-54 de KM1 en serie con la bobina de KM2: KM2 solo arranca si KM1 ya está en marcha.</p></div>
   </a>
   <a class="card" href="enclavamiento.html">
-    <div class="num">3.6</div>
+    <div class="num">T3.6</div>
     <div><h2>Enclavamiento entre dos contactores</h2><p>Inversión de giro: el 61-62 de cada contactor bloquea al otro. Quítalo y mira qué pasa.</p></div>
   </a>
   <a class="card" href="rele_auxiliar.html">
-    <div class="num">3.7</div>
+    <div class="num">T3.7</div>
     <div><h2>El relé auxiliar</h2><p>Una bobina y tres contactos conmutados: KA1 se sujeta solo y maneja KM1 y dos pilotos.</p></div>
   </a>
   <a class="card" href="rele_base.html">
-    <div class="num">3.8</div>
+    <div class="num">T3.8</div>
     <div><h2>El relé y su base: leer los dibujos del fabricante</h2><p>Base, pegatina y esquema: los mismos tornillos dibujados de tres formas. Con polímetro y retos.</p></div>
   </a>
   <a class="card" href="arranque_motor.html">
-    <div class="num">3.9</div>
+    <div class="num">T3.9</div>
     <div><h2>Arranque directo de un motor</h2><p>Fuerza y mando: contactor, relé térmico y motor. Provoca una sobrecarga y mira qué pasa.</p></div>
   </a>
   <a class="card" href="inversion_giro.html">
-    <div class="num">3.10</div>
+    <div class="num">T3.10</div>
     <div><h2>Inversión de giro de un motor</h2><p>Fuerza y mando: KM2 cruza L1 y L3. Con enclavamiento, sobrecarga y cortocircuito si lo quitas.</p></div>
   </a>
     </div>
@@ -447,15 +447,15 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 1 · animaciones de las soluciones</span><span class="gn">3 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p1_1_serie.html">
-    <div class="num">1.1</div>
+    <div class="num">P1.1</div>
     <div><h2>Pulsadores en serie</h2><p>-S1 y -S2 a la vez para activar -KM1. Pilotos verde (53-54) y rojo (61-62).</p></div>
   </a>
   <a class="card" href="p1_2_paralelo.html">
-    <div class="num">1.2</div>
+    <div class="num">P1.2</div>
     <div><h2>Pulsadores en paralelo</h2><p>-S3 o -S4 activan -KM1: con uno basta.</p></div>
   </a>
   <a class="card" href="p1_3_excluyentes.html">
-    <div class="num">1.3</div>
+    <div class="num">P1.3</div>
     <div><h2>Paralelo, pero excluyentes</h2><p>Solo uno a la vez: el NA de cada pulsador en serie con el NC del otro.</p></div>
   </a>
     </div>
@@ -464,19 +464,19 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 2 · animaciones de las soluciones</span><span class="gn">4 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p2_1_prioridades.html">
-    <div class="num">2.1</div>
+    <div class="num">P2.1</div>
     <div><h2>Dos contactores realimentados</h2><p>-KM1 con prioridad al paro y -KM2 con prioridad a la marcha.</p></div>
   </a>
   <a class="card" href="p2_2_compartidos.html">
-    <div class="num">2.2</div>
+    <div class="num">P2.2</div>
     <div><h2>Marchas y paros compartidos</h2><p>-S2 para los dos; -S4 arranca -KM1 y para -KM2 a la vez.</p></div>
   </a>
   <a class="card" href="p2_3_totales.html">
-    <div class="num">2.3</div>
+    <div class="num">P2.3</div>
     <div><h2>Marcha y paro totales</h2><p>Tres contactores, paro total -S4 y marcha total -S5 con un relé auxiliar de 3 contactos.</p></div>
   </a>
   <a class="card" href="p2_4_cascada.html">
-    <div class="num">2.4</div>
+    <div class="num">P2.4</div>
     <div><h2>Activación condicionada</h2><p>-KM2 solo entra con -KM1 y -KM3 solo con -KM2. Cinco pilotos.</p></div>
   </a>
     </div>
@@ -485,11 +485,11 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 3 · animaciones de las soluciones</span><span class="gn">2 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p3_1_termicos_serie.html">
-    <div class="num">3.1</div>
+    <div class="num">P3.1</div>
     <div><h2>Cualquier térmico para todo</h2><p>Fuerza con tres motores y sus térmicos; los tres 95-96 en serie antes de -S4. Dispara un térmico con TEST.</p></div>
   </a>
   <a class="card" href="p3_3_dos_o_mas.html">
-    <div class="num">3.2 y 3.3</div>
+    <div class="num">P3.2 y 3.3</div>
     <div><h2>Cada térmico para su motor · paro si saltan dos o más</h2><p>Solución por pasos de los dos apartados: primero cada 95-96 en la rama de su contactor (3.2); después relés de avería con el 97-98, parejas 1-2, 1-3 y 3-2 que activan -KA5; -KA5 para todo (también el motor sano) y enciende la alarma (3.3).</p></div>
   </a>
     </div>
@@ -498,35 +498,35 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Práctica 4 · animaciones de las soluciones</span><span class="gn">8 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="p4_1_bomba_riego.html">
-    <div class="num">4.1</div>
+    <div class="num">P4.1</div>
     <div><h2>Bomba de riego</h2><p>Al pulsar la marcha -S2, la bomba -M1 funciona 20 s y se para sola. El paro -S1 la para en cualquier momento.</p></div>
   </a>
   <a class="card" href="p4_2_paro_automatico.html">
-    <div class="num">4.2</div>
+    <div class="num">P4.2</div>
     <div><h2>Motor con paro automático</h2><p>Marcha -S2 y paro -S1. Al arrancar el motor, -KT1 empieza a contar y a los 12 s para todo. Pilotos: verde en marcha, rojo parado y naranja si salta el térmico.</p></div>
   </a>
   <a class="card" href="p4_3_cinta_aviso.html">
-    <div class="num">4.3</div>
+    <div class="num">P4.3</div>
     <div><h2>Cinta con aviso de arranque</h2><p>Al pulsar -S2 se enciende el aviso -H1; a los 8 s arranca la cinta -M1 y el aviso se apaga. -S1 lo para todo.</p></div>
   </a>
   <a class="card" href="p4_4_ventilador.html">
-    <div class="num">4.4</div>
+    <div class="num">P4.4</div>
     <div><h2>Ventilador que se queda enfriando</h2><p>Con -S2 arrancan la máquina -M1 y el ventilador -M2. Con -S1 se para la máquina, pero el ventilador sigue 30 s más.</p></div>
   </a>
   <a class="card" href="p4_5_dos_motores_fc.html">
-    <div class="num">4.5</div>
+    <div class="num">P4.5</div>
     <div><h2>Dos motores con final de carrera</h2><p>-M1 arranca con -S2 o con -FC1 y queda realimentado. A los 20 s arranca -M2 y, 30 s después, se para todo. -S1 para todo.</p></div>
   </a>
   <a class="card" href="p4_6_escalera_emergencia.html">
-    <div class="num">4.6</div>
+    <div class="num">P4.6</div>
     <div><h2>Escalera mecánica con emergencia</h2><p>La escalera arranca con -S2 o con el detector -S3 y funciona 10 s. -S4 o -S5 activan la emergencia (-KA1): se para y no arranca hasta el rearme -S6.</p></div>
   </a>
   <a class="card" href="p4_7_tres_motores.html">
-    <div class="num">4.7</div>
+    <div class="num">P4.7</div>
     <div><h2>Tres motores con un solo pulsador</h2><p>Según lo que mantengas pulsado -S2: a los 2 s arranca -M1, a los 4 s -M2 y a los 6 s -M3. Al soltar, los que arrancaron siguen. -S1 para todo.</p></div>
   </a>
   <a class="card" href="p4_8_baliza.html">
-    <div class="num">4.8</div>
+    <div class="num">P4.8</div>
     <div><h2>RETO · Baliza intermitente</h2><p>-S2 activa -KA1 (realimentado). Mientras está activado, -H1 parpadea: 2 s apagado, 2 s encendido. -S1 lo para todo.</p></div>
   </a>
     </div>
@@ -535,11 +535,11 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Simulación de examen práctico · soluciones</span><span class="gn">2 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="examen1_ej1_mando.html">
-    <div class="num">Ej. 1</div>
+    <div class="num">E1</div>
     <div><h2>Mando con luz de alarma</h2><p>Cada térmico para solo su motor; el 97-98 enciende la luz de alarma y -S5 la apaga con el relé -KA1. Toca cada apartado (a, b, c…) para ver qué parte lo resuelve.</p></div>
   </a>
   <a class="card" href="examen1_ej2_fuerza.html">
-    <div class="num">Ej. 2</div>
+    <div class="num">E2</div>
     <div><h2>Fuerza y mando: cada térmico para su motor</h2><p>Dos motores con contactor, térmico y bornero; marchas, paro total y pilotos de marcha, de parado y de avería. Solución por apartados.</p></div>
   </a>
     </div>
@@ -548,11 +548,11 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Examen práctico · soluciones</span><span class="gn">2 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="examen_ej1_bombas.html">
-    <div class="num">Ej. 1</div>
+    <div class="num">E1</div>
     <div><h2>Bomba de reserva</h2><p>Solo mando. Si salta -F1, su 97-98 activa -KA1, que arranca la bomba de reserva; enclavamiento con el 61-62 de -KM1 (la principal siempre manda). Toca cada apartado (a, b, c…) para ver qué parte lo resuelve.</p></div>
   </a>
   <a class="card" href="examen_ej2_cinta.html">
-    <div class="num">Ej. 2</div>
+    <div class="num">E2</div>
     <div><h2>Cinta y triturador</h2><p>Fuerza y mando. Triturador con prioridad al paro, cinta con prioridad a la marcha y solo si funciona el triturador; cualquier térmico para todo. Solución por apartados.</p></div>
   </a>
     </div>
@@ -561,11 +561,11 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Tema 5 · Temporizadores y cambio de sentido · teoría</span><span class="gn">2 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="cronograma_temporizadores.html">
-    <div class="num">5.2</div>
+    <div class="num">T5.2</div>
     <div><h2>A la conexión y a la desconexión: el cronograma</h2><p>Un pulsador y dos temporizadores: el cronograma se dibuja en directo. Pulsaciones largas, cortas y pulsos seguidos.</p></div>
   </a>
   <a class="card" href="usos_temporizadores.html">
-    <div class="num">5.5</div>
+    <div class="num">T5.5</div>
     <div><h2>Para qué se usa un temporizador</h2><p>Los usos del temporizador que pide la Práctica 4, y uno más, con su mando, su cronograma y para qué sirven: se para solo, arranca más tarde, sigue un rato más, hay que mantener pulsado y filtro de señales dudosas.</p></div>
   </a>
     </div>
@@ -574,27 +574,27 @@ details.grp summary{color:var(--ink)}
     <summary><span class="gt">Tema 6 · Dimensionamiento de protecciones · teoría</span><span class="gn">6 animaciones</span></summary>
     <div class="cards2">
   <a class="card" href="intensidad_calor.html">
-    <div class="num">6.4</div>
+    <div class="num">T6.4</div>
     <div><h2>La intensidad calienta los cables</h2><p>Qué es la intensidad, por qué calienta los cables, por qué ayuda subir la tensión y el pico de arranque del motor.</p></div>
   </a>
   <a class="card" href="regla_ib_in_iz.html">
-    <div class="num">6.5</div>
+    <div class="num">T6.5</div>
     <div><h2>La regla de oro: IB ≤ In ≤ Iz</h2><p>Para comprobar una línea: si no se cumple, qué subir o bajar, el calibre o la sección del cable. Con reto.</p></div>
   </a>
   <a class="card" href="curvas_disparo.html">
-    <div class="num">6.6</div>
+    <div class="num">T6.6</div>
     <div><h2>Las curvas de disparo</h2><p>Pasar la curva a amperios según el calibre y usarla en los problemas: zonas, tiempos y si el motor arranca.</p></div>
   </a>
   <a class="card" href="arranque_curvas.html">
-    <div class="num">6.7</div>
+    <div class="num">T6.7</div>
     <div><h2>El arranque de los motores sobre las curvas</h2><p>Varias curvas a la vez y hasta cuatro motores con su pico: el escalón de cada motor dice si arranca o no.</p></div>
   </a>
   <a class="card" href="proteger_motor.html">
-    <div class="num">6.8</div>
+    <div class="num">T6.8</div>
     <div><h2>Tres formas de proteger un motor</h2><p>Magnetotérmico + térmico, fusibles aM/gG + térmico o guardamotor: qué salta con una sobrecarga, un cortocircuito o el arranque. La ruleta del térmico. Apartados 6.8, 6.9 y 6.10.</p></div>
   </a>
   <a class="card" href="cuadro_motores.html">
-    <div class="num">6.11</div>
+    <div class="num">T6.11</div>
     <div><h2>Un cuadro con varios motores</h2><p>Leer la placa (estrella o triángulo), la línea general y la selectividad, las pinzas en las tres fases y la falta de una fase.</p></div>
   </a>
     </div>
@@ -679,10 +679,10 @@ details.grp summary{color:var(--ink)}
     {n:2, t:'Dispositivos básicos', pdf:'temas/T2_Dispositivos_basicos_Automatismos.pdf', chips:[['Medidas','medidas.html'],['Test 28 oct','test_28oct.html']]},
     {n:3, t:'Conexionado básico II', pdf:'temas/T3_Conexionado_basico_II_Automatismos.pdf', chips:[['Resumen R3','temas/R3_Resumen_conexionados_mando_Automatismos.pdf'],['Prácticas 1 y 2','#practicas'],['11 animaciones','#animaciones'],['Test II','test_28oct_II.html']]},
     {n:4, t:'Conexionado básico III: esquemas de fuerza', pdf:'temas/T4_Conexionado_basico_III_Esquemas_de_fuerza.pdf', chips:[['Práctica 3','#practicas'],['Test diciembre','test_diciembre.html']]},
-    {n:5, t:'Temporizadores y cambio de sentido de giro', pdf:'temas/T5_Temporizadores_y_cambio_de_sentido.pdf', chips:[['Prácticas 4 y 5','#practicas'],['Animación 5.2','cronograma_temporizadores.html'],['Animación 5.5','usos_temporizadores.html'],['Test T5-T6','test_t5_t6.html']],
-     ruta:[['5.2','cronograma_temporizadores.html'],['5.5','usos_temporizadores.html']]},
+    {n:5, t:'Temporizadores y cambio de sentido de giro', pdf:'temas/T5_Temporizadores_y_cambio_de_sentido.pdf', chips:[['Prácticas 4 y 5','#practicas'],['Animación T5.2','cronograma_temporizadores.html'],['Animación T5.5','usos_temporizadores.html'],['Test T5-T6','test_t5_t6.html']],
+     ruta:[['T5.2','cronograma_temporizadores.html'],['T5.5','usos_temporizadores.html']]},
     {n:6, t:'Dimensionamiento de protecciones', pdf:'temas/T6_Dimensionamiento_protecciones.pdf', chips:[['20 ejercicios','ejercicios/T6_Ejercicios_Dimensionamiento_protecciones.pdf'],['6 animaciones','#ejercicios'],['Test T5-T6','test_t5_t6.html']],
-     ruta:[['6.4','intensidad_calor.html'],['6.5','regla_ib_in_iz.html'],['6.6','curvas_disparo.html'],['6.7','arranque_curvas.html'],['6.8','proteger_motor.html'],['6.11','cuadro_motores.html']]}
+     ruta:[['T6.4','intensidad_calor.html'],['T6.5','regla_ib_in_iz.html'],['T6.6','curvas_disparo.html'],['T6.7','arranque_curvas.html'],['T6.8','proteger_motor.html'],['T6.11','cuadro_motores.html']]}
   ];
   function link(c){ var f = /\.pdf$/.test(c[1]); return '<a href="'+c[1]+'"'+(f?' download':'')+'>'+c[0]+'</a>'; }
   document.getElementById('temasList').innerHTML = T.slice().reverse().map(function(x){

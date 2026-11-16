@@ -41,6 +41,7 @@ subir.bat                  publica todo con doble clic
 - Temas y Prácticas: un recuadro por PDF con enlace `download`. Si el PDF todavía no está en el servidor, un `fetch HEAD` lo marca en gris como "próximamente".
 - Las soluciones animadas de las prácticas aparecen en dos sitios: en Prácticas y en Animaciones (por partes: Tema 3, Práctica 1, 2 y 3).
 - Tests: una tarjeta por test; el test vuelve a `index.html#tests`.
+- **Letra delante del número (T, P, E)**, igual en las tres webs: cada animación dice a qué se refiere. **T** si explica un apartado del tema (`T5.5`, `T6.4`), **P** si es la solución de un ejercicio de una práctica (`P4.1`, `P3.2 y 3.3`) y **E** si es un ejercicio suelto, como los de los exámenes (`E1`, `E2`). Así se ve, por ejemplo, que la T5.5 del grupo de la Práctica 4 explica un apartado del Tema 5. Va en las tarjetas, en «Ahora en clase» (`ruta` y `chips`), en la tira, en la última miga, en el título y en el botón «Siguiente». Los tests y las medidas no llevan letra. Una animación nueva se pone ya con su letra.
 
 ## Tests: mapa y test a medias
 - A la izquierda, el mapa de preguntas con colores (verde, rojo, gris) y, a la derecha, «Cómo vas»; en el móvil, una barra abajo que abre el mapa.
@@ -53,7 +54,7 @@ subir.bat                  publica todo con doble clic
 - La letra va a la izquierda del hilo con una guía hasta el tornillo; si no cabe, al lado del número. En la fuerza solo caben en los hilos de fuera (L1 y L3): las medidas entre fases se hacen entre esos dos.
 - Las figuras van dentro de cada test (`IMGS`, en base64) y la misma figura se repite en varios tests: si se cambia una, se cambia en todos. «En orden» coincide con el test en papel (mismo número y mismo orden de respuestas).
 - `medidas.html`: las tareas ligadas a una pregunta dicen el tornillo y, entre paréntesis, la letra del dibujo del test.
-- Animaciones: una tarjeta por animación, **numerada con el apartado de los apuntes** (3.1, 3.2…) y en ese orden. Cada animación nueva se añade aquí con número, título y una línea de descripción.
+- Animaciones: una tarjeta por animación, **numerada con T y el apartado de los apuntes** (T3.1, T3.2…; las soluciones de las prácticas, con P: P4.1) y en ese orden. Cada animación nueva se añade aquí con número, título y una línea de descripción.
 
 ## Animaciones actuales (Tema 3 · Conexionado básico II)
 | Apdo. | Archivo | Qué muestra |
