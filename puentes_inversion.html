@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>T5.9 Los puentes de la inversión de giro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:2100px;margin:0 auto;padding:20px clamp(16px,2.2vw,44px) 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:110ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.15fr) 300px;gap:16px;align-items:start}
+@media (max-width:1500px){.grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:76vh;min-width:300px}
+@media (max-width:780px){.sheet svg{min-width:620px;max-height:none}}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:12px 10px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button[disabled]{opacity:.45;cursor:not-allowed}
+#bS1{border-color:#2E8B3E;grid-column:1 / -1;padding:16px 10px;font-size:1.1rem}
+#bS1.on{background:#2E8B3E;color:#fff}
+button.tog.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.small{font-size:.86rem;font-weight:400;display:block;opacity:.8}
+.foot{color:var(--muted);font-size:.9rem;margin-top:4px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+/* temporizadores (columna de estado) */
+.tm{display:grid;grid-template-columns:78px 1fr;gap:12px;align-items:center}
+.tm + .tm{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tm svg{width:78px;height:108px}
+.tmname{font-weight:700}
+.tmname .ty{font-weight:400;color:var(--muted)}
+.cd{font-size:2rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;min-height:1.1em}
+.cd.run{color:#B07800}
+:root[data-theme="dark"] .cd.run{color:#FFC94D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cd.run{color:#FFC94D}}
+.stt{font-weight:700;color:var(--muted)}
+.stt.work{color:var(--ok)}
+.led{display:inline-flex;align-items:center;gap:6px;font-weight:700;margin-top:4px}
+.dot{width:22px;height:22px;border-radius:50%;border:3px solid #333;background:#fff;transition:background .15s,box-shadow .15s}
+.dot.g.on{background:#3DBB4E;box-shadow:0 0 14px #3DBB4E}
+.dot.a.on{background:#FFB000;box-shadow:0 0 14px #FFB000}
+.inside{font-size:.9rem;color:var(--muted);margin:10px 0 0}
+/* ruleta */
+.dialrow{display:flex;align-items:center;gap:14px}
+.dialrow svg{width:96px;height:96px;flex:none}
+.dialrow input{width:100%;accent-color:#1F4E79;height:28px}
+.tval{font-size:1.5rem;font-weight:700}
+/* cronograma */
+.chart{margin-top:0}
+.chartwrap{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px}
+.chartwrap canvas{display:block;width:100%;height:480px}
+.howread{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.95rem;color:var(--muted);margin:0 0 8px}
+.howread b{color:var(--ink)}
+.sw{display:inline-block;width:26px;height:5px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.uses h2{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
+.uses ul{margin:6px 0 0;padding-left:22px}
+.uses li{margin:4px 0}
+.tag{white-space:nowrap;font-size:.8rem;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff}
+.tag.on{background:#2E8B3E}.tag.off{background:#B07800}
+.big{font-size:1.15rem}
+.box{border-radius:10px;padding:12px 14px;margin-top:10px;border:2px solid}
+.box.ojo{border-color:#C0392B}
+.box.ojo b.t{color:#C0392B}
+.box.pista{border-color:#1F4E79}
+.box.pista b.t{color:#1F4E79}
+:root[data-theme="dark"] .box.pista b.t{color:#8DB8E8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .box.pista b.t{color:#8DB8E8}}
+/* diagrama */
+.w{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.wf{stroke:var(--fase)} .wn{stroke:var(--neutro)}
+.w.wf{opacity:.42;transition:opacity .15s,stroke-width .15s}
+.w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.cdt{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:16px;fill:#9a6a00}
+.flow{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;transition:opacity .15s}
+.flow.on{opacity:.95;animation:run .9s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+.blade{transition:transform .14s ease}
+.glow{opacity:0;transition:opacity .15s}
+.glow.on{opacity:.9}
+.coilfill{transition:fill .15s}
+@media (prefers-reduced-motion: reduce){ .flow.on{animation:none;opacity:.8} .blade{transition:none} }
+.hit{cursor:pointer}
+.hit:hover .hitbox,.hit:focus-visible .hitbox{stroke:#F2B400;stroke-opacity:.9}
+.hit:focus{outline:none}
+.hitbox{fill:transparent;stroke:transparent;stroke-width:2;stroke-dasharray:4 4}
+.hit.latched .hitbox{fill:#FFF3C4;fill-opacity:.35;stroke:#F2B400;stroke-opacity:1;stroke-width:3;stroke-dasharray:none}
+button.latched{box-shadow:0 0 0 4px #F2B400}
+.pin{display:inline-block;background:#FFF3C4;border:2px solid #F2B400;border-radius:6px;padding:0 6px;font-weight:700;color:#1a1a1a}
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+/* tira del tema */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:#2E8B3E}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+</style>
+
+<style>
+.g2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(250px,1fr);gap:16px;align-items:start}
+.g2 .side{display:flex;flex-direction:column;gap:14px;grid-column:auto;grid-row:auto}
+.g2 > .sheet{grid-column:auto;grid-row:auto}
+@media (max-width:820px){.g2{grid-template-columns:minmax(0,1fr)}}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.tabs button{border:2px solid var(--line);background:var(--btn);color:var(--ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tabs button.on{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.sheet svg{max-height:none}
+.cbox{fill:#D5D8DD;stroke:#333;stroke-width:3}
+.fbox{fill:#E8D9C3;stroke:#333;stroke-width:3}
+.scr{fill:#F4F4F4;stroke:#222;stroke-width:2.4}
+.cab{fill:none;stroke:#141414;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.rig{fill:none;stroke:#8B4A1C;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.halo{fill:none;stroke:#fff;stroke-width:15}
+.clav{fill:#B8860B;stroke:#333;stroke-width:2}
+.tl{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:14px;fill:#111}
+.tn{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:19px;font-weight:700;fill:#111}
+.ph{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:16px;font-weight:700;fill:#C0392B}
+.hit{cursor:pointer}.hit:focus{outline:none}.hit:focus-visible .cbox{stroke:#1F4E79;stroke-width:5}
+.hit .hb{fill:transparent}
+.flowc{fill:none;stroke:#FFE28A;stroke-width:3;stroke-linecap:round;stroke-dasharray:0.5 17.5;opacity:0;pointer-events:none}
+.flowc.on{opacity:.95;animation:run .9s linear infinite}
+@keyframes run{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion: reduce){.flowc.on{animation:none;opacity:.8}}
+.ok{fill:#2E8B3E}.bad{fill:#C0392B}
+.seg{fill:none;stroke:var(--fase);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;opacity:.42}
+.seg.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
+.seg.liar{opacity:.42}
+.liarbox{fill:none;stroke:#E67E22;stroke-width:14;stroke-linecap:round;stroke-linejoin:round;opacity:0;stroke-dasharray:3 9}
+.liarbox.on{opacity:.75}
+.sym{fill:none;stroke:#111;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.symf{fill:#fff;stroke:#111;stroke-width:3}
+.dash{fill:none;stroke:#111;stroke-width:2;stroke-dasharray:7 5}
+.t{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111;font-size:15px}
+.name{font-weight:700;font-size:18px}
+.pt circle{fill:#FFDD40;stroke:#111;stroke-width:2.4}.pt text{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-weight:700;font-size:17px;fill:#111}
+.pt.sel circle{fill:#1F4E79}.pt.sel text{fill:#fff}
+.meter{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:8px;font-size:1.02rem}
+.meter b{white-space:nowrap}
+.big{font-weight:700}
+.seg.cur{}
+.modebtn.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.kmbtn.on{background:#FFE9A8;border-color:#B8860B}
+.case{display:none}.case.on{display:block}
+.pieces{margin-top:8px}
+.leyenda{font-size:.88rem;color:var(--muted);margin:6px 2px 0}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 5</a><span class="sep">›</span><b>T5.9 Los puentes de la inversión de giro</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 5"><a class="arr" href="usos_temporizadores.html" aria-label="Anterior: T5.5 Para qué se usa un temporizador">‹ T5.5</a><span class="where">Tema 5 · 3 de 3</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="cronograma_temporizadores.html" title="El cronograma de los temporizadores">T5.2</a><a href="usos_temporizadores.html" title="Para qué se usa un temporizador">T5.5</a><a href="puentes_inversion.html" class="cur" aria-current="page" title="Los puentes de la inversión de giro">T5.9</a></div></nav>
+  <h1>Los puentes de la inversión de giro</h1>
+  <p class="sub">Te sirve para la <b>Práctica 5</b>. Dos cosas de la fuerza del cambio de sentido: <b>por qué en el aula se cruza arriba</b> y <b>por qué en las animaciones algunos cables salen apagados aunque tengan tensión</b>.</p>
+  <div class="tabs" role="tablist"><button id="tab1" role="tab">1 · Dónde se cruza</button><button id="tab2" role="tab">2 · Tensión sin corriente</button></div>
+
+  <div id="case1" class="case">
+  <div class="g2">
+    <div class="sheet"><svg id="sv1" viewBox="0 0 760 640" role="img" aria-labelledby="t1"><title id="t1">Cableado de la fuerza de la inversión de giro: -Q1, -KM1, -KM2, -F1 y bornero -X1, con los puentes entre los dos contactores</title><rect x="60" y="20" width="190" height="90" rx="10" class="cbox"/><text class="tn" x="50" y="70" text-anchor="end">-Q1</text><text class="tl" x="100" y="64" text-anchor="middle">2</text><text class="tl" x="155" y="64" text-anchor="middle">4</text><text class="tl" x="210" y="64" text-anchor="middle">6</text><g id="hk1" class="hit" tabindex="0" role="button" aria-label="-KM1: activar o soltar"><rect x="60" y="196" width="190" height="136" rx="10" class="cbox"/><text class="tn" x="50" y="270" text-anchor="end">-KM1</text></g><g id="hk2" class="hit" tabindex="0" role="button" aria-label="-KM2: activar o soltar"><rect x="430" y="196" width="190" height="136" rx="10" class="cbox"/><text class="tn" x="420" y="270" text-anchor="end">-KM2</text></g><text class="tl" x="100" y="250" text-anchor="middle">1/L1</text><text class="tl" x="100" y="292" text-anchor="middle">2/T1</text><text class="tl" x="155" y="250" text-anchor="middle">3/L2</text><text class="tl" x="155" y="292" text-anchor="middle">4/T2</text><text class="tl" x="210" y="250" text-anchor="middle">5/L3</text><text class="tl" x="210" y="292" text-anchor="middle">6/T3</text><text class="tl" x="470" y="250" text-anchor="middle">1/L1</text><text class="tl" x="470" y="292" text-anchor="middle">2/T1</text><text class="tl" x="525" y="250" text-anchor="middle">3/L2</text><text class="tl" x="525" y="292" text-anchor="middle">4/T2</text><text class="tl" x="580" y="250" text-anchor="middle">5/L3</text><text class="tl" x="580" y="292" text-anchor="middle">6/T3</text><text id="st1" class="tl" x="155" y="275" text-anchor="middle" style="font-weight:700"></text><text id="st2" class="tl" x="525" y="275" text-anchor="middle" style="font-weight:700"></text><rect x="60" y="418" width="190" height="78" rx="10" class="fbox"/><text class="tn" x="50" y="462" text-anchor="end">-F1</text><rect class="clav" x="93" y="318" width="14" height="100"/><rect class="clav" x="148" y="318" width="14" height="100"/><rect class="clav" x="203" y="318" width="14" height="100"/><rect x="78" y="538" width="44" height="44" fill="#EEEEEE" stroke="#333" stroke-width="2.6"/><text class="tl" x="100" y="600" text-anchor="middle">1</text><text id="ph0" class="ph" x="100" y="625" text-anchor="middle"></text><rect x="133" y="538" width="44" height="44" fill="#EEEEEE" stroke="#333" stroke-width="2.6"/><text class="tl" x="155" y="600" text-anchor="middle">2</text><text id="ph1" class="ph" x="155" y="625" text-anchor="middle"></text><rect x="188" y="538" width="44" height="44" fill="#EEEEEE" stroke="#333" stroke-width="2.6"/><text class="tl" x="210" y="600" text-anchor="middle">3</text><text id="ph2" class="ph" x="210" y="625" text-anchor="middle"></text><text class="tn" x="70" y="566" text-anchor="end">-X1</text><text class="tl" x="250" y="556">U1  V1  W1</text><text class="tl" x="250" y="576" id="motT">→ al motor</text><path class="cab" d="M100 88 L100 226"/><path class="cab" d="M100 470 L100 560"/><path class="cab" d="M155 88 L155 226"/><path class="cab" d="M155 470 L155 560"/><path class="cab" d="M210 88 L210 226"/><path class="cab" d="M210 470 L210 560"/><g id="m_a"><path class="halo" d="M109 150 L580 150"/><path class="cab" d="M109 226 L109 150 L580 150 L580 226"/><path class="halo" d="M164 165 L525 165"/><path class="cab" d="M164 226 L164 165 L525 165 L525 226"/><path class="halo" d="M219 180 L470 180"/><path class="cab" d="M219 226 L219 180 L470 180 L470 226"/><path class="halo" d="M112 340 L112 352"/><path class="rig" d="M112 304 L112 352 L470 352 L470 304"/><path class="halo" d="M167 340 L167 366"/><path class="rig" d="M167 304 L167 366 L525 366 L525 304"/><path class="halo" d="M222 340 L222 380"/><path class="rig" d="M222 304 L222 380 L580 380 L580 304"/></g><g id="m_b"><path class="halo" d="M109 180 L470 180"/><path class="cab" d="M109 226 L109 180 L470 180 L470 226"/><path class="halo" d="M164 165 L525 165"/><path class="cab" d="M164 226 L164 165 L525 165 L525 226"/><path class="halo" d="M219 150 L580 150"/><path class="cab" d="M219 226 L219 150 L580 150 L580 226"/><path class="halo" d="M222 340 L222 352"/><path class="rig" d="M222 304 L222 352 L470 352 L470 304"/><path class="halo" d="M167 340 L167 366"/><path class="rig" d="M167 304 L167 366 L525 366 L525 304"/><path class="halo" d="M112 340 L112 380"/><path class="rig" d="M112 304 L112 380 L580 380 L580 304"/></g><circle class="scr" cx="100" cy="88" r="12"/><line x1="92" y1="88" x2="108" y2="88" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="100" cy="226" r="12"/><line x1="92" y1="226" x2="108" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="100" cy="304" r="12"/><line x1="92" y1="304" x2="108" y2="304" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="100" cy="470" r="12"/><line x1="92" y1="470" x2="108" y2="470" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="100" cy="560" r="12"/><line x1="92" y1="560" x2="108" y2="560" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="155" cy="88" r="12"/><line x1="147" y1="88" x2="163" y2="88" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="155" cy="226" r="12"/><line x1="147" y1="226" x2="163" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="155" cy="304" r="12"/><line x1="147" y1="304" x2="163" y2="304" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="155" cy="470" r="12"/><line x1="147" y1="470" x2="163" y2="470" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="155" cy="560" r="12"/><line x1="147" y1="560" x2="163" y2="560" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="210" cy="88" r="12"/><line x1="202" y1="88" x2="218" y2="88" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="210" cy="226" r="12"/><line x1="202" y1="226" x2="218" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="210" cy="304" r="12"/><line x1="202" y1="304" x2="218" y2="304" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="210" cy="470" r="12"/><line x1="202" y1="470" x2="218" y2="470" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="210" cy="560" r="12"/><line x1="202" y1="560" x2="218" y2="560" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="470" cy="226" r="12"/><line x1="462" y1="226" x2="478" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="470" cy="304" r="12"/><line x1="462" y1="304" x2="478" y2="304" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="525" cy="226" r="12"/><line x1="517" y1="226" x2="533" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="525" cy="304" r="12"/><line x1="517" y1="304" x2="533" y2="304" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="580" cy="226" r="12"/><line x1="572" y1="226" x2="588" y2="226" stroke="#222" stroke-width="2.2"/><circle class="scr" cx="580" cy="304" r="12"/><line x1="572" y1="304" x2="588" y2="304" stroke="#222" stroke-width="2.2"/><path id="f1_a_0" class="flowc" d="M100 88 L100 226 L100 304 L100 470 L100 560"/><path id="f2_a_0" class="flowc" d="M100 88 L100 226 L109 226 L109 150 L580 150 L580 226 L580 304 L580 380 L222 380 L222 304 L210 304 L210 470 L210 560"/><path id="f1_a_1" class="flowc" d="M155 88 L155 226 L155 304 L155 470 L155 560"/><path id="f2_a_1" class="flowc" d="M155 88 L155 226 L164 226 L164 165 L525 165 L525 226 L525 304 L525 366 L167 366 L167 304 L155 304 L155 470 L155 560"/><path id="f1_a_2" class="flowc" d="M210 88 L210 226 L210 304 L210 470 L210 560"/><path id="f2_a_2" class="flowc" d="M210 88 L210 226 L219 226 L219 180 L470 180 L470 226 L470 304 L470 352 L112 352 L112 304 L100 304 L100 470 L100 560"/><path id="f1_b_0" class="flowc" d="M100 88 L100 226 L100 304 L100 470 L100 560"/><path id="f2_b_0" class="flowc" d="M100 88 L100 226 L109 226 L109 180 L470 180 L470 226 L470 304 L470 352 L222 352 L222 304 L210 304 L210 470 L210 560"/><path id="f1_b_1" class="flowc" d="M155 88 L155 226 L155 304 L155 470 L155 560"/><path id="f2_b_1" class="flowc" d="M155 88 L155 226 L164 226 L164 165 L525 165 L525 226 L525 304 L525 366 L167 366 L167 304 L155 304 L155 470 L155 560"/><path id="f1_b_2" class="flowc" d="M210 88 L210 226 L210 304 L210 470 L210 560"/><path id="f2_b_2" class="flowc" d="M210 88 L210 226 L219 226 L219 150 L580 150 L580 226 L580 304 L580 380 L112 380 L112 304 L100 304 L100 470 L100 560"/><g transform="translate(445 420)"><rect x="0" y="0" width="300" height="196" rx="10" fill="#F6F7F9" stroke="#cfd6de" stroke-width="2"/><text class="tl" x="14" y="24" style="font-weight:700">Los tres puentes de abajo, sueltos:</text><g id="pz"></g><text id="pzt" class="tl" x="150" y="184" text-anchor="middle" style="font-weight:700"></text></g></svg></div>
+    <div class="side">
+      <div class="card"><div class="controls two">
+        <button id="bArr" class="modebtn">Cruce arriba<span class="small">el del aula · tecla A</span></button>
+        <button id="bAba" class="modebtn">Cruce abajo<span class="small">el de antes · tecla B</span></button></div>
+        <p class="leyenda">Negro: cable normal. Marrón: cable rígido. Dorado: las clavijas del térmico, enchufado bajo -KM1.</p></div>
+      <div class="card"><div class="controls">
+        <button id="b1k1" class="kmbtn">Entra -KM1<span class="small">derechas · tecla D</span></button>
+        <button id="b1k2" class="kmbtn">Entra -KM2<span class="small">izquierdas · tecla I</span></button>
+        <button id="b1p">Parado<span class="small">tecla P</span></button></div>
+        <p id="gira1" class="big" style="margin:10px 2px 0"></p></div>
+    </div>
+  </div>
+  </div>
+
+  <div id="case2" class="case">
+  <div class="g2">
+    <div class="sheet"><svg id="sv2" viewBox="0 0 620 720" role="img" aria-labelledby="t2"><title id="t2">Fuerza de la inversión de giro con el cruce arriba; se puede medir en cuatro puntos</title><path id="lb0" class="liarbox" d="M130 32 L130 60"/><path id="lb1" class="liarbox" d="M180 32 L180 60"/><path id="lb2" class="liarbox" d="M230 32 L230 60"/><path id="lb3" class="liarbox" d="M130 184 L130 214"/><path id="lb4" class="liarbox" d="M130 214 L130 280"/><path id="lb5" class="liarbox" d="M130 214 L450 214 L450 280"/><path id="lb6" class="liarbox" d="M180 184 L180 230"/><path id="lb7" class="liarbox" d="M180 230 L180 280"/><path id="lb8" class="liarbox" d="M180 230 L400 230 L400 280"/><path id="lb9" class="liarbox" d="M230 184 L230 246"/><path id="lb10" class="liarbox" d="M230 246 L230 280"/><path id="lb11" class="liarbox" d="M230 246 L350 246 L350 280"/><path id="lb12" class="liarbox" d="M130 346 L130 386"/><path id="lb13" class="liarbox" d="M130 386 L130 470"/><path id="lb14" class="liarbox" d="M350 346 L350 386 L130 386"/><path id="lb15" class="liarbox" d="M180 346 L180 402"/><path id="lb16" class="liarbox" d="M180 402 L180 470"/><path id="lb17" class="liarbox" d="M400 346 L400 402 L180 402"/><path id="lb18" class="liarbox" d="M230 346 L230 418"/><path id="lb19" class="liarbox" d="M230 418 L230 470"/><path id="lb20" class="liarbox" d="M450 346 L450 418 L230 418"/><path id="lb21" class="liarbox" d="M130 518 L130 570"/><path id="lb22" class="liarbox" d="M180 518 L180 570"/><path id="lb23" class="liarbox" d="M230 518 L230 570"/><path id="lb24" class="liarbox" d="M130 570 L130 590 L149 609"/><path id="lb25" class="liarbox" d="M180 570 L180 596"/><path id="lb26" class="liarbox" d="M230 570 L230 590 L211 609"/><path id="sg0" class="seg" data-c="A" d="M130 32 L130 60"/><path id="sg1" class="seg" data-c="A" d="M180 32 L180 60"/><path id="sg2" class="seg" data-c="A" d="M230 32 L230 60"/><path id="sg3" class="seg" data-c="A" d="M130 184 L130 214"/><path id="sg4" class="seg" data-c="A" d="M130 214 L130 280"/><path id="sg5" class="seg" data-c="K2in" d="M130 214 L450 214 L450 280"/><path id="sg6" class="seg" data-c="A" d="M180 184 L180 230"/><path id="sg7" class="seg" data-c="A" d="M180 230 L180 280"/><path id="sg8" class="seg" data-c="K2in" d="M180 230 L400 230 L400 280"/><path id="sg9" class="seg" data-c="A" d="M230 184 L230 246"/><path id="sg10" class="seg" data-c="A" d="M230 246 L230 280"/><path id="sg11" class="seg" data-c="K2in" d="M230 246 L350 246 L350 280"/><path id="sg12" class="seg" data-c="K1out" d="M130 346 L130 386"/><path id="sg13" class="seg" data-c="O" d="M130 386 L130 470"/><path id="sg14" class="seg" data-c="K2out" d="M350 346 L350 386 L130 386"/><path id="sg15" class="seg" data-c="K1out" d="M180 346 L180 402"/><path id="sg16" class="seg" data-c="O" d="M180 402 L180 470"/><path id="sg17" class="seg" data-c="K2out" d="M400 346 L400 402 L180 402"/><path id="sg18" class="seg" data-c="K1out" d="M230 346 L230 418"/><path id="sg19" class="seg" data-c="O" d="M230 418 L230 470"/><path id="sg20" class="seg" data-c="K2out" d="M450 346 L450 418 L230 418"/><path id="sg21" class="seg" data-c="O" d="M130 518 L130 570"/><path id="sg22" class="seg" data-c="O" d="M180 518 L180 570"/><path id="sg23" class="seg" data-c="O" d="M230 518 L230 570"/><path id="sg24" class="seg" data-c="O" d="M130 570 L130 590 L149 609"/><path id="sg25" class="seg" data-c="O" d="M180 570 L180 596"/><path id="sg26" class="seg" data-c="O" d="M230 570 L230 590 L211 609"/><path id="g1_0" class="flowc" d="M130 32 L130 570 L130 590 L149 609"/><path id="g2_0" class="flowc" d="M130 32 L130 214 L450 214 L450 418 L230 418 L230 570 L230 590 L211 609"/><path id="g1_1" class="flowc" d="M180 32 L180 570 L180 596"/><path id="g2_1" class="flowc" d="M180 32 L180 230 L400 230 L400 402 L180 402 L180 570 L180 596"/><path id="g1_2" class="flowc" d="M230 32 L230 570 L230 590 L211 609"/><path id="g2_2" class="flowc" d="M230 32 L230 246 L350 246 L350 386 L130 386 L130 570 L130 590 L149 609"/><text class="t name" x="130" y="24" text-anchor="middle" style="fill:var(--fase)">L1</text><line class="sym" x1="130" y1="60" x2="130" y2="76"/><line class="sym" x1="122" y1="68" x2="138" y2="84" style="stroke-width:2.4"/><line class="sym" x1="122" y1="84" x2="138" y2="68" style="stroke-width:2.4"/><line class="sym" x1="130" y1="108" x2="130" y2="78"/><line class="sym" x1="130" y1="108" x2="130" y2="120"/><rect class="symf" x="117" y="120" width="26" height="26"/><path class="sym" d="M130 120 V130 H137 V137 H130 V146" style="stroke-width:2.2"/><line class="sym" x1="130" y1="146" x2="130" y2="152"/><rect class="symf" x="117" y="152" width="26" height="22"/><text class="t" x="130" y="168" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="130" y1="174" x2="130" y2="184"/><text class="t" x="138" y="60">1</text><text class="t" x="138" y="198">2</text><text class="t name" x="180" y="24" text-anchor="middle" style="fill:var(--fase)">L2</text><line class="sym" x1="180" y1="60" x2="180" y2="76"/><line class="sym" x1="172" y1="68" x2="188" y2="84" style="stroke-width:2.4"/><line class="sym" x1="172" y1="84" x2="188" y2="68" style="stroke-width:2.4"/><line class="sym" x1="180" y1="108" x2="180" y2="78"/><line class="sym" x1="180" y1="108" x2="180" y2="120"/><rect class="symf" x="167" y="120" width="26" height="26"/><path class="sym" d="M180 120 V130 H187 V137 H180 V146" style="stroke-width:2.2"/><line class="sym" x1="180" y1="146" x2="180" y2="152"/><rect class="symf" x="167" y="152" width="26" height="22"/><text class="t" x="180" y="168" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="180" y1="174" x2="180" y2="184"/><text class="t" x="188" y="60">3</text><text class="t" x="188" y="198">4</text><text class="t name" x="230" y="24" text-anchor="middle" style="fill:var(--fase)">L3</text><line class="sym" x1="230" y1="60" x2="230" y2="76"/><line class="sym" x1="222" y1="68" x2="238" y2="84" style="stroke-width:2.4"/><line class="sym" x1="222" y1="84" x2="238" y2="68" style="stroke-width:2.4"/><line class="sym" x1="230" y1="108" x2="230" y2="78"/><line class="sym" x1="230" y1="108" x2="230" y2="120"/><rect class="symf" x="217" y="120" width="26" height="26"/><path class="sym" d="M230 120 V130 H237 V137 H230 V146" style="stroke-width:2.2"/><line class="sym" x1="230" y1="146" x2="230" y2="152"/><rect class="symf" x="217" y="152" width="26" height="22"/><text class="t" x="230" y="168" text-anchor="middle" style="font-size:12px;font-weight:700">I&gt;</text><line class="sym" x1="230" y1="174" x2="230" y2="184"/><text class="t" x="238" y="60">5</text><text class="t" x="238" y="198">6</text><line class="dash" x1="84" y1="94" x2="224" y2="94"/><text class="t name" x="76" y="100" text-anchor="end">-Q1</text><text class="t" x="468" y="208" style="font-size:13px;fill:#56606b">cruce arriba</text><g id="hc1" class="hit" tabindex="0" role="button" aria-label="-KM1: activar o soltar"><rect class="hb" x="50" y="272" width="210" height="82"/><line class="sym" x1="130" y1="280" x2="130" y2="298"/><path class="sym" d="M123 296 A7 7 0 0 0 137 296" style="stroke-width:2.2"/><line id="bl_hc1_0" class="sym" x1="130" y1="328" x2="110" y2="296" style="transform-origin:130px 328px;transition:transform .15s"/><line class="sym" x1="130" y1="328" x2="130" y2="346"/><text class="t" x="138" y="278">1</text><text class="t" x="138" y="360">2</text><line class="sym" x1="180" y1="280" x2="180" y2="298"/><path class="sym" d="M173 296 A7 7 0 0 0 187 296" style="stroke-width:2.2"/><line id="bl_hc1_1" class="sym" x1="180" y1="328" x2="160" y2="296" style="transform-origin:180px 328px;transition:transform .15s"/><line class="sym" x1="180" y1="328" x2="180" y2="346"/><text class="t" x="188" y="278">3</text><text class="t" x="188" y="360">4</text><line class="sym" x1="230" y1="280" x2="230" y2="298"/><path class="sym" d="M223 296 A7 7 0 0 0 237 296" style="stroke-width:2.2"/><line id="bl_hc1_2" class="sym" x1="230" y1="328" x2="210" y2="296" style="transform-origin:230px 328px;transition:transform .15s"/><line class="sym" x1="230" y1="328" x2="230" y2="346"/><text class="t" x="238" y="278">5</text><text class="t" x="238" y="360">6</text><line class="dash" x1="120" y1="312" x2="220" y2="312"/><text class="t name" x="102" y="318" text-anchor="end">-KM1</text></g><g id="hc2" class="hit" tabindex="0" role="button" aria-label="-KM2: activar o soltar"><rect class="hb" x="270" y="272" width="210" height="82"/><line class="sym" x1="350" y1="280" x2="350" y2="298"/><path class="sym" d="M343 296 A7 7 0 0 0 357 296" style="stroke-width:2.2"/><line id="bl_hc2_0" class="sym" x1="350" y1="328" x2="330" y2="296" style="transform-origin:350px 328px;transition:transform .15s"/><line class="sym" x1="350" y1="328" x2="350" y2="346"/><text class="t" x="358" y="278">1</text><text class="t" x="358" y="360">2</text><line class="sym" x1="400" y1="280" x2="400" y2="298"/><path class="sym" d="M393 296 A7 7 0 0 0 407 296" style="stroke-width:2.2"/><line id="bl_hc2_1" class="sym" x1="400" y1="328" x2="380" y2="296" style="transform-origin:400px 328px;transition:transform .15s"/><line class="sym" x1="400" y1="328" x2="400" y2="346"/><text class="t" x="408" y="278">3</text><text class="t" x="408" y="360">4</text><line class="sym" x1="450" y1="280" x2="450" y2="298"/><path class="sym" d="M443 296 A7 7 0 0 0 457 296" style="stroke-width:2.2"/><line id="bl_hc2_2" class="sym" x1="450" y1="328" x2="430" y2="296" style="transform-origin:450px 328px;transition:transform .15s"/><line class="sym" x1="450" y1="328" x2="450" y2="346"/><text class="t" x="458" y="278">5</text><text class="t" x="458" y="360">6</text><line class="dash" x1="340" y1="312" x2="440" y2="312"/><text class="t name" x="322" y="318" text-anchor="end">-KM2</text></g><text class="t" x="340" y="446" style="font-size:13px;fill:#56606b">tres puentes iguales</text><line class="sym" x1="130" y1="470" x2="130" y2="480"/><rect class="symf" x="117" y="480" width="26" height="28"/><path class="sym" d="M130 480 V490 H137 V498 H130 V508" style="stroke-width:2.2"/><line class="sym" x1="130" y1="508" x2="130" y2="518"/><text class="t" x="138" y="470">1</text><text class="t" x="138" y="532">2</text><text class="t" x="136" y="562" style="font-size:13px">U1</text><line class="sym" x1="180" y1="470" x2="180" y2="480"/><rect class="symf" x="167" y="480" width="26" height="28"/><path class="sym" d="M180 480 V490 H187 V498 H180 V508" style="stroke-width:2.2"/><line class="sym" x1="180" y1="508" x2="180" y2="518"/><text class="t" x="188" y="470">3</text><text class="t" x="188" y="532">4</text><text class="t" x="186" y="562" style="font-size:13px">V1</text><line class="sym" x1="230" y1="470" x2="230" y2="480"/><rect class="symf" x="217" y="480" width="26" height="28"/><path class="sym" d="M230 480 V490 H237 V498 H230 V508" style="stroke-width:2.2"/><line class="sym" x1="230" y1="508" x2="230" y2="518"/><text class="t" x="238" y="470">5</text><text class="t" x="238" y="532">6</text><text class="t" x="236" y="562" style="font-size:13px">W1</text><line class="dash" x1="84" y1="494" x2="117" y2="494"/><line class="dash" x1="143" y1="494" x2="167" y2="494"/><line class="dash" x1="193" y1="494" x2="217" y2="494"/><text class="t name" x="76" y="500" text-anchor="end">-F1</text><circle class="symf" cx="180" cy="640" r="44"/><text class="t" x="180" y="644" text-anchor="middle" style="font-size:26px;font-weight:700">M</text><text class="t" x="180" y="666" text-anchor="middle">3~</text><text class="t name" x="100" y="646" text-anchor="end">-M1</text><g id="rR" style="display:none"><path d="M238 640 A58 58 0 0 1 184 698" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M186 688 L170 698 L186 708 Z" fill="#1F4E79"/></g><g id="rL" style="display:none"><path d="M122 640 A58 58 0 0 0 176 698" fill="none" stroke="#1F4E79" stroke-width="5"/><path d="M174 688 L190 698 L174 708 Z" fill="#1F4E79"/></g><circle cx="130" cy="214" r="5" fill="var(--fase)"/><circle cx="130" cy="386" r="5" fill="var(--fase)"/><circle cx="180" cy="230" r="5" fill="var(--fase)"/><circle cx="180" cy="402" r="5" fill="var(--fase)"/><circle cx="230" cy="246" r="5" fill="var(--fase)"/><circle cx="230" cy="418" r="5" fill="var(--fase)"/><g id="ptA" class="pt hit" tabindex="0" role="button" aria-label="Medir en el cable de L1 que va de -Q1 a -KM1"><line x1="90" y1="200" x2="130" y2="200" stroke="#111" stroke-width="1.8"/><circle cx="90" cy="200" r="15"/><text x="90" y="206" text-anchor="middle">A</text></g><g id="ptB" class="pt hit" tabindex="0" role="button" aria-label="Medir en el puente de entrada de L1 al 5 de -KM2"><line x1="488" y1="262" x2="450" y2="262" stroke="#111" stroke-width="1.8"/><circle cx="488" cy="262" r="15"/><text x="488" y="268" text-anchor="middle">B</text></g><g id="ptC" class="pt hit" tabindex="0" role="button" aria-label="Medir en el puente de salida del 2 de -KM2 al 2 de -KM1"><line x1="310" y1="372" x2="350" y2="372" stroke="#111" stroke-width="1.8"/><circle cx="310" cy="372" r="15"/><text x="310" y="378" text-anchor="middle">C</text></g><g id="ptD" class="pt hit" tabindex="0" role="button" aria-label="Medir en el cable del motor que va a U1"><line x1="90" y1="548" x2="130" y2="548" stroke="#111" stroke-width="1.8"/><circle cx="90" cy="548" r="15"/><text x="90" y="554" text-anchor="middle">D</text></g></svg></div>
+    <div class="side">
+      <div class="card"><div class="controls two">
+        <button id="bVer" class="modebtn">Cómo es de verdad<span class="small">tecla V</span></button>
+        <button id="bPin" class="modebtn">Cómo lo pintamos<span class="small">en las animaciones · tecla T</span></button></div>
+        <p class="leyenda">En rojo vivo, los cables con tensión. Los puntos amarillos que se mueven son la corriente. En naranja, lo que tiene tensión pero pintamos apagado.</p></div>
+      <div class="card"><div class="controls">
+        <button id="b2k1" class="kmbtn">Entra -KM1<span class="small">derechas · tecla D</span></button>
+        <button id="b2k2" class="kmbtn">Entra -KM2<span class="small">izquierdas · tecla I</span></button>
+        <button id="b2p">Parado<span class="small">tecla P</span></button></div></div>
+      <div class="card"><h2 style="margin:0 0 4px;font-size:1rem">Medir en <span id="mp">Ⓑ</span></h2><p id="mpd" style="margin:0;color:var(--muted)"></p>
+        <div class="meter"><b>Polímetro (V~)</b><span id="mv"></span><b>Pinza (A~)</b><span id="ma"></span></div>
+        <p class="leyenda">Toca una letra del esquema (Ⓐ Ⓑ Ⓒ Ⓓ) para medir allí. El motor pide 5,2 A.</p></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="boxes">
+    <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
+    <div class="card idea"><h2>Para qué sirve</h2><div id="pqs"></div></div>
+  </div>
+  <p class="foot">Toca <b>-KM1</b> o <b>-KM2</b> en el dibujo (o sus botones) para que entren. «Borne» quiere decir <b>tornillo</b>. Teclado: <kbd>1</kbd> y <kbd>2</kbd> cambian de parte, <kbd>D</kbd> -KM1, <kbd>I</kbd> -KM2, <kbd>P</kbd> parado, <kbd>A</kbd>/<kbd>B</kbd> cruce arriba o abajo, <kbd>V</kbd>/<kbd>T</kbd> de verdad o como lo pintamos, <kbd>Esc</kbd> volver al índice.</p>
+  <a class="nextbig" href="index.html#animaciones">Has llegado al final del Tema 5 · Volver a las animaciones →</a>
+</main>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var SEG = ["A","A","A","A","A","K2in","A","A","K2in","A","A","K2in","K1out","O","K2out","K1out","O","K2out","K1out","O","K2out","O","O","O","O","O","O"], PD = {A:"el cable de L1 que va de -Q1 a -KM1",B:"el puente de entrada de L1 al 5 de -KM2",C:"el puente de salida del 2 de -KM2 al 2 de -KM1",D:"el cable del motor que va a U1"};
+  var st = { cas: 1, km: 0, mode: 'a', ver: false, pt: 'B' };   // km: 0 parado, 1 -KM1, 2 -KM2
+  var PQS = {
+    1: '<p>En el aula los puentes entre los contactores se hacen con <b>cable rígido</b>. Si los tres de abajo son <b>iguales</b>, se doblan igual y quedan ordenados junto a las clavijas del térmico.</p><p>Por eso el cruce de L1 y L3 se hace <b>arriba</b>: el 1 de -KM1 va al 5 de -KM2 y el 5 al 1. El motor gira al revés igual que antes.</p>',
+    2: '<p><b>Tensión no es corriente.</b> Los puentes del contactor que no ha entrado tienen tensión, pero por ellos no pasa corriente.</p><p>En las animaciones los pintamos <b>apagados</b> para que se vea bien por dónde va la corriente. Es una pequeña «mentira»: si los tocas, dan calambre. Antes de tocar nada, <b>baja -Q1</b>.</p>'
+  };
+  function setCase(n){ st.cas = n; $('case1').classList.toggle('on', n === 1); $('case2').classList.toggle('on', n === 2);
+    $('tab1').classList.toggle('on', n === 1); $('tab2').classList.toggle('on', n === 2);
+    $('tab1').setAttribute('aria-selected', n === 1); $('tab2').setAttribute('aria-selected', n === 2);
+    try { history.replaceState(null, '', '#' + n); } catch(e){}
+    render(); }
+  function km(n){ st.km = (st.km === n) ? 0 : n; render(); }
+  function render(){
+    var a = st.km === 1, b = st.km === 2, any = a || b;
+    // ---- parte 1 ----
+    $('m_a').style.display = st.mode === 'a' ? '' : 'none'; $('m_b').style.display = st.mode === 'b' ? '' : 'none';
+    ['a','b'].forEach(function(m){ for (var p = 0; p < 3; p++){
+      $('f1_' + m + '_' + p).classList.toggle('on', m === st.mode && a);
+      $('f2_' + m + '_' + p).classList.toggle('on', m === st.mode && b); } });
+    $('st1').textContent = a ? 'activado' : ''; $('st2').textContent = b ? 'activado' : '';
+    var ph = a ? ['L1','L2','L3'] : b ? ['L3','L2','L1'] : ['','',''];
+    for (var i = 0; i < 3; i++) $('ph' + i).textContent = ph[i];
+    $('bArr').classList.toggle('on', st.mode === 'a'); $('bAba').classList.toggle('on', st.mode === 'b');
+    ['b1k1','b2k1'].forEach(function(id){ $(id).classList.toggle('on', a); }); ['b1k2','b2k2'].forEach(function(id){ $(id).classList.toggle('on', b); });
+    $('gira1').textContent = a ? 'El motor gira a derechas: L1 a U1, L3 a W1.' : b ? 'El motor gira a izquierdas: L3 a U1, L1 a W1.' : 'Motor parado.';
+    var pz = '', iguales = st.mode === 'a';
+    for (var j = 0; j < 3; j++){
+      var w = iguales ? 92 : [62, 92, 122][j], d = iguales ? 34 : [22, 34, 46][j], y0 = 52;
+      var x0 = iguales ? [14, 110, 206][j] : [14, 86, 182][j];
+      pz += '<path d="M' + x0 + ' ' + y0 + ' V' + (y0 + d + 40) + ' H' + (x0 + w * 0.8) + ' V' + y0 + '" fill="none" stroke="#8B4A1C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>';
+      pz += '<text class="tl" x="' + (x0 + w * 0.4) + '" y="' + (y0 + d + 66) + '" text-anchor="middle">' + (iguales ? ['2 → 2','4 → 4','6 → 6'][j] : ['2 → 6','4 → 4','6 → 2'][j]) + '</text>';
+    }
+    $('pz').innerHTML = pz;
+    $('pzt').textContent = iguales ? 'Los tres iguales: fáciles de doblar' : 'Los tres distintos: cada uno a medida';
+    $('pzt').setAttribute('class', 'tl ' + (iguales ? 'ok' : 'bad'));
+    // ---- parte 2 ----
+    var realLive = { A: true, K2in: true, K1out: any, K2out: any, O: any };
+    var paint   = { A: true, K2in: b, K1out: a, K2out: b, O: any };
+    SEG.forEach(function(cl, n){
+      var r = realLive[cl], p = paint[cl], liar = r && !p;
+      var el = $('sg' + n); el.classList.toggle('live', st.ver ? r : p);
+      $('lb' + n).classList.toggle('on', !st.ver && liar);
+    });
+    for (var q = 0; q < 3; q++){ $('g1_' + q).classList.toggle('on', a); $('g2_' + q).classList.toggle('on', b); }
+    for (var q2 = 0; q2 < 3; q2++){ $('bl_hc1_' + q2).style.transform = a ? 'rotate(32deg)' : ''; $('bl_hc2_' + q2).style.transform = b ? 'rotate(32deg)' : ''; }
+    $('rR').style.display = a ? '' : 'none'; $('rL').style.display = b ? '' : 'none';
+    $('bVer').classList.toggle('on', st.ver); $('bPin').classList.toggle('on', !st.ver);
+    ['A','B','C','D'].forEach(function(L){ $('pt' + L).classList.toggle('sel', st.pt === L); });
+    var V = { A: true, B: true, C: any, D: any }[st.pt], I = { A: any, B: b, C: b, D: any }[st.pt];
+    $('mp').textContent = { A:'Ⓐ', B:'Ⓑ', C:'Ⓒ', D:'Ⓓ' }[st.pt]; $('mpd').textContent = PD[st.pt].charAt(0).toUpperCase() + PD[st.pt].slice(1) + '.';
+    $('mv').innerHTML = V ? '<b style="color:#C0392B">hay tensión</b> (230 V con otra fase)' : '0 V';
+    $('ma').innerHTML = I ? '<b>5,2 A</b>' : '<b>0 A</b>';
+    $('pqs').innerHTML = PQS[st.cas];
+    $('explain').innerHTML = st.cas === 1 ? msg1(a, b) : msg2(a, b, V, I);
+  }
+  function msg1(a, b){
+    if (st.mode === 'a'){
+      if (b) return '<b>-KM2 activado:</b> la corriente de L1 sube por el cruce de arriba al <span class="k">5 de -KM2</span>, baja por su contacto y vuelve a -KM1 por el puente igual del <span class="k">6</span>. Llega a <b>W1</b>; L3 llega a <b>U1</b>. Han cambiado dos fases: <b>gira al revés</b>.';
+      if (a) return '<b>-KM1 activado:</b> L1, L2 y L3 bajan tal cual hasta el térmico y el motor. Por los puentes de -KM2 no pasa corriente.';
+      return '<b>Cruce arriba</b> (el del aula): el <span class="k">1 de -KM1 va al 5 de -KM2</span>, el 3 al 3 y el <span class="k">5 al 1</span>. Abajo, <b>tres puentes iguales</b>: 2 con 2, 4 con 4 y 6 con 6. Haz entrar -KM2 y sigue la corriente.';
+    }
+    if (b) return '<b>-KM2 activado (cruce abajo):</b> las fases entran a -KM2 en el mismo orden y se cruzan al salir: su <span class="k">2 va al 6 de -KM1</span> y su 6 al 2. El resultado es el mismo: L3 llega a U1 y L1 a W1.';
+    if (a) return '<b>-KM1 activado:</b> igual que con el cruce arriba: las fases bajan tal cual.';
+    return '<b>Cruce abajo</b> (el de antes): arriba los puentes van 1 con 1, 3 con 3 y 5 con 5, y se cruza abajo. Mira los puentes de abajo, sueltos: <b>cada uno tiene una forma</b> y además tienen que pasar junto a las clavijas del térmico. Con cable rígido, eso cuesta.';
+  }
+  function msg2(a, b, V, I){
+    var P = { A:'Ⓐ', B:'Ⓑ', C:'Ⓒ', D:'Ⓓ' }[st.pt], s = '';
+    if (V && !I && (a || st.pt === 'B' || st.pt === 'C')) s = 'En ' + P + ' <b>hay tensión pero no corriente</b>: le llega la fase, pero el circuito no se cierra por ahí. ';
+    else if (V && I) s = 'En ' + P + ' hay tensión <b>y</b> corriente: por ahí va el motor. ';
+    else s = 'En ' + P + ' no hay tensión. ';
+    if (!st.ver && !b && (st.pt === 'B' || (a && st.pt === 'C'))) s += 'En las animaciones lo pintamos <b>apagado</b> (marco naranja): así ves solo el camino de la corriente. Es la pequeña «mentira».';
+    else if (st.ver && !b) s += 'Así es de verdad: los puentes de -KM2 tienen tensión ' + (a ? 'por arriba (desde -Q1) y por abajo (desde los 2-4-6 de -KM1)' : 'por arriba, desde -Q1') + ', aunque -KM2 no haya entrado. <b>Si los tocas, dan calambre.</b>';
+    else if (b) s += 'Con -KM2 activado, sus puentes llevan la corriente del motor; ahora los que no la llevan son los 2-4-6 de -KM1, hasta donde llegan los puentes.';
+    return s;
+  }
+  // eventos
+  function click(el, fn){ el.addEventListener('click', fn); el.addEventListener('keydown', function(e){ if (el.tagName !== 'BUTTON' && (e.key === ' ' || e.key === 'Enter')){ e.preventDefault(); fn(); } }); }
+  click($('tab1'), function(){ setCase(1); }); click($('tab2'), function(){ setCase(2); });
+  click($('bArr'), function(){ st.mode = 'a'; render(); }); click($('bAba'), function(){ st.mode = 'b'; render(); });
+  click($('bVer'), function(){ st.ver = true; render(); }); click($('bPin'), function(){ st.ver = false; render(); });
+  ['b1k1','b2k1','hk1','hc1'].forEach(function(id){ click($(id), function(){ km(1); }); });
+  ['b1k2','b2k2','hk2','hc2'].forEach(function(id){ click($(id), function(){ km(2); }); });
+  ['b1p','b2p'].forEach(function(id){ click($(id), function(){ st.km = 0; render(); }); });
+  ['A','B','C','D'].forEach(function(L){ click($('pt' + L), function(){ st.pt = L; render(); }); });
+  document.addEventListener('keydown', function(e){
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return;
+    var k = e.key.toLowerCase();
+    if (k === '1') setCase(1); else if (k === '2') setCase(2);
+    else if (k === 'd') km(1); else if (k === 'i') km(2); else if (k === 'p'){ st.km = 0; render(); }
+    else if (k === 'a'){ st.mode = 'a'; render(); } else if (k === 'b'){ st.mode = 'b'; render(); }
+    else if (k === 'v'){ st.ver = true; render(); } else if (k === 't'){ st.ver = false; render(); }
+  });
+  setCase(location.hash === '#2' ? 2 : 1);
+})();
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();location.href='index.html#animaciones';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '☀️' : '🌙';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
+})();</script>
+</body>
+</html>
