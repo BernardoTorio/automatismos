@@ -27,6 +27,7 @@ practicas/                 fichas de prácticas en PDF
   P1_Automatismos.pdf      Cableados iniciales
   P2_Automatismos.pdf      Cableados iniciales II   (+ P3, P4, P5 y el examen práctico)
   P5_Automatismos_hoja_medidas_y_solucion_5_2.pdf   hoja de taller de la P5: tabla de medidas y, detrás, la fuerza y el mando de la 5.2 (la que se monta)
+.github/, .lycheeignore    revisión de enlaces al subir (ver «Comprobaciones automáticas»)
 subir.bat                  publica todo con doble clic
 .gitignore                 contiene *.zip (los zip no se suben nunca)
 ```
@@ -154,6 +155,11 @@ Q magnetotérmico/diferencial · F fusible y relé térmico · S pulsadores y de
 - Pulsadores: se mantienen pulsados mientras se aprieta; **doble clic** los deja **fijados** (recuadro y borde amarillos) y un clic más los suelta. Así se pueden tener varios pulsados a la vez con el ratón. Obligatorio en todas.
 - Cuando tiene sentido, se puede **quitar un contacto** tocándolo (realimentación 13-14, enclavamiento 61-62, condición 53-54): queda en gris con una cruz roja y, si estaba en serie, se sustituye por un puente.
 - Lenguaje sencillo y directo, en español; frases cortas.
+
+## Comprobaciones automáticas (desde el 23/11/2026)
+- **Antes de publicar**, Claude pasa `comprobar_web.py` (proyecto «Materiales para instituto», `claude/herramientas/`; skill «comprobar-web-de-clase»): abre todas las páginas con Chrome en escritorio y en móvil (400 px), en claro y en oscuro, y da **errores** (fallos de JavaScript, enlaces rotos —también los que la portada crea con JavaScript—, páginas que se salen por la derecha, la tira mal, un archivo que estaba y ya no está) y **avisos** (falta el botón de volver, la miga, el modo claro/oscuro o Esc). Con `--antes-git origin/main` dice además **qué páginas se ven distintas** que las publicadas: tienen que ser solo las que se han tocado.
+- **Al subir** (`.github/workflows/enlaces.yml`), GitHub revisa con lychee los enlaces de los `.html` de la raíz. Si alguno apunta a un archivo que no existe, el commit sale con una ✗ roja en GitHub y llega un correo; la web se publica igual. Un PDF enlazado que todavía no está subido («próximamente») se apunta en `.lycheeignore` (una línea) y se quita al subirlo.
+- **Cada noche**, el repositorio privado `BernardoTorio/comprobaciones` repite la comprobación completa de las tres webs y abre allí una incidencia si hay errores o páginas que han cambiado de aspecto desde la noche anterior.
 
 ## Los Word originales: `C:\dev\originales`
 Los PDF de esta web salen de un Word. Los Word no se suben a GitHub, pero **no se pierden**: están en `C:\dev\originales` (en el PC del profesor, fuera de git), con todas sus versiones. Es la misma carpeta para las tres webs (automatismos, domotica, maquinas).
