@@ -75,9 +75,6 @@ button.b-speed{width:100%;margin-top:8px}button.b-speed.on{background:#1F4E79;co
 .crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
 .crumbs .sep{margin:0 6px;opacity:.7}.crumbs b{color:var(--ink)}
 .themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.1rem;cursor:pointer;padding:0}
-.pnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-.pnav a{border:2px solid var(--line);border-radius:8px;padding:2px 10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.9rem}
-.pnav a.sel{background:#2E7D32;border-color:#2E7D32;color:#fff}
 /* índice */
 .sec{font-size:1.15rem;color:var(--ink);margin:22px 0 10px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
@@ -94,12 +91,27 @@ button.b-speed{width:100%;margin-top:8px}button.b-speed.on{background:#1F4E79;co
 [data-theme="dark"] .card.ojo{background:#3A3115;border-color:#C99A1E}
 [data-theme="dark"] .card.ojo h2{color:#F2C94C}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .card.ojo{background:#3A3115;border-color:#C99A1E}:root:not([data-theme="light"]) .card.ojo h2{color:#F2C94C}}
+/* --- tira de la práctica y botón «Siguiente» (como las de los Temas 5 y 6) --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn,transparent);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok,#3E9B48)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Práctica 4</a><span class="sep">›</span><b>P4.2 Motor con paro automático</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="pnav"><a href="p4_1_bomba_riego.html">P4.1</a> <a href="p4_2_paro_automatico.html" class="sel">P4.2</a> <a href="p4_3_cinta_aviso.html">P4.3</a> <a href="p4_4_ventilador.html">P4.4</a> <a href="p4_5_dos_motores_fc.html">P4.5</a> <a href="p4_6_escalera_emergencia.html">P4.6</a> <a href="p4_7_tres_motores.html">P4.7</a> <a href="p4_8_baliza.html">P4.8</a></nav>
+  <nav class="t6nav" aria-label="Animaciones de la Práctica 4"><a class="arr" href="p4_1_bomba_riego.html" aria-label="Anterior: P4.1 Bomba de riego">‹ P4.1</a><span class="where">Práctica 4 · 2 de 8</span><a class="arr" href="p4_3_cinta_aviso.html" aria-label="Siguiente: P4.3 Cinta con aviso de arranque">P4.3 ›</a><div class="steps"><a href="p4_1_bomba_riego.html" title="Bomba de riego">P4.1</a><a href="p4_2_paro_automatico.html" class="cur" aria-current="page" title="Motor con paro automático">P4.2</a><a href="p4_3_cinta_aviso.html" title="Cinta con aviso de arranque">P4.3</a><a href="p4_4_ventilador.html" title="Ventilador que se queda enfriando">P4.4</a><a href="p4_5_dos_motores_fc.html" title="Dos motores con final de carrera">P4.5</a><a href="p4_6_escalera_emergencia.html" title="Escalera mecánica con emergencia">P4.6</a><a href="p4_7_tres_motores.html" title="Tres motores con un solo pulsador">P4.7</a><a href="p4_8_baliza.html" title="RETO · Baliza intermitente">P4.8</a></div></nav>
   <h1>P4.2 Motor con paro automático</h1>
   <p class="sub">Marcha -S2 y paro -S1. Al arrancar el motor, -KT1 empieza a contar y a los 12 s para todo. Pilotos: verde en marcha, rojo parado y naranja si salta el térmico. En la animación, los tiempos se regulan con las ruletas, de 1 a 5 s.</p>
   <div class="grid">
@@ -596,6 +608,7 @@ button.b-speed{width:100%;margin-top:8px}button.b-speed.on{background:#1F4E79;co
     <div class="card"><h2>Pruébalo</h2><ol><li>Mira -H2 encendido en reposo.</li><li>Pulsa -S2: se apaga -H2 y se enciende -H1.</li><li>Espera a que -KT1 acabe de contar.</li><li>Dispara -F1: se para todo y se enciende -H3.</li></ol></div>
   </div>
   <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>; un clic más lo suelta. Toca los aparatos del esquema: pulsadores, magnetotérmicos, térmicos (para dispararlos), finales de carrera y detectores. Cables en rojo vivo: tienen tensión. Línea amarilla: corriente.</p>
+  <a class="nextbig" href="p4_3_cinta_aviso.html">Siguiente: P4.3 Cinta con aviso de arranque →</a>
 </main>
 <script>var DRAW = [{"key": "F", "net": {"wires": [{"a": [2.6, 13.2], "b": [2.6, 12.9], "c": "f"}, {"a": [3.2, 13.2], "b": [3.2, 12.9], "c": "f"}, {"a": [3.8, 13.2], "b": [3.8, 12.9], "c": "f"}, {"a": [2.6, 11.0], "b": [2.6, 10.5], "c": "f"}, {"a": [3.2, 11.0], "b": [3.2, 10.5], "c": "f"}, {"a": [3.8, 11.0], "b": [3.8, 10.5], "c": "f"}, {"a": [2.6, 9.858], "b": [2.6, 9.358], "c": "f"}, {"a": [3.2, 9.858], "b": [3.2, 9.358], "c": "f"}, {"a": [3.8, 9.858], "b": [3.8, 9.358], "c": "f"}, {"a": [2.6, 8.458], "b": [2.6, 7.958], "c": "f"}, {"a": [3.2, 8.458], "b": [3.2, 7.958], "c": "f"}, {"a": [3.8, 8.458], "b": [3.8, 7.958], "c": "f"}, {"a": [2.6, 7.858], "b": [2.6, 7.408], "c": "f"}, {"a": [2.6, 7.408], "b": [2.785, 6.699], "c": "f"}, {"a": [3.2, 7.858], "b": [3.2, 6.858], "c": "f"}, {"a": [3.8, 7.858], "b": [3.8, 7.408], "c": "f"}, {"a": [3.8, 7.408], "b": [3.615, 6.699], "c": "f"}], "els": [{"id": "c1", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [2.6, 12.9], "b": [2.6, 12.258]}, {"id": "c2", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [3.2, 12.9], "b": [3.2, 12.258]}, {"id": "c3", "t": "contact", "dev": "-Q1", "kind": "na", "timed": null, "typ": "aux", "a": [3.8, 12.9], "b": [3.8, 12.258]}, {"id": "c4", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [2.6, 10.5], "b": [2.6, 9.858]}, {"id": "c5", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [3.2, 10.5], "b": [3.2, 9.858]}, {"id": "c6", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "main", "a": [3.8, 10.5], "b": [3.8, 9.858]}, {"id": "m7", "t": "motor", "dev": "-M1", "pts": [[2.6, 7.858], [3.2, 7.858], [3.8, 7.858]]}], "links": [[[2.6, 12.258], [2.6, 11.0]], [[3.2, 12.258], [3.2, 11.0]], [[3.8, 12.258], [3.8, 11.0]], [[2.6, 9.358], [2.6, 8.458]], [[3.2, 9.358], [3.2, 8.458]], [[3.8, 9.358], [3.8, 8.458]], [[2.6, 7.958], [2.6, 7.858]], [[3.2, 7.958], [3.2, 7.858]], [[3.8, 7.958], [3.8, 7.858]]], "src": [["L1", 2.6, 13.32], ["L2", 3.2, 13.32], ["L3", 3.8, 13.32]]}}, {"key": "M", "net": {"wires": [{"a": [2.3, 12.5], "b": [2.3, 12.3], "c": "f"}, {"a": [2.3, 12.3], "b": [2.3, 11.8], "c": "f"}, {"a": [2.3, 9.9], "b": [2.3, 9.75], "c": "f"}, {"a": [2.3, 9.75], "b": [2.3, 9.25], "c": "f"}, {"a": [2.3, 8.608], "b": [2.3, 8.108], "c": "f"}, {"a": [2.3, 7.467], "b": [2.3, 6.967], "c": "f"}, {"a": [2.3, 6.325], "b": [2.3, 6.025], "c": "f"}, {"a": [2.3, 6.025], "b": [3.8, 6.025], "c": "f"}, {"a": [2.3, 6.025], "b": [2.3, 5.525], "c": "f"}, {"a": [2.3, 4.884], "b": [2.3, 4.475], "c": "f"}, {"a": [3.8, 6.025], "b": [3.8, 5.525], "c": "f"}, {"a": [3.8, 4.884], "b": [3.8, 4.475], "c": "f"}, {"a": [2.3, 4.475], "b": [3.8, 4.475], "c": "f"}, {"a": [2.3, 4.475], "b": [3.8, 4.475], "c": "f"}, {"a": [3.8, 4.475], "b": [5.6, 4.475], "c": "f"}, {"a": [2.3, 9.75], "b": [7.6, 9.75], "c": "f"}, {"a": [7.6, 9.75], "b": [9.6, 9.75], "c": "f"}, {"a": [9.6, 9.75], "b": [11.6, 9.75], "c": "f"}, {"a": [7.6, 9.75], "b": [7.6, 9.25], "c": "f"}, {"a": [9.6, 9.75], "b": [9.6, 9.25], "c": "f"}, {"a": [11.6, 9.75], "b": [11.6, 9.25], "c": "f"}, {"a": [2.3, 4.475], "b": [2.3, 3.675], "c": "f"}, {"a": [2.3, 2.975], "b": [2.3, 2.425], "c": "n"}, {"a": [5.6, 4.475], "b": [5.6, 3.675], "c": "f"}, {"a": [5.6, 2.975], "b": [5.6, 2.425], "c": "n"}, {"a": [7.6, 8.608], "b": [7.6, 3.675], "c": "f"}, {"a": [7.6, 3.075], "b": [7.6, 2.425], "c": "n"}, {"a": [9.6, 8.608], "b": [9.6, 3.675], "c": "f"}, {"a": [9.6, 3.075], "b": [9.6, 2.425], "c": "n"}, {"a": [11.6, 8.608], "b": [11.6, 3.675], "c": "f"}, {"a": [11.6, 3.075], "b": [11.6, 2.425], "c": "n"}, {"a": [0.9, 2.425], "b": [2.3, 2.425], "c": "n"}, {"a": [2.3, 2.425], "b": [5.6, 2.425], "c": "n"}, {"a": [5.6, 2.425], "b": [7.6, 2.425], "c": "n"}, {"a": [7.6, 2.425], "b": [9.6, 2.425], "c": "n"}, {"a": [9.6, 2.425], "b": [11.6, 2.425], "c": "n"}], "els": [{"id": "c1", "t": "contact", "dev": "-Q2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 11.8], "b": [2.3, 11.158]}, {"id": "c2", "t": "contact", "dev": "-F1", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 9.25], "b": [2.3, 8.608]}, {"id": "c3", "t": "contact", "dev": "-S1", "kind": "nc", "timed": null, "typ": "aux", "a": [2.3, 8.108], "b": [2.3, 7.467]}, {"id": "c4", "t": "contact", "dev": "-KT1", "kind": "nc", "timed": "on", "typ": "aux", "a": [2.3, 6.967], "b": [2.3, 6.325]}, {"id": "c5", "t": "contact", "dev": "-S2", "kind": "na", "timed": null, "typ": "aux", "a": [2.3, 5.525], "b": [2.3, 4.884]}, {"id": "c6", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "aux", "a": [3.8, 5.525], "b": [3.8, 4.884]}, {"id": "c7", "t": "contact", "dev": "-KM1", "kind": "na", "timed": null, "typ": "aux", "a": [7.6, 9.25], "b": [7.6, 8.608]}, {"id": "c8", "t": "contact", "dev": "-KM1", "kind": "nc", "timed": null, "typ": "aux", "a": [9.6, 9.25], "b": [9.6, 8.608]}, {"id": "c9", "t": "contact", "dev": "-F1", "kind": "na", "timed": null, "typ": "aux", "a": [11.6, 9.25], "b": [11.6, 8.608]}, {"id": "k10", "t": "coil", "dev": "-KM1", "a": [2.3, 3.675], "b": [2.3, 2.975]}, {"id": "k11", "t": "coil", "dev": "-KT1", "timer": "on", "a": [5.6, 3.675], "b": [5.6, 2.975]}, {"id": "h12", "t": "pilot", "dev": "-H1", "color": "#9BE09B", "a": [7.6, 3.675], "b": [7.6, 3.075]}, {"id": "h13", "t": "pilot", "dev": "-H2", "color": "#F08080", "a": [9.6, 3.675], "b": [9.6, 3.075]}, {"id": "h14", "t": "pilot", "dev": "-H3", "color": "#F4A04A", "a": [11.6, 3.675], "b": [11.6, 3.075]}], "links": [[[2.3, 11.158], [2.3, 9.9]]], "src": [["L", 2.3, 12.75], ["N", 0.75, 2.425]]}}]; var CFG = {"timers": {"-KT1": 12}}; var DRAWCOL = {"-H1": "#9BE09B", "-H2": "#F08080", "-H3": "#F4A04A"};</script>
 <script>(function(){
@@ -872,7 +885,7 @@ function loop(ts){
 }
 render(L);
 requestAnimationFrame(loop);
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var t = e.target.tagName; if (t !== 'INPUT' && t !== 'TEXTAREA'){ e.preventDefault(); location.href = 'index.html#practicas'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var t = e.target.tagName; if (t !== 'INPUT' && t !== 'TEXTAREA' && t !== 'SELECT'){ e.preventDefault(); location.href = 'index.html#practicas'; } } });
 try { localStorage.setItem('visto:' + 'p4_2_paro_automatico.html', '1'); } catch(e){}
 window.__DEV = DEV;
 })();
@@ -883,6 +896,14 @@ window.__DEV = DEV;
   function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19'; }
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t); try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me && !/\.html$/.test(me)) me += '.html'; if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
 })();</script>
 </body>
 </html>

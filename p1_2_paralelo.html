@@ -96,10 +96,6 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 main{max-width:1640px}
 .w.wf{stroke:#D0191C;opacity:.42;transition:opacity .15s,stroke-width .15s}
 .w.wf.live{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px rgba(255,40,40,.55))}
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
-.tabs a{padding:6px 12px;border-radius:999px;border:2px solid var(--line);background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700;font-size:.95rem}
-.tabs a.sel{border-color:#1F4E79;background:#1F4E79;color:#fff}
-.tabs a:hover{border-color:#1F4E79}
 .sheet{margin-bottom:4px}
 .sheet svg{max-height:none}
 .boxes3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.1fr);gap:16px;margin-top:16px;align-items:start}
@@ -112,7 +108,7 @@ main{max-width:1640px}
 /* ---- barra superior: volver, dónde estás, tema ---- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
 .tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
 .tbback:hover,.themebtn:hover{border-color:#1F4E79}
 .crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
 .crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
@@ -133,13 +129,27 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .howto li{margin:3px 0}
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
-.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
+/* --- tira de la práctica y botón «Siguiente» (como las de los Temas 5 y 6) --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn,transparent);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok,#3E9B48)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver (tecla Esc)" aria-label="Volver">←</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Prácticas</a><span class="sep">›</span><a href="index.html#practicas">Práctica 1</a><span class="sep">›</span><b id="crumbLast">P1.2 Paralelo</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="tabs" aria-label="Apartados de la práctica"><a href="p1_1_serie.html">P1.1 Serie</a><a href="p1_2_paralelo.html" class="sel">P1.2 Paralelo</a><a href="p1_3_excluyentes.html">P1.3 Excluyentes</a></nav>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Prácticas</a><span class="sep">›</span><a href="index.html#practicas">Práctica 1</a><span class="sep">›</span><b id="crumbLast">P1.2 Paralelo</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones de la Práctica 1"><a class="arr" href="p1_1_serie.html" aria-label="Anterior: P1.1 Control directo con dos pulsadores en serie">‹ P1.1</a><span class="where">Práctica 1 · 2 de 3</span><a class="arr" href="p1_3_excluyentes.html" aria-label="Siguiente: P1.3 Dos pulsadores en paralelo, pero excluyentes">P1.3 ›</a><div class="steps"><a href="p1_1_serie.html" title="Control directo con dos pulsadores en serie">P1.1</a><a href="p1_2_paralelo.html" class="cur" aria-current="page" title="Control directo con dos pulsadores en paralelo">P1.2</a><a href="p1_3_excluyentes.html" title="Dos pulsadores en paralelo, pero excluyentes">P1.3</a></div></nav>
   <h1>P1.2 Control directo con dos pulsadores en paralelo<span class="sol">SOLUCIÓN</span></h1>
   <p class="sub">El contactor se activa con <b>‑S3 o con ‑S4</b>; si se pulsan los dos, también. Señalización: la fase va <b>directa</b> al 53 y al 61 de ‑KM1; piloto <b>verde</b> en el 54 (activado) y <b>rojo</b> en el 62 (desactivado).</p>
   <div class="sheet"><svg viewBox="0 0 660 710" role="img" aria-labelledby="svgt" style="max-width:660px;margin:0 auto;min-width:409px"><title id="svgt">1.2 Control directo con S3 y S4 en paralelo, con señalización</title><line class="w wf" x1="40" y1="40" x2="150" y2="40"/><text class="t name" x="30" y="46" text-anchor="end" style="fill:var(--fase)">L</text><text class="t name" x="30" y="686" text-anchor="end" style="fill:var(--neutro)">N</text><path id="w0" class="w wf" d="M40 40 L150 40"/><path id="w2" class="w wf" d="M150 40 L150 58"/><path id="w3" class="w wf" d="M150 222 L270 222"/><path id="w4" class="w wf" d="M270 222 L430 222"/><path id="w5" class="w wf" d="M430 222 L550 222"/><path id="w6" class="w wf" d="M150 200 L150 222"/><path id="w8" class="w wf" d="M150 222 L150 256"/><path id="w10" class="w wf" d="M270 222 L270 256"/><path id="w11" class="w wf" d="M150 322 L150 350"/><path id="w12" class="w wf" d="M270 322 L270 350 L150 350"/><path id="w14" class="w wn" d="M150 626 L150 680"/><path id="w15" class="w wf" d="M150 350 L150 574"/><path id="w17" class="w wf" d="M430 222 L430 380"/><path id="w19" class="w wn" d="M430 626 L430 680"/><path id="w20" class="w wf" d="M430 446 L430 574"/><path id="w22" class="w wf" d="M550 222 L550 380"/><path id="w24" class="w wn" d="M550 626 L550 680"/><path id="w25" class="w wf" d="M550 446 L550 574"/><path id="w26" class="w wn" d="M40 680 L150 680"/><path id="w27" class="w wn" d="M150 680 L430 680"/><path id="w28" class="w wn" d="M430 680 L550 680"/><circle cx="150" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="270" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="430" cy="222" r="5.5" style="fill:var(--fase)"/><circle cx="150" cy="350" r="5.5" style="fill:var(--fase)"/><circle cx="150" cy="680" r="5.5" style="fill:var(--neutro)"/><circle cx="430" cy="680" r="5.5" style="fill:var(--neutro)"/><path id="fl0" class="flow" d="M40 40 L150 40"/><path id="fl1" class="flow" d="M150 58 L150 200"/><path id="fl2" class="flow" d="M150 40 L150 58"/><path id="fl3" class="flow" d="M150 222 L270 222"/><path id="fl4" class="flow" d="M270 222 L430 222"/><path id="fl5" class="flow" d="M430 222 L550 222"/><path id="fl6" class="flow" d="M150 200 L150 222"/><path id="fl7" class="flow" d="M150 256 L150 322"/><path id="fl8" class="flow" d="M150 222 L150 256"/><path id="fl9" class="flow" d="M270 256 L270 322"/><path id="fl10" class="flow" d="M270 222 L270 256"/><path id="fl11" class="flow" d="M150 322 L150 350"/><path id="fl12" class="flow" d="M270 322 L270 350 L150 350"/><path id="fl13" class="flow" d="M150 574 L150 626"/><path id="fl14" class="flow" d="M150 626 L150 680"/><path id="fl15" class="flow" d="M150 350 L150 574"/><path id="fl16" class="flow" d="M430 380 L430 446"/><path id="fl17" class="flow" d="M430 222 L430 380"/><path id="fl18" class="flow" d="M430 574 L430 626"/><path id="fl19" class="flow" d="M430 626 L430 680"/><path id="fl20" class="flow" d="M430 446 L430 574"/><path id="fl21" class="flow" d="M550 380 L550 446"/><path id="fl22" class="flow" d="M550 222 L550 380"/><path id="fl23" class="flow" d="M550 574 L550 626"/><path id="fl24" class="flow" d="M550 626 L550 680"/><path id="fl25" class="flow" d="M550 446 L550 574"/><path id="fl26" class="flow" d="M40 680 L150 680"/><path id="fl27" class="flow" d="M150 680 L430 680"/><path id="fl28" class="flow" d="M430 680 L550 680"/><g id="g_Q1" class="hit" tabindex="0" role="button" aria-label="Magnetotérmico Q1: abrir o cerrar">
@@ -166,6 +176,7 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
     <div style="display:flex;flex-direction:column;gap:16px"><div class="card idea"><h2>Idea clave</h2><p><b>Paralelo = O</b>: basta con <b>uno</b>.</p><p>Fíjate en los <b>puntos de unión</b>: ahí se separan y se juntan las dos ramas.</p></div></div>
   </div>
   <p class="foot"><span class="pin">Doble clic</span> en un pulsador (en el esquema o en su botón) lo deja <b>fijado</b>, como si lo mantuvieras pulsado: así puedes pulsar varios a la vez con el ratón. Un clic más lo suelta. La línea amarilla que se mueve es la <b>corriente</b>. Toca -Q1 para abrirlo o cerrarlo. Teclado: <kbd>3</kbd> -S3, <kbd>4</kbd> -S4, <kbd>Q</kbd> magnetotérmico, <kbd>Esc</kbd> volver al índice. Los <b>bornes</b> son los tornillos del aparato.</p>
+  <a class="nextbig" href="p1_3_excluyentes.html">Siguiente: P1.3 Dos pulsadores en paralelo, pero excluyentes →</a>
 </main>
 <script>
 window.PAGE = {"edges": [{"t": "w", "a": "L", "b": "L1", "d": "M40 40 L150 40", "dr": "M150 40 L40 40"}, {"t": "q", "a": "d1t", "b": "d1b", "id": "Q1", "d": "M150 58 L150 200", "dr": "M150 200 L150 58"}, {"t": "w", "a": "L1", "b": "d1t", "d": "M150 40 L150 58", "dr": "M150 58 L150 40"}, {"t": "w", "a": "D150", "b": "D270", "d": "M150 222 L270 222", "dr": "M270 222 L150 222"}, {"t": "w", "a": "D270", "b": "D430", "d": "M270 222 L430 222", "dr": "M430 222 L270 222"}, {"t": "w", "a": "D430", "b": "D550", "d": "M430 222 L550 222", "dr": "M550 222 L430 222"}, {"t": "w", "a": "d1b", "b": "D150", "d": "M150 200 L150 222", "dr": "M150 222 L150 200"}, {"t": "no", "a": "d2t", "b": "d2b", "ctl": "S3", "d": "M150 256 L150 322", "dr": "M150 322 L150 256"}, {"t": "w", "a": "D150", "b": "d2t", "d": "M150 222 L150 256", "dr": "M150 256 L150 222"}, {"t": "no", "a": "d3t", "b": "d3b", "ctl": "S4", "d": "M270 256 L270 322", "dr": "M270 322 L270 256"}, {"t": "w", "a": "D270", "b": "d3t", "d": "M270 222 L270 256", "dr": "M270 256 L270 222"}, {"t": "w", "a": "d2b", "b": "J150", "d": "M150 322 L150 350", "dr": "M150 350 L150 322"}, {"t": "w", "a": "d3b", "b": "J150", "d": "M270 322 L270 350 L150 350", "dr": "M150 350 L270 350 L270 322"}, {"t": "l", "load": true, "id": "KM1", "a": "d4t", "b": "d4b", "d": "M150 574 L150 626", "dr": "M150 626 L150 574"}, {"t": "w", "a": "d4b", "b": "N_150", "d": "M150 626 L150 680", "dr": "M150 680 L150 626"}, {"t": "w", "a": "J150", "b": "d4t", "d": "M150 350 L150 574", "dr": "M150 574 L150 350"}, {"t": "no", "a": "d5t", "b": "d5b", "ctl": "KM1", "d": "M430 380 L430 446", "dr": "M430 446 L430 380"}, {"t": "w", "a": "D430", "b": "d5t", "d": "M430 222 L430 380", "dr": "M430 380 L430 222"}, {"t": "l", "load": true, "id": "H1", "a": "d6t", "b": "d6b", "d": "M430 574 L430 626", "dr": "M430 626 L430 574"}, {"t": "w", "a": "d6b", "b": "N_430", "d": "M430 626 L430 680", "dr": "M430 680 L430 626"}, {"t": "w", "a": "d5b", "b": "d6t", "d": "M430 446 L430 574", "dr": "M430 574 L430 446"}, {"t": "nc", "a": "d7t", "b": "d7b", "ctl": "KM1", "d": "M550 380 L550 446", "dr": "M550 446 L550 380"}, {"t": "w", "a": "D550", "b": "d7t", "d": "M550 222 L550 380", "dr": "M550 380 L550 222"}, {"t": "l", "load": true, "id": "H2", "a": "d8t", "b": "d8b", "d": "M550 574 L550 626", "dr": "M550 626 L550 574"}, {"t": "w", "a": "d8b", "b": "N_550", "d": "M550 626 L550 680", "dr": "M550 680 L550 626"}, {"t": "w", "a": "d7b", "b": "d8t", "d": "M550 446 L550 574", "dr": "M550 574 L550 446"}, {"t": "w", "a": "N", "b": "N_150", "d": "M40 680 L150 680", "dr": "M150 680 L40 680"}, {"t": "w", "a": "N_150", "b": "N_430", "d": "M150 680 L430 680", "dr": "M430 680 L150 680"}, {"t": "w", "a": "N_430", "b": "N_550", "d": "M430 680 L550 680", "dr": "M550 680 L430 680"}], "devs": [{"t": "q", "key": "d1", "id": "Q1"}, {"t": "no", "key": "d2", "ctl": "S3", "btn": true, "rm": null}, {"t": "no", "key": "d3", "ctl": "S4", "btn": true, "rm": null}, {"t": "coil", "key": "d4", "id": "KM1"}, {"t": "no", "key": "d5", "ctl": "KM1", "btn": false, "rm": null}, {"t": "lamp", "key": "d6", "id": "H1"}, {"t": "nc", "key": "d7", "ctl": "KM1", "btn": false, "rm": null}, {"t": "lamp", "key": "d8", "id": "H2"}], "buttons": ["S3", "S4"], "coils": ["KM1"], "qs": ["Q1"], "back": "index.html#practicas", "keys": {"3": "S3", "4": "S4", "q": "Q1"}};
@@ -309,7 +320,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT' && tg !== 'TEXTAREA' && tg !== 'SELECT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;
@@ -331,6 +342,14 @@ settle();
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me && !/\.html$/.test(me)) me += '.html'; if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
 })();</script>
 </body>
 </html>

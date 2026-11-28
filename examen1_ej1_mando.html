@@ -133,7 +133,6 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .howto li{margin:3px 0}
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
-.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
 </style>
 <style>
 main{max-width:1700px}
@@ -183,11 +182,12 @@ button.a{border-color:#E08A00} button.a.on{background:#E08A00;color:#fff}
 #sch[data-sel="d"] .halo.ap-d{display:inline}
 #sch[data-sel="e"] .halo.ap-e{display:inline}
 #sch[data-sel="f"] .halo.ap-f{display:inline}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás">Automatismos<span class="sep">›</span>Simulación de examen práctico<span class="sep">›</span><b>Ejercicio 1 · Mando</b></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Simulación de examen práctico</a><span class="sep">›</span><b>E1 Mando con luz de alarma</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <nav class="tabs" aria-label="Ejercicios del examen"><a href="examen1_ej1_mando.html" class="sel">Ejercicio 1 · Mando</a><a href="examen1_ej2_fuerza.html">Ejercicio 2 · Fuerza y mando</a></nav>
   <h1>Ejercicio 1 · Mando con luz de alarma<span class="sol">SOLUCIÓN</span></h1>
   <p class="sub">Dos contactores con marcha-paro y prioridad al paro. Cada térmico para solo su motor; si salta cualquiera, se encienden la luz de alarma -H3 y el piloto de avería -H4. Con -S5 (y el relé -KA1) se apaga la luz de alarma, pero -H4 sigue encendido hasta rearmar el térmico.</p>
@@ -363,7 +363,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT' && tg !== 'TEXTAREA' && tg !== 'SELECT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;

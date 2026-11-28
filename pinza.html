@@ -196,7 +196,7 @@ button:disabled{opacity:.45;cursor:default}
       <ul>
         <li>Arranca el motor tocando <b>-S1</b> en el esquema (o con el botón Marcha) y páralo con <b>-S0</b>. Con doble clic, un pulsador se queda <b>fijado</b>.</li>
         <li>Toca un <b>círculo amarillo</b> para poner ahí la pinza: en una fase, en los tres cables a la vez o en el cable de la bobina.</li>
-        <li>La línea amarilla que se mueve es la <b>corriente</b>. La pantalla de la pinza marca lo que pasa por el cable que abrazas.</li>
+        <li>Los puntos amarillos que se mueven por el cable son la <b>corriente</b>. La pantalla de la pinza marca lo que pasa por el cable que abrazas.</li>
         <li>Cambia cómo está el motor (normal, eje duro, falta una fase) y vuelve a medir las tres fases.</li>
         <li>Teclas: <kbd>M</kbd> marcha · <kbd>P</kbd> paro · <kbd>1</kbd> a <kbd>6</kbd> sitios de la pinza.</li>
       </ul>
@@ -369,11 +369,6 @@ draw();
   b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
-})();</script>
-<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
-  try {
-    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
-  } catch(e) {}
 })();</script>
 </body>
 </html>

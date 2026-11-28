@@ -29,7 +29,7 @@ h1{font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0 0 4px;line-height:1.15}
 /* barra superior (igual que el resto de la web) */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
 .tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
 .tbback:hover,.themebtn:hover{border-color:#1F4E79}
 .crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
 .crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
@@ -116,11 +116,12 @@ text{font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;fill:#111}
 .spin{transform-box:fill-box;transform-origin:center;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.spin{animation:none}}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#medidas" title="Volver (tecla Esc)" aria-label="Volver">←</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#medidas">Medidas</a><span class="sep">›</span><b id="crumbLast">Polímetro y pinza</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#medidas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#medidas">Medidas</a><span class="sep">›</span><b id="crumbLast">Polímetro y pinza</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <h1>Medidas con el polímetro y la pinza</h1>
   <p class="sub">Elige un circuito. Toca los pulsadores (doble toque para dejarlos fijos), sube o baja los magnetotérmicos, elige qué mides y pon las puntas tocando los <b>tornillos</b> (bornes) del esquema.</p>
   <nav class="tabs" id="tabs"></nav>
@@ -862,6 +863,6 @@ load((location.hash||'').slice(1));
     try { localStorage.setItem('tema', t); } catch(e){} paint(); });
   paint();
 })();</script>
-<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){if(e.target.tagName!=='INPUT'){e.preventDefault();location.href='index.html#medidas';}}});</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#medidas';}}});</script>
 </body>
 </html>

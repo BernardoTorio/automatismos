@@ -186,7 +186,7 @@ document.addEventListener('keydown', e => {
     if (zoom.style.display === 'flex') { zoom.style.display = 'none'; return; }
     location.href = 'index.html#tests'; return;
   }
-  if (e.key === 'Backspace' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+  if (e.key === 'Backspace' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {
     location.href = 'index.html#tests'; return;
   }
   if (state.screen !== 'q') return;

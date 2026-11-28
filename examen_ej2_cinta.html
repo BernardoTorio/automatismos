@@ -133,7 +133,6 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .howto li{margin:3px 0}
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
-.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
 </style>
 <style>
 main{max-width:1700px}
@@ -183,11 +182,12 @@ button.a{border-color:#E08A00} button.a.on{background:#E08A00;color:#fff}
 #sch[data-sel="d"] .halo.ap-d{display:inline}
 #sch[data-sel="e"] .halo.ap-e{display:inline}
 #sch[data-sel="f"] .halo.ap-f{display:inline}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás">Automatismos<span class="sep">›</span>Examen práctico<span class="sep">›</span><b>Ejercicio 2 · Cinta y triturador</b></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#practicas" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#practicas">Examen práctico</a><span class="sep">›</span><b>E2 Cinta y triturador</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
   <nav class="tabs" aria-label="Ejercicios del examen"><a href="examen_ej1_bombas.html">Ejercicio 1 · Bombas</a><a href="examen_ej2_cinta.html" class="sel">Ejercicio 2 · Cinta y triturador</a></nav>
   <h1>Ejercicio 2 · Cinta y triturador<span class="sol">SOLUCIÓN</span></h1>
   <p class="sub">Fuerza: -Q1 de 3 polos y, para cada motor, contactor, térmico y bornero. Mando: el triturador -KM1 con prioridad al paro y la cinta -KM2 con prioridad a la marcha; la cinta solo funciona si funciona el triturador. Los 95-96 en serie: cualquier térmico para todo.</p>
@@ -370,7 +370,7 @@ P.qs.forEach(function(q){ var f = function(){ st.q[q] = !st.q[q]; st.last = 'q';
 });
 (P.extra||[]).forEach(function(x){ click($(x.el), function(){ x.fn(st); settle(); }); });
 var keymap = P.keys || {};
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT' && tg !== 'TEXTAREA' && tg !== 'SELECT') { e.preventDefault(); location.href = P.back || 'index.html#practicas'; } } });
 document.addEventListener('keydown', function(e){
   if (e.repeat) return;
   var tag = e.target.tagName; if (tag === 'BUTTON' || tag === 'INPUT' || (e.target.getAttribute && e.target.getAttribute('role') === 'button')) return;

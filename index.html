@@ -71,7 +71,6 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .howto li{margin:3px 0}
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
-.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
 /* ---- rúbrica de las prácticas ---- */
 .rub{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:12px;padding:6px 16px 12px;margin:0 0 18px}
 .rub table{border-collapse:collapse;width:100%;font-size:.98rem}
@@ -99,8 +98,8 @@ details.grp summary:hover,details.grp summary:focus-visible{background:var(--bg)
 
 /* ===== portada: aspecto de los apuntes ===== */
 :root{--bg:#F4F1E8;--card:#FFFEFA;--line:#D6D0C0;--acc:#1a1a1a;--green:#5E8C1A;--fase:#D0191C;--neutro:#1F5FBF}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#16181b;--card:#1f2327;--line:#3a4047;--acc:#eef1f4;--green:#9CCB4A}}
-:root[data-theme="dark"]{--bg:#16181b;--card:#1f2327;--line:#3a4047;--acc:#eef1f4;--green:#9CCB4A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#16181b;--card:#1f2327;--line:#3a4047;--acc:#eef1f4;--green:#9CCB4A;--fase:#FF7A70;--neutro:#6FA8FF}}
+:root[data-theme="dark"]{--bg:#16181b;--card:#1f2327;--line:#3a4047;--acc:#eef1f4;--green:#9CCB4A;--fase:#FF7A70;--neutro:#6FA8FF}
 main{max-width:860px;padding-top:14px}
 .top{border-bottom:0;margin-bottom:14px;padding-bottom:0}
 .top small{color:var(--muted);letter-spacing:.06em;font-size:.82rem}
@@ -148,6 +147,7 @@ details.grp summary{color:var(--ink)}
 .tema.hoy{border-left:8px solid var(--green)}
 .vis{display:inline-block;margin-left:8px;font-size:.72rem;font-weight:700;color:var(--ink);border:1.5px solid var(--green);border-radius:999px;padding:1px 7px;white-space:nowrap;vertical-align:middle}
 .ahora .ruta a.seen::after{content:"✓ vista";font-size:.68rem;font-weight:700;color:var(--muted);line-height:1.1}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
 </style>
 </head>
 <body>
@@ -741,7 +741,7 @@ details.grp summary{color:var(--ink)}
   </a>
     </div>
   </details>
-    <p class="foot">Toca los aparatos del esquema para accionarlos. La línea amarilla que se mueve es la corriente.</p>
+    <p class="foot">Toca los aparatos del esquema para accionarlos. Los puntos amarillos que se mueven por los cables son la corriente.</p>
   </section>
   <section id="sec-tests">
     <h2 class="sec">Tests · repasa con preguntas tipo test</h2>
@@ -838,7 +838,7 @@ details.grp summary{color:var(--ink)}
 <script>(function(){
   // marca «vista» en las animaciones que ya se han abierto en este navegador
   function file(h){ return h.split('#')[0].split('?')[0]; }
-  function isAnim(h){ var f = file(h); return /\.html$/.test(f) && !/^(index|test_|medidas)/.test(f); }
+  function isAnim(h){ var f = file(h); return /\.html$/.test(f) && !/^(index|test_|medidas|pinza)/.test(f); }
   function seen(h){ try { return !!localStorage.getItem('visto:' + file(h)); } catch(e){ return false; } }
   function mark(){
     document.querySelectorAll('a.card[href], .ruta a[href]').forEach(function(a){
